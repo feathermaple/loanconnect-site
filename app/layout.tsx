@@ -53,9 +53,7 @@ export default function RootLayout({
   return (
     <html lang="zh-Hant">
       <head>
-        <meta
-          name="google-site-verification"
-          content="6GAJmOE_9Da5hl"
+       <meta name="google-site-verification" content="6GAJmOE_9Da5hLgAi6oa73iDM2f0BYhYInupwi7ORZU" />
         />
       </head>
       <body>{children}</body>
