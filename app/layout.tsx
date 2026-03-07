@@ -51,11 +51,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="zh-Hant">
+      <head>
+        <meta
+          name="google-site-verification"
+          content="6GAJmOE_9Da5hl"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
