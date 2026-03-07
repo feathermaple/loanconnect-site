@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://loanconnect-site-six.vercel.app/sitemap.xml",
+    sitemap: "https://loanconnect-site.vercel.app/sitemap.xml",
   };
 }

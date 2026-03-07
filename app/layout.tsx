@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://loanconnect-site-six.vercel.app"),
+  metadataBase: new URL("https://loanconnect-site.vercel.app"),
 
   title: {
     default: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
     description:
       "快速填表、專人聯繫，協助你找到合適的信用貸款、整合負債與小額借款方案。",
-    url: "https://loanconnect-site-six.vercel.app",
+    url: "https://loanconnect-site.vercel.app",
     siteName: "LoanConnect",
     locale: "zh_TW",
     type: "website",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: "https://loanconnect-site-six.vercel.app",
+    canonical: "https://loanconnect-site.vercel.app",
   },
 };
 
