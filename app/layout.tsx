@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://loanconnect-site.vercel.app"),
@@ -58,7 +59,10 @@ export default function RootLayout({
           content="6GAJmOE_9Da5hLgAi6oa73iDM2f0BYhYInupwi7ORZU"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
