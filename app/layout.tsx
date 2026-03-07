@@ -23,18 +23,21 @@ export const metadata: Metadata = {
     "LoanConnect",
   ],
 
-  verification: {
-    google: "6GAJmOE_9Da5hl",
-  },
-
   openGraph: {
     title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
     description:
-      "快速填表、專人聯繫，協助你找到合適的信用貸款與整合負債方案。",
+      "快速填表、專人聯繫，協助你找到合適的信用貸款、整合負債與小額借款方案。",
     url: "https://loanconnect-site.vercel.app",
     siteName: "LoanConnect",
     locale: "zh_TW",
     type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
+    description:
+      "快速填表、專人聯繫，協助你找到合適的信用貸款、整合負債與小額借款方案。",
   },
 
   alternates: {
@@ -49,6 +52,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-Hant">
+      <head>
+        <meta
+          name="google-site-verification"
+          content="6GAJmOE_9Da5hl"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
