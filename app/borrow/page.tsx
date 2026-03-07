@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     "填寫 LoanConnect 貸款申請表，快速評估信用貸款、小額借款與整合負債方案，專人協助媒合適合的貸款方案。",
 };
 
-0:45 2026/3/8import { cityOptions } from "@/lib/data";
+import { cityOptions } from "@/lib/data";
 import SectionTitle from "@/components/SectionTitle";
 
 export default function BorrowPage() {
