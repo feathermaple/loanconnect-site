@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "貸款知識文章｜信用貸款與負債整合指南",
+  description:
+    "LoanConnect 提供貸款知識文章，包括信用貸款條件、整合負債方法、小額借款注意事項等實用指南。",
+};
+
 import SectionTitle from "@/components/SectionTitle";
 import { blogSeed } from "@/lib/data";
 

@@ -1,4 +1,12 @@
-import { cityOptions } from "@/lib/data";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "信用貸款申請｜快速貸款評估",
+  description:
+    "填寫 LoanConnect 貸款申請表，快速評估信用貸款、小額借款與整合負債方案，專人協助媒合適合的貸款方案。",
+};
+
+0:45 2026/3/8import { cityOptions } from "@/lib/data";
 import SectionTitle from "@/components/SectionTitle";
 
 export default function BorrowPage() {

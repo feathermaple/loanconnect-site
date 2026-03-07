@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "貸款媒合平台｜合作放款機構",
+  description:
+    "LoanConnect 與多家貸款機構合作，提供信用貸款、整合負債與小額借款媒合服務。",
+};
+
 import SectionTitle from "@/components/SectionTitle";
 import { lendersSeed } from "@/lib/data";
 
