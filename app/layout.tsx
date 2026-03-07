@@ -59,7 +59,8 @@ export default function RootLayout({
           content="6GAJmOE_9Da5hLgAi6oa73iDM2f0BYhYInupwi7ORZU"
         />
       </head>
-      <body>
+
+      <body className="bg-[#f6f2ec] text-[#2f2a25]">
         <Navbar />
         {children}
       </body>
