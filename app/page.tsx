@@ -1,7 +1,9 @@
 import Link from "next/link";
 import QuickApplyCard from "@/components/QuickApplyCard";
 import SectionTitle from "@/components/SectionTitle";
-import { channels, faq, features, stats, steps } from "@/lib/data";
+import { channels, faq } from "@/lib/data";
+import ProcessSection from "@/components/home/process-section";
+import CtaSection from "@/components/home/cta-section";
 
 export default function HomePage() {
   return (
@@ -28,14 +30,14 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/borrow"
-                className="rounded-full bg-[#3e3a34] px-7 py-3 text-sm font-semibold text-white shadow-lg hover:opacity-95"
+                className="rounded-full bg-[#3e3a34] px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-95"
               >
                 立即免費評估
               </Link>
 
               <Link
                 href="/loan-info"
-                className="rounded-full border border-[#e6dfd5] bg-white px-7 py-3 text-sm font-semibold text-[#5f5750] hover:bg-[#f5f1eb]"
+                className="rounded-full border border-[#e6dfd5] bg-white px-7 py-3 text-sm font-semibold text-[#5f5750] transition hover:bg-[#f5f1eb]"
               >
                 了解貸款條件
               </Link>
@@ -43,35 +45,92 @@ export default function HomePage() {
 
             <div className="mt-10 grid grid-cols-3 gap-6 text-sm text-[#7a7269]">
               <div>
-                <div className="text-xl font-bold text-[#2f2a25]">100+</div>
-                <div>合作資金方案</div>
+                <div className="text-xl font-bold text-[#2f2a25]">1000+</div>
+                <div>需求評估案例</div>
               </div>
 
               <div>
-                <div className="text-xl font-bold text-[#2f2a25]">快速評估</div>
-                <div>線上填表</div>
+                <div className="text-xl font-bold text-[#2f2a25]">30 分鐘</div>
+                <div>平均初步回覆</div>
               </div>
 
               <div>
-                <div className="text-xl font-bold text-[#2f2a25]">專人協助</div>
-                <div>媒合方案</div>
+                <div className="text-xl font-bold text-[#2f2a25]">多方案</div>
+                <div>媒合評估方向</div>
               </div>
             </div>
+
+            <p className="mt-6 max-w-2xl text-xs leading-6 text-[#8a8178]">
+              提醒：本站提供需求評估與資訊媒合服務，實際申辦條件、額度、利率與核准結果，
+              仍需依個人條件與合作單位最終審核為準。
+            </p>
           </div>
 
           <QuickApplyCard />
         </div>
       </section>
 
-      {/* FEATURES */}
+      {/* POPULAR NEEDS */}
+      <section className="border-t border-line/70 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+          <SectionTitle
+            badge="熱門需求"
+            title="你現在比較像哪一種資金需求？"
+            desc="先從你的情況出發，快速找到適合的了解方向與申請入口。"
+          />
+
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              {
+                title: "信用貸款評估",
+                desc: "適合有穩定收入、想快速比較貸款方案的人。",
+                href: "/loan-info",
+              },
+              {
+                title: "整合負債規劃",
+                desc: "將多筆債務整合，降低月付壓力，改善資金配置。",
+                href: "/loan-info",
+              },
+              {
+                title: "短期資金週轉",
+                desc: "臨時需要週轉金時，先評估可行方案與申辦方向。",
+                href: "/borrow",
+              },
+              {
+                title: "借款流程諮詢",
+                desc: "不確定自己適合哪一種方案，可先由專人協助判斷。",
+                href: "/borrow",
+              },
+            ].map((item) => (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="group rounded-[28px] border border-line bg-paper p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              >
+                <div className="text-lg font-bold text-ink transition group-hover:text-[#3e3a34]">
+                  {item.title}
+                </div>
+                <p className="mt-3 text-sm leading-6 text-muted">{item.desc}</p>
+                <div className="mt-5 text-sm font-semibold text-[#5c534c]">
+                  了解更多 →
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PROCESS */}
+      <ProcessSection />
+
+      {/* FEATURES (優化版) */}
       <section className="border-y border-line/80 bg-paper/70 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 pt-8 md:px-6">
           {[
-            "SEO 文章佈局",
-            "廣告著陸頁導流",
-            "LINE 客服承接",
-            "會員註冊轉換",
-            "名單分流管理",
+            "快速需求評估",
+            "一對一協助說明",
+            "資料保密處理",
+            "條件透明了解",
           ].map((item) => (
             <div
               key={item}
@@ -84,19 +143,92 @@ export default function HomePage() {
 
         <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
           <SectionTitle
-            badge="平台特色"
-            title="簡單填表，快速媒合貸款方案"
-            desc="透過 LoanConnect，你可以快速提交需求，讓合適的貸款方案主動媒合。"
+            badge="平台優勢"
+            title="不只填表，更幫你釐清適合的借款方向"
+            desc="從需求了解、條件說明到後續媒合，讓借款流程更清楚，也更安心。"
           />
 
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {features.map(([title, desc]) => (
+            {[
+              [
+                "01 先了解再申請",
+                "先釐清資金用途、額度需求與條件方向，避免盲目申請造成額外負擔。",
+              ],
+              [
+                "02 專人協助說明",
+                "有疑問可先了解流程與評估方式，再決定是否進一步申請。",
+              ],
+              [
+                "03 依條件媒合評估",
+                "依個人情況與需求內容，協助判斷較適合的方案方向。",
+              ],
+              [
+                "04 流程透明安心",
+                "申請前先了解條件、聯繫流程與注意事項，降低資訊不對稱。",
+              ],
+            ].map(([title, desc]) => (
               <div
                 key={title}
-                className="rounded-[28px] border border-line bg-gradient-to-b from-paper to-soft p-6 shadow-sm"
+                className="min-h-[190px] rounded-[28px] border border-line bg-gradient-to-b from-paper to-soft p-6 shadow-sm"
               >
                 <div className="text-lg font-bold text-ink">{title}</div>
-                <p className="mt-3 text-sm leading-6 text-muted">{desc}</p>
+                <p className="mt-3 text-sm leading-7 text-muted">{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex gap-6 text-sm">
+            <Link href="/borrow" className="font-semibold text-[#5c534c]">
+              立即免費評估 →
+            </Link>
+
+            <Link href="/loan-info" className="font-semibold text-[#5c534c]">
+              先了解貸款條件 →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* TARGET USERS */}
+       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <div className="grid gap-8 rounded-[32px] border border-line bg-paper p-6 shadow-sm md:p-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <div className="inline-flex rounded-full border border-[#e8dfd4] bg-white px-3 py-1 text-xs font-semibold text-[#7a7269]">
+              適合對象
+            </div>
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-ink">
+              不確定自己適不適合？
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-muted md:text-base">
+              如果你正在比較貸款方式、想先了解條件、或擔心申請流程太複雜，
+              都可以先從免費評估開始。先了解，再決定，會比直接申請更安心。
+            </p>
+
+            <div className="mt-6">
+              <Link
+                href="/borrow"
+                className="inline-flex rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95"
+              >
+                先做免費評估
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              "上班族有資金需求",
+              "想整合多筆債務者",
+              "需要短期週轉者",
+              "第一次申請貸款者",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-[24px] border border-[#efe7de] bg-[#f9f6f1] p-5"
+              >
+                <div className="text-base font-bold text-ink">{item}</div>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  可先由專人協助了解條件與方向，再判斷下一步是否申請。
+                </p>
               </div>
             ))}
           </div>
@@ -104,9 +236,15 @@ export default function HomePage() {
       </section>
 
       {/* CHANNELS */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
-        <div className="mb-14 rounded-[32px] border border-line bg-paper p-6 shadow-sm md:p-8">
-          <div className="grid gap-6 lg:grid-cols-3">
+      <section className="mx-auto max-w-7xl px-4 pb-16 md:px-6">
+        <div className="rounded-[32px] border border-line bg-paper p-6 shadow-sm md:p-8">
+          <SectionTitle
+            badge="聯繫方式"
+            title="多種聯繫管道，依你的習慣選擇"
+            desc="可透過網站表單留下需求、由專人協助說明，或透過客服管道進一步了解流程。"
+          />
+
+          <div className="mt-8 grid gap-6 lg:grid-cols-3">
             {channels.map(([title, desc]) => (
               <div
                 key={title}
@@ -117,70 +255,93 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        <div className="mt-8 flex flex-wrap gap-4 text-sm">
+          <Link href="/borrow" className="font-semibold text-[#5c534c]">
+            立即免費評估 →
+            </Link>
+          <Link href="/contact" className="font-semibold text-[#5c534c]">
+            聯繫客服 →
+          </Link>
         </div>
+      </div>
+      </section>
 
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div>
-            <SectionTitle
-              badge="服務流程"
-              title="三個步驟完成貸款評估"
-              desc="簡單填表後，我們會協助你媒合適合的貸款方案。"
-            />
+      {/* KNOWLEDGE */}
+      <section className="border-y border-line/70 bg-[#fcfaf7]">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+          <SectionTitle
+            badge="知識專區"
+            title="先看懂借款重點，再做選擇"
+            desc="把常見觀念、申請重點與評估方向整理給你，幫助你做更穩的判斷。"
+          />
 
-            <div className="mt-8 space-y-4">
-              {[
-                "填寫貸款需求資料",
-                "專人評估與媒合方案",
-                "確認條件後安排申請流程",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-line bg-paper p-4 text-sm leading-7 text-muted shadow-sm"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-3">
-            {steps.map(([title, desc], i) => (
-              <div
-                key={title}
-                className="rounded-[28px] border border-line bg-paper p-6 shadow-sm"
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {[
+              {
+                title: "貸款申請前要注意什麼？",
+                desc: "先了解利率、期數、月付與審核重點，降低申請風險。",
+                href: "/articles",
+              },
+              {
+                title: "信用條件不足還可以評估嗎？",
+                desc: "不同條件適合不同方案，先評估再選擇比較安心。",
+                href: "/articles",
+              },
+              {
+                title: "整合負債有哪些常見優缺點？",
+                desc: "整理常見情況與適合族群，幫助你判斷是否需要整合。",
+                href: "/articles",
+              },
+            ].map((item) => (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="rounded-[28px] border border-line bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-ink text-sm font-bold text-white shadow-md">
-                  {i + 1}
+                <div className="text-lg font-bold text-ink">{item.title}</div>
+                <p className="mt-3 text-sm leading-6 text-muted">{item.desc}</p>
+                <div className="mt-5 text-sm font-semibold text-[#5c534c]">
+                  前往閱讀 →
                 </div>
-                <div className="text-xl font-bold text-ink">{title}</div>
-                <p className="mt-3 text-sm leading-6 text-muted">{desc}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="mx-auto max-w-5xl px-4 py-16 md:px-6">
-        <SectionTitle
-          badge="FAQ"
-          title="常見貸款問題"
-          desc="以下整理一些常見問題，幫助你更了解貸款流程。"
-          center
-        />
+      {/* CTA */}
+      <CtaSection />
 
-        <div className="mt-10 space-y-4">
-          {faq.map((item) => (
-            <div
-              key={item.q}
-              className="rounded-[28px] border border-line bg-paper p-6 shadow-sm"
-            >
-              <div className="text-lg font-semibold text-ink">{item.q}</div>
-              <div className="mt-2 text-sm leading-6 text-muted">{item.a}</div>
-            </div>
-          ))}
+     {/* FAQ */}
+<section className="mx-auto max-w-5xl px-4 py-16 md:px-6">
+  <SectionTitle
+    badge="FAQ"
+    title="常見貸款問題"
+    desc="以下整理一些常見問題，幫助你更了解貸款流程。"
+    center
+  />
+
+  <div className="mt-10 space-y-4">
+    {faq.map((item) => (
+      <details
+        key={item.q}
+        className="group rounded-[28px] border border-line bg-paper shadow-sm transition"
+      >
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left text-lg font-semibold text-ink outline-none [&::-webkit-details-marker]:hidden">
+          <span>{item.q}</span>
+
+          <span className="shrink-0 text-xl text-[#8b8178] transition-transform duration-200 group-open:rotate-45">
+            ＋
+          </span>
+        </summary>
+
+        <div className="border-t border-line/70 px-6 py-5 text-sm leading-7 text-muted">
+          {item.a}
         </div>
-      </section>
+      </details>
+    ))}
+  </div>
+</section>
     </>
   );
 }
