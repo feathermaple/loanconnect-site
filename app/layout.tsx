@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import GTM from "@/components/GTM";
+import AdminEntryButton from "@/components/AdminEntryButton";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://loanconnect-site.vercel.app"),
@@ -53,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-Hant">
+    <html lang="zh-Hant" suppressContentEditableWarning>
       <head>
         <meta
           name="google-site-verification"
@@ -62,8 +65,12 @@ export default function RootLayout({
       </head>
 
       <body className="bg-[#f6f2ec] text-[#2f2a25]">
+        <GoogleTagManager gtmId="GTM-MFLZMWPV" />
+        
         <Navbar />
+        <GTM />
         {children}
+        <AdminEntryButton />
         <Footer />
       </body>
     </html>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import QuickApplyCard from "@/components/QuickApplyCard";
 import SectionTitle from "@/components/SectionTitle";
 import { channels, faq } from "@/lib/data";
+import { articles } from "@/lib/articles";
 import ProcessSection from "@/components/home/process-section";
 import CtaSection from "@/components/home/cta-section";
 
@@ -123,7 +124,7 @@ export default function HomePage() {
       {/* PROCESS */}
       <ProcessSection />
 
-      {/* FEATURES (優化版) */}
+      {/* FEATURES */}
       <section className="border-y border-line/80 bg-paper/70 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 pt-8 md:px-6">
           {[
@@ -190,7 +191,7 @@ export default function HomePage() {
       </section>
 
       {/* TARGET USERS */}
-       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
         <div className="grid gap-8 rounded-[32px] border border-line bg-paper p-6 shadow-sm md:p-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <div className="inline-flex rounded-full border border-[#e8dfd4] bg-white px-3 py-1 text-xs font-semibold text-[#7a7269]">
@@ -255,15 +256,16 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        <div className="mt-8 flex flex-wrap gap-4 text-sm">
-          <Link href="/borrow" className="font-semibold text-[#5c534c]">
-            立即免費評估 →
+
+          <div className="mt-8 flex flex-wrap gap-4 text-sm">
+            <Link href="/borrow" className="font-semibold text-[#5c534c]">
+              立即免費評估 →
             </Link>
-          <Link href="/contact" className="font-semibold text-[#5c534c]">
-            聯繫客服 →
-          </Link>
+            <Link href="/contact" className="font-semibold text-[#5c534c]">
+              聯繫客服 →
+            </Link>
+          </div>
         </div>
-      </div>
       </section>
 
       {/* KNOWLEDGE */}
@@ -272,39 +274,42 @@ export default function HomePage() {
           <SectionTitle
             badge="知識專區"
             title="先看懂借款重點，再做選擇"
-            desc="把常見觀念、申請重點與評估方向整理給你，幫助你做更穩的判斷。"
+            desc="整理常見貸款觀念、申請流程與注意事項，幫助你做出更穩的資金決策。"
           />
 
           <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {[
-              {
-                title: "貸款申請前要注意什麼？",
-                desc: "先了解利率、期數、月付與審核重點，降低申請風險。",
-                href: "/articles",
-              },
-              {
-                title: "信用條件不足還可以評估嗎？",
-                desc: "不同條件適合不同方案，先評估再選擇比較安心。",
-                href: "/articles",
-              },
-              {
-                title: "整合負債有哪些常見優缺點？",
-                desc: "整理常見情況與適合族群，幫助你判斷是否需要整合。",
-                href: "/articles",
-              },
-            ].map((item) => (
+            {articles.slice(0, 3).map((article) => (
               <Link
-                key={item.title}
-                href={item.href}
+                key={article.slug}
+                href={`/articles/${article.slug}`}
                 className="rounded-[28px] border border-line bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
-                <div className="text-lg font-bold text-ink">{item.title}</div>
-                <p className="mt-3 text-sm leading-6 text-muted">{item.desc}</p>
+                <div className="text-sm font-semibold text-[#8a8178]">
+                  {article.category}
+                </div>
+
+                <div className="mt-2 text-lg font-bold text-ink">
+                  {article.title}
+                </div>
+
+                <p className="mt-3 text-sm leading-6 text-muted">
+                  {article.description}
+                </p>
+
                 <div className="mt-5 text-sm font-semibold text-[#5c534c]">
                   前往閱讀 →
                 </div>
               </Link>
             ))}
+          </div>
+
+          <div className="mt-10">
+            <Link
+              href="/articles"
+              className="inline-flex rounded-full border border-[#e6dfd5] bg-white px-6 py-3 text-sm font-semibold text-[#5f5750] transition hover:bg-[#f5f1eb]"
+            >
+              查看所有文章
+            </Link>
           </div>
         </div>
       </section>
@@ -312,36 +317,36 @@ export default function HomePage() {
       {/* CTA */}
       <CtaSection />
 
-     {/* FAQ */}
-<section className="mx-auto max-w-5xl px-4 py-16 md:px-6">
-  <SectionTitle
-    badge="FAQ"
-    title="常見貸款問題"
-    desc="以下整理一些常見問題，幫助你更了解貸款流程。"
-    center
-  />
+      {/* FAQ */}
+      <section className="mx-auto max-w-5xl px-4 py-16 md:px-6">
+        <SectionTitle
+          badge="FAQ"
+          title="常見貸款問題"
+          desc="以下整理一些常見問題，幫助你更了解貸款流程。"
+          center
+        />
 
-  <div className="mt-10 space-y-4">
-    {faq.map((item) => (
-      <details
-        key={item.q}
-        className="group rounded-[28px] border border-line bg-paper shadow-sm transition"
-      >
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left text-lg font-semibold text-ink outline-none [&::-webkit-details-marker]:hidden">
-          <span>{item.q}</span>
+        <div className="mt-10 space-y-4">
+          {faq.map((item) => (
+            <details
+              key={item.q}
+              className="group rounded-[28px] border border-line bg-paper shadow-sm transition"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left text-lg font-semibold text-ink outline-none [&::-webkit-details-marker]:hidden">
+                <span>{item.q}</span>
 
-          <span className="shrink-0 text-xl text-[#8b8178] transition-transform duration-200 group-open:rotate-45">
-            ＋
-          </span>
-        </summary>
+                <span className="shrink-0 text-xl text-[#8b8178] transition-transform duration-200 group-open:rotate-45">
+                  ＋
+                </span>
+              </summary>
 
-        <div className="border-t border-line/70 px-6 py-5 text-sm leading-7 text-muted">
-          {item.a}
+              <div className="border-t border-line/70 px-6 py-5 text-sm leading-7 text-muted">
+                {item.a}
+              </div>
+            </details>
+          ))}
         </div>
-      </details>
-    ))}
-  </div>
-</section>
+      </section>
     </>
   );
 }
