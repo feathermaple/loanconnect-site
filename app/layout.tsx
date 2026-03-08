@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import GTM from "@/components/GTM";
 import AdminEntryButton from "@/components/AdminEntryButton";
 import { GoogleTagManager } from "@next/third-parties/google";
 
@@ -68,7 +67,6 @@ export default function RootLayout({
         <GoogleTagManager gtmId="GTM-MFLZMWPV" />
         
         <Navbar />
-        <GTM />
         {children}
         <AdminEntryButton />
         <Footer />

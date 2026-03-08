@@ -1,14 +1,13 @@
-declare global {
-  interface Window {
-    dataLayer: Record<string, unknown>[];
-  }
-}
+type GTMEvent = Record<string, unknown>;
 
-export function pushEvent(event: Record<string, unknown>) {
+type GTMWindow = Window & {
+  dataLayer?: GTMEvent[];
+};
+
+export function pushEvent(event: GTMEvent) {
   if (typeof window === "undefined") return;
 
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push(event);
+  const gtmWindow = window as GTMWindow;
+  gtmWindow.dataLayer = gtmWindow.dataLayer || [];
+  gtmWindow.dataLayer.push(event);
 }
-
-export {};
