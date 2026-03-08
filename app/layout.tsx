@@ -64,6 +64,7 @@ export default function RootLayout({
       </head>
 
       <body className="bg-[#f6f2ec] text-[#2f2a25]">
+        
         <GoogleTagManager gtmId="GTM-MFLZMWPV" />
         
         <Navbar />
