@@ -55,7 +55,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-Hant" suppressContentEditableWarning>
+    <html lang="zh-Hant" suppressHydrationWarning>
       <head>
         <meta
           name="google-site-verification"
@@ -64,7 +64,7 @@ export default function RootLayout({
       </head>
 
       <body className="bg-[#f6f2ec] text-[#2f2a25]">
-        
+
         <GoogleTagManager gtmId="GTM-MFLZMWPV" />
         
         <Navbar />
