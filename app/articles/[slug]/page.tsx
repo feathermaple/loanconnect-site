@@ -27,6 +27,13 @@ export async function generateMetadata({
   return {
     title: article.title,
     description: article.description,
+    keywords: [
+      article.category,
+      article.title,
+      "貸款知識",
+      "信用貸款",
+      "借款教學",
+    ],
     alternates: {
       canonical: url,
     },
@@ -77,6 +84,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
     description: article.description,
     image: article.coverImage,
     datePublished: article.date,
+    dateModified: article.date,
     author: {
       "@type": "Organization",
       name: "LoanConnect",
@@ -85,7 +93,10 @@ export default async function ArticleDetailPage({ params }: PageProps) {
       "@type": "Organization",
       name: "LoanConnect",
     },
-    mainEntityOfPage: url,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
   };
 
   return (

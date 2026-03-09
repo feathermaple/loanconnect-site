@@ -27,6 +27,10 @@ export const metadata: Metadata = {
     "LoanConnect",
   ],
 
+  authors: [{ name: "LoanConnect" }],
+  creator: "LoanConnect",
+  publisher: "LoanConnect",
+
   openGraph: {
     title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
     description:
@@ -47,6 +51,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://loanconnect-site.vercel.app",
   },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -64,9 +73,7 @@ export default function RootLayout({
       </head>
 
       <body className="bg-[#f6f2ec] text-[#2f2a25]">
-
         <GoogleTagManager gtmId="GTM-MFLZMWPV" />
-        
         <Navbar />
         {children}
         <AdminEntryButton />
