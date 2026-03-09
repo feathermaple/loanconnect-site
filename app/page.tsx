@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import QuickApplyCard from "@/components/QuickApplyCard";
 import SectionTitle from "@/components/SectionTitle";
@@ -5,6 +6,43 @@ import { channels, faq } from "@/lib/data";
 import { articles } from "@/lib/articles";
 import ProcessSection from "@/components/home/process-section";
 import CtaSection from "@/components/home/cta-section";
+
+export const metadata: Metadata = {
+  title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
+  description:
+    "LoanConnect 提供信用貸款、整合負債與資金週轉需求評估服務，快速填表、專人聯繫，協助你找到適合的貸款方案。",
+  keywords: [
+    "貸款",
+    "信用貸款",
+    "整合負債",
+    "小額貸款",
+    "借款評估",
+    "貸款平台",
+    "貸款媒合",
+    "LoanConnect",
+  ],
+  alternates: {
+    canonical: "https://loanconnect-site.vercel.app",
+  },
+  openGraph: {
+    title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
+    description:
+      "快速填表、專人聯繫，協助你找到適合的信用貸款與資金方案。",
+    url: "https://loanconnect-site.vercel.app",
+    siteName: "LoanConnect",
+    locale: "zh_TW",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LoanConnect｜貸款評估平台",
+    description: "信用貸款、整合負債與資金週轉需求評估平台。",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 export default function HomePage() {
   return (
