@@ -37,6 +37,13 @@ export default function HomePage() {
               </Link>
 
               <Link
+                href="/credit-loan"
+                className="rounded-full border border-[#d8c2a8] bg-[#fffaf4] px-7 py-3 text-sm font-semibold text-[#6b5642] transition hover:bg-[#f8efe4]"
+              >
+                信用貸款專區
+              </Link>
+
+              <Link
                 href="/loan-info"
                 className="rounded-full border border-[#e6dfd5] bg-white px-7 py-3 text-sm font-semibold text-[#5f5750] transition hover:bg-[#f5f1eb]"
               >
@@ -85,7 +92,7 @@ export default function HomePage() {
               {
                 title: "信用貸款評估",
                 desc: "適合有穩定收入、想快速比較貸款方案的人。",
-                href: "/loan-info",
+                href: "/credit-loan",
               },
               {
                 title: "整合負債規劃",
@@ -178,9 +185,13 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-8 flex gap-6 text-sm">
+          <div className="mt-8 flex flex-wrap gap-6 text-sm">
             <Link href="/borrow" className="font-semibold text-[#5c534c]">
               立即免費評估 →
+            </Link>
+
+            <Link href="/credit-loan" className="font-semibold text-[#5c534c]">
+              前往信用貸款專區 →
             </Link>
 
             <Link href="/loan-info" className="font-semibold text-[#5c534c]">
@@ -205,12 +216,19 @@ export default function HomePage() {
               都可以先從免費評估開始。先了解，再決定，會比直接申請更安心。
             </p>
 
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap gap-4">
               <Link
                 href="/borrow"
                 className="inline-flex rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95"
               >
                 先做免費評估
+              </Link>
+
+              <Link
+                href="/credit-loan"
+                className="inline-flex rounded-full border border-[#d8c2a8] bg-[#fffaf4] px-6 py-3 text-sm font-semibold text-[#6b5642] transition hover:bg-[#f8efe4]"
+              >
+                看信用貸款方案
               </Link>
             </div>
           </div>
