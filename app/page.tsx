@@ -383,6 +383,58 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* HOME SEO INTERNAL LINKS */}
+      <section className="mx-auto max-w-6xl px-4 py-16 md:px-6">
+        <h2 className="mb-6 text-3xl font-black text-[#2f2a25]">
+          貸款資訊與評估
+        </h2>
+
+        <p className="mb-8 max-w-4xl leading-8 text-[#5f5750]">
+          LoanConnect 提供貸款知識整理與信用貸款評估服務，
+          讓你在申請貸款前能先了解申請條件、利率與流程，
+          再決定是否進一步申請。你可以先閱讀信用貸款介紹、查看貸款知識文章，
+          或直接填寫需求進行免費貸款評估。
+        </p>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          <Link
+            href="/credit-loan"
+            className="rounded-[28px] border border-[#e8e1d8] bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:bg-[#f8f5ef] hover:shadow-md"
+          >
+            <h3 className="mb-2 text-xl font-bold text-[#2f2a25]">
+              信用貸款介紹
+            </h3>
+            <p className="text-sm leading-7 text-[#6f675f]">
+              了解信用貸款申請條件、利率區間與申請流程，幫助你先建立完整概念。
+            </p>
+          </Link>
+
+          <Link
+            href="/articles"
+            className="rounded-[28px] border border-[#e8e1d8] bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:bg-[#f8f5ef] hover:shadow-md"
+          >
+            <h3 className="mb-2 text-xl font-bold text-[#2f2a25]">
+              貸款知識文章
+            </h3>
+            <p className="text-sm leading-7 text-[#6f675f]">
+              閱讀貸款知識、借款流程與常見問題整理，先看懂再評估更安心。
+            </p>
+          </Link>
+
+          <Link
+            href="/borrow"
+            className="rounded-[28px] border border-[#e8e1d8] bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:bg-[#f8f5ef] hover:shadow-md"
+          >
+            <h3 className="mb-2 text-xl font-bold text-[#2f2a25]">
+              免費貸款評估
+            </h3>
+            <p className="text-sm leading-7 text-[#6f675f]">
+              提交貸款需求，快速進行貸款方案評估，由專人協助釐清適合方向。
+            </p>
+          </Link>
+        </div>
+      </section>
+
       {/* CTA */}
       <CtaSection />
 
