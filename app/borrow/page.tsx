@@ -1,70 +1,271 @@
-import { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "信用貸款申請｜快速貸款評估",
-  description:
-    "填寫 LoanConnect 貸款申請表，快速評估信用貸款、小額借款與整合負債方案，專人協助媒合適合的貸款方案。",
-};
+declare global {
+  interface Window {
+    dataLayer?: Object[];
+  }
+}
 
+import { useState } from "react";
 import { cityOptions } from "@/lib/data";
 import SectionTitle from "@/components/SectionTitle";
 
 export default function BorrowPage() {
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    line_id: "",
+    city: "",
+    amount: "",
+    message: "",
+  });
+
+  const [agree, setAgree] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (key: keyof typeof form, value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!form.name.trim()) {
+      alert("請填寫姓名");
+      return;
+    }
+
+    if (!form.phone.trim()) {
+      alert("請填寫手機號碼");
+      return;
+    }
+
+    if (!agree) {
+      alert("請先勾選同意服務條款與隱私權說明");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...form,
+          company: "",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+  alert(data.error || "送出失敗，請稍後再試");
+  return;
+}
+
+if (typeof window !== "undefined") {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: "lead_submit",
+    form_name: "borrow_form",
+    page_path: "/borrow",
+  });
+
+  console.log("lead_submit pushed", window.dataLayer);
+}
+
+alert("申請已送出，我們會盡快與你聯繫");
+
+      setForm({
+        name: "",
+        phone: "",
+        line_id: "",
+        city: "",
+        amount: "",
+        message: "",
+      });
+
+      setAgree(false);
+    } catch (error) {
+      console.error(error);
+      alert("送出失敗，請稍後再試");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-      <SectionTitle badge="Borrow Page" title="立即申請" desc="這一頁可當正式送單頁，後續可加上驗證碼、OTP、地區分流與 CRM 串接。" />
+      <SectionTitle
+        badge="Borrow Page"
+        title="立即申請"
+        desc="填寫基本資料後，將由專人協助初步評估適合的貸款方向與方案。"
+      />
+
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        {/* 表單 */}
         <div className="rounded-[32px] border border-line bg-paper p-6 shadow-soft md:p-8">
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="姓名" placeholder="請輸入姓名" />
-            <Field label="手機號碼" placeholder="09xx-xxx-xxx" />
-            <Field label="LINE ID" placeholder="請輸入 LINE ID" />
-            <Field label="Email" placeholder="example@mail.com" />
+            <Field
+              label="姓名"
+              placeholder="請輸入姓名"
+              value={form.name}
+              onChange={(v) => handleChange("name", v)}
+            />
+
+            <Field
+              label="手機號碼"
+              placeholder="09xx-xxx-xxx"
+              value={form.phone}
+              onChange={(v) => handleChange("phone", v)}
+            />
+
+            <Field
+              label="LINE ID"
+              placeholder="請輸入 LINE ID"
+              value={form.line_id}
+              onChange={(v) => handleChange("line_id", v)}
+            />
+
+            <SelectField
+              label="地區"
+              value={form.city}
+              options={cityOptions}
+              onChange={(v) => handleChange("city", v)}
+            />
+
+            <SelectField
+              label="需求金額"
+              value={form.amount}
+              options={[
+                "1 - 5 萬",
+                "5 - 10 萬",
+                "10 - 30 萬",
+                "30 - 100 萬",
+                "100 萬以上",
+              ]}
+              onChange={(v) => handleChange("amount", v)}
+            />
           </div>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <SelectField label="地區" options={cityOptions} />
-            <SelectField label="借款類型" options={["小額周轉", "信用需求", "汽機車周轉", "企業周轉"]} />
-            <SelectField label="需求金額" options={["1 - 5 萬", "5 - 10 萬", "10 - 30 萬", "30 - 100 萬", "100 萬以上"]} />
-            <SelectField label="方便聯繫時段" options={["上午", "下午", "晚上", "都可以"]} />
-          </div>
+
           <div className="mt-4">
-            <label className="mb-2 block text-sm font-medium text-muted">需求補充</label>
-            <textarea rows={5} className="w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none transition focus:border-ink" placeholder="請補充你的需求內容" />
+            <label className="mb-2 block text-sm font-medium text-muted">
+              需求補充
+            </label>
+            <textarea
+              rows={5}
+              value={form.message}
+              onChange={(e) => handleChange("message", e.target.value)}
+              className="w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none transition focus:border-ink"
+              placeholder="請補充你的需求內容"
+            />
           </div>
-          <div className="mt-6 flex items-start gap-3 rounded-2xl border border-line bg-soft p-4 text-sm text-muted">
-            <input type="checkbox" className="mt-1 h-4 w-4" />
-            <span>我已閱讀並同意平台服務條款、隱私權政策與資料使用說明。</span>
+
+          <div className="mt-6 rounded-2xl border border-line bg-soft p-4">
+            <div className="flex items-start gap-3 text-sm text-muted">
+              <input
+                id="agree"
+                type="checkbox"
+                checked={agree}
+                onChange={(e) => setAgree(e.target.checked)}
+                className="mt-1 h-4 w-4"
+              />
+              <label htmlFor="agree" className="leading-6">
+                我已閱讀並同意平台服務條款、隱私權政策與資料使用說明。
+              </label>
+            </div>
           </div>
-          <button className="mt-6 w-full rounded-2xl bg-ink px-5 py-3 text-sm font-semibold text-white shadow-soft hover:-translate-y-0.5 transition">送出申請</button>
+
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="mt-6 w-full rounded-2xl bg-ink px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {loading ? "送出中..." : "送出申請"}
+          </button>
         </div>
 
+        {/* 右側說明 */}
         <div className="space-y-5">
-          <InfoCard title="頁面用途" desc="適合用在廣告導流後的正式申請頁，讓首頁與送單頁分工更清楚。" />
-          <InfoCard title="下一步可串接" desc="Google Sheets、CRM、Email 通知、LINE Notify、簡訊 OTP、資料庫 API。" />
-          <InfoCard title="建議補件" desc="品牌真實資訊、風險揭露、費用揭露、客服資料、法務頁面。" />
+          <InfoCard
+            title="申請後流程"
+            desc="送出資料後，將由專人與你聯繫，先了解需求、初步評估條件，再協助說明適合的貸款方向與後續流程。"
+          />
+
+          <InfoCard
+            title="適合這些情況"
+            desc="適合短期資金需求、上班族信用貸款、想整合多筆債務，或第一次申請貸款、想先了解條件與流程的人。"
+          />
+
+          <InfoCard
+            title="安心申請說明"
+            desc="資料僅用於貸款需求評估與聯繫，不會任意公開；流程以先了解、再決定為原則，讓你更安心掌握申請方向。"
+          />
         </div>
       </div>
     </section>
   );
 }
 
-function Field({ label, placeholder, type = "text" }: { label: string; placeholder: string; type?: string }) {
+function Field({
+  label,
+  placeholder,
+  value,
+  onChange,
+  type = "text",
+}: {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+}) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-muted">{label}</label>
-      <input type={type} className="w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none transition focus:border-ink" placeholder={placeholder} />
+      <label className="mb-2 block text-sm font-medium text-muted">
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none transition focus:border-ink"
+        placeholder={placeholder}
+      />
     </div>
   );
 }
 
-function SelectField({ label, options }: { label: string; options: string[] }) {
+function SelectField({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-muted">{label}</label>
-      <select className="w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none transition focus:border-ink">
-        <option>請選擇</option>
+      <label className="mb-2 block text-sm font-medium text-muted">
+        {label}
+      </label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none transition focus:border-ink"
+      >
+        <option value="">請選擇</option>
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
     </div>

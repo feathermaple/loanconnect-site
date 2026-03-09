@@ -78,6 +78,57 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* LOAN ENTRY */}
+      <section className="border-t border-line/70 bg-[#fcfaf7]">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+          <SectionTitle
+            badge="貸款入口"
+            title="依需求快速找到適合的貸款方向"
+            desc="把首頁流量導向主要貸款分類，讓使用者更快找到對應資訊，也有助於頁面權重傳遞。"
+            center
+          />
+
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              {
+                title: "信用貸款",
+                desc: "適合有穩定收入、想比較貸款方案與額度條件的人。",
+                href: "/credit-loan",
+              },
+              {
+                title: "整合負債",
+                desc: "整合多筆債務、降低月付壓力，改善整體資金配置。",
+                href: "/loan-info",
+              },
+              {
+                title: "資金週轉",
+                desc: "有短期週轉需求時，先了解可行方案與申辦方向。",
+                href: "/borrow",
+              },
+              {
+                title: "貸款知識",
+                desc: "先看懂貸款條件、流程與注意事項，再決定下一步。",
+                href: "/articles",
+              },
+            ].map((item) => (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="group rounded-[28px] border border-line bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              >
+                <div className="text-lg font-bold text-ink transition group-hover:text-[#3e3a34]">
+                  {item.title}
+                </div>
+                <p className="mt-3 text-sm leading-6 text-muted">{item.desc}</p>
+                <div className="mt-5 text-sm font-semibold text-[#5c534c]">
+                  立即查看 →
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* POPULAR NEEDS */}
       <section className="border-t border-line/70 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
