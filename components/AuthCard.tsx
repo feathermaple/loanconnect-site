@@ -1,16 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type Props = {
+  mode: "register" | "login";
   title: string;
   desc: string;
   primaryText: string;
   extraFields?: [string, string][];
 };
 
-export default function AuthCard({ title, desc, primaryText, extraFields = [] }: Props) {
+export default function AuthCard({
+  mode,
+  title,
+  desc,
+  primaryText,
+}: Props) {
+  const router = useRouter();
 
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -20,26 +28,46 @@ export default function AuthCard({ title, desc, primaryText, extraFields = [] }:
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  async function handleRegister() {
+  async function handleSubmit() {
     setLoading(true);
     setMsg("");
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          phone,
-          line_id: lineId,
-          company
-        }
-      }
-    });
+    if (!email || !password) {
+      setMsg("請輸入 Email 與密碼");
+      setLoading(false);
+      return;
+    }
 
-    if (error) {
-      setMsg(error.message);
+    if (mode === "register") {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: "https://loanconnect-site.vercel.app/auth/callback",
+          data: {
+            phone,
+            line_id: lineId,
+            company,
+          },
+        },
+      });
+
+      if (error) {
+        setMsg(error.message);
+      } else {
+        setMsg("註冊成功，請到信箱驗證 Email");
+      }
     } else {
-      setMsg("註冊成功，請到信箱驗證 Email");
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setMsg("登入失敗，請確認帳號、密碼，並先完成 Email 驗證");
+      } else {
+        router.push("/dashboard");
+      }
     }
 
     setLoading(false);
@@ -47,35 +75,33 @@ export default function AuthCard({ title, desc, primaryText, extraFields = [] }:
 
   return (
     <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-[1fr_0.95fr] md:px-6 md:py-16">
-
       <div className="flex flex-col justify-center rounded-[32px] bg-ink p-8 text-white md:p-10">
         <h2 className="text-4xl font-black">{title}</h2>
         <p className="mt-4 text-sm text-[#ddd3c7]">{desc}</p>
       </div>
 
       <div className="rounded-[32px] border border-line bg-paper p-6 shadow-soft md:p-8 space-y-4">
-
-        <Field label="手機號碼" value={phone} onChange={setPhone} />
-
-        <Field label="Email" value={email} onChange={setEmail} />
-
-        <Field label="密碼" type="password" value={password} onChange={setPassword} />
-
-        <Field label="營業名稱 / 店家名稱" value={company} onChange={setCompany} />
-
-        <Field label="LINE ID" value={lineId} onChange={setLineId} />
-
-        <button
-          onClick={handleRegister}
-          className="w-full rounded-2xl bg-ink px-5 py-3 text-white"
-        >
-          {loading ? "註冊中..." : primaryText}
-        </button>
-
-        {msg && (
-          <p className="text-sm text-center text-red-500">{msg}</p>
+        {mode === "register" && (
+          <>
+            <Field label="手機號碼" value={phone} onChange={setPhone} />
+            <Field label="營業名稱 / 店家名稱" value={company} onChange={setCompany} />
+            <Field label="LINE ID" value={lineId} onChange={setLineId} />
+          </>
         )}
 
+        <Field label="Email" type="email" value={email} onChange={setEmail} />
+        <Field label="密碼" type="password" value={password} onChange={setPassword} />
+
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full rounded-2xl bg-ink px-5 py-3 text-white disabled:opacity-60"
+        >
+          {loading ? "處理中..." : primaryText}
+        </button>
+
+        {msg && <p className="text-sm text-center text-red-500">{msg}</p>}
       </div>
     </section>
   );
@@ -85,12 +111,12 @@ function Field({
   label,
   value,
   onChange,
-  type = "text"
+  type = "text",
 }: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-  type?: string
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
 }) {
   return (
     <div>
