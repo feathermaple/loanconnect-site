@@ -6,6 +6,16 @@ export const metadata: Metadata = {
   title: "信用貸款是什麼？條件、利率、流程一次看懂",
   description:
     "想申請信用貸款卻不知道條件與利率？本頁整理信用貸款申請條件、利率比較、申請流程與常見問題，快速了解並進行貸款評估。",
+  keywords: [
+    "信用貸款",
+    "銀行信用貸款",
+    "信用貸款條件",
+    "信用貸款利率",
+    "貸款申請流程",
+    "貸款評估",
+    "整合負債",
+    "資金週轉",
+  ],
   alternates: {
     canonical: "https://loanconnect-site.vercel.app/credit-loan",
   },
@@ -17,6 +27,36 @@ export const metadata: Metadata = {
     siteName: "LoanConnect",
     locale: "zh_TW",
     type: "article",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "信用貸款是什麼？條件、利率、流程一次看懂",
+    description:
+      "整理信用貸款申請條件、利率比較、申請流程與常見問題，幫助你快速了解並進行貸款評估。",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: "信用貸款是什麼？申請條件、利率與流程一次看懂",
+  description:
+    "整理信用貸款申請條件、利率比較、申請流程與常見問題，幫助你快速了解並進行貸款評估。",
+  author: {
+    "@type": "Organization",
+    name: "LoanConnect",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "LoanConnect",
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": "https://loanconnect-site.vercel.app/credit-loan",
   },
 };
 
@@ -56,6 +96,10 @@ export default function CreditLoanPage() {
     <main className="mx-auto max-w-5xl px-6 py-12">
       <script
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
@@ -63,8 +107,7 @@ export default function CreditLoanPage() {
         <Link href="/" className="hover:underline">
           首頁
         </Link>{" "}
-        /{" "}
-        <span className="text-[#2f2a25] font-medium">信用貸款</span>
+        / <span className="font-medium text-[#2f2a25]">信用貸款</span>
       </div>
 
       <h1 className="mb-6 text-3xl font-bold leading-tight text-[#2f2a25]">
@@ -87,7 +130,7 @@ export default function CreditLoanPage() {
         </ul>
       </div>
 
-      <h2 className="mt-10 mb-4 text-2xl font-semibold text-[#2f2a25]">
+      <h2 className="mb-4 mt-10 text-2xl font-semibold text-[#2f2a25]">
         信用貸款申請條件
       </h2>
 
@@ -103,7 +146,7 @@ export default function CreditLoanPage() {
         <li>沒有嚴重信用瑕疵</li>
       </ul>
 
-      <h2 className="mt-10 mb-4 text-2xl font-semibold text-[#2f2a25]">
+      <h2 className="mb-4 mt-10 text-2xl font-semibold text-[#2f2a25]">
         信用貸款利率是多少？
       </h2>
 
@@ -117,7 +160,7 @@ export default function CreditLoanPage() {
         <QuickApplyCard />
       </div>
 
-      <h2 className="mt-10 mb-4 text-2xl font-semibold text-[#2f2a25]">
+      <h2 className="mb-4 mt-10 text-2xl font-semibold text-[#2f2a25]">
         信用貸款申請流程
       </h2>
 
@@ -132,7 +175,7 @@ export default function CreditLoanPage() {
         <li>核准後撥款</li>
       </ol>
 
-      <h2 className="mt-10 mb-4 text-2xl font-semibold text-[#2f2a25]">
+      <h2 className="mb-4 mt-10 text-2xl font-semibold text-[#2f2a25]">
         常見問題 FAQ
       </h2>
 
@@ -169,8 +212,7 @@ export default function CreditLoanPage() {
       <div className="mt-12 rounded-3xl bg-[#3e3a34] p-8 text-white">
         <h3 className="text-2xl font-bold">想了解自己適不適合申請信用貸款？</h3>
         <p className="mt-3 leading-7 text-[#efe7dd]">
-          可以先填寫基本需求，由 線上客服 協助初步評估方向，再決定是否進一步申請。
-          再決定是否進一步申請。
+          可以先填寫基本需求，由線上客服協助初步評估方向，再決定是否進一步申請。
         </p>
 
         <div className="mt-6">
