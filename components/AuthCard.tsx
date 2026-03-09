@@ -39,7 +39,7 @@ export default function AuthCard({
     }
 
     if (mode === "register") {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -54,23 +54,47 @@ export default function AuthCard({
 
       if (error) {
         setMsg(error.message);
-      } else {
-        setMsg("註冊成功，請到信箱驗證 Email");
+        setLoading(false);
+        return;
       }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
 
-      if (error) {
-        setMsg("登入失敗，請確認帳號、密碼，並先完成 Email 驗證");
-      } else {
-        router.push("/dashboard");
+      const userId = data.user?.id;
+
+      if (userId) {
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: userId,
+          email,
+          phone,
+          line_id: lineId,
+          company,
+          role: "member",
+        });
+
+        if (profileError) {
+          setMsg(`帳號已建立，但會員資料寫入失敗：${profileError.message}`);
+          setLoading(false);
+          return;
+        }
       }
+
+      setMsg("註冊成功，請到信箱驗證 Email");
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setMsg("登入失敗，請確認帳號、密碼，並先完成 Email 驗證");
+      setLoading(false);
+      return;
     }
 
     setLoading(false);
+    router.push("/dashboard");
   }
 
   return (
@@ -84,13 +108,22 @@ export default function AuthCard({
         {mode === "register" && (
           <>
             <Field label="手機號碼" value={phone} onChange={setPhone} />
-            <Field label="營業名稱 / 店家名稱" value={company} onChange={setCompany} />
+            <Field
+              label="營業名稱 / 店家名稱"
+              value={company}
+              onChange={setCompany}
+            />
             <Field label="LINE ID" value={lineId} onChange={setLineId} />
           </>
         )}
 
         <Field label="Email" type="email" value={email} onChange={setEmail} />
-        <Field label="密碼" type="password" value={password} onChange={setPassword} />
+        <Field
+          label="密碼"
+          type="password"
+          value={password}
+          onChange={setPassword}
+        />
 
         <button
           type="button"
@@ -101,7 +134,7 @@ export default function AuthCard({
           {loading ? "處理中..." : primaryText}
         </button>
 
-        {msg && <p className="text-sm text-center text-red-500">{msg}</p>}
+        {msg && <p className="text-center text-sm text-red-500">{msg}</p>}
       </div>
     </section>
   );
