@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const articleRoutes = articles.map((article) => ({
     url: `${baseUrl}/articles/${article.slug}`,
-    lastModified: article.date,
+    lastModified: article.date ? new Date(article.date) : now,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
@@ -21,6 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/borrow`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/credit-loan`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.9,
