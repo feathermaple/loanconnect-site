@@ -4,7 +4,12 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 只保護 /admin 後台
+  // 放行 admin 登入頁，避免無限重導
+  if (pathname === "/admin/login") {
+    return NextResponse.next();
+  }
+
+  // 只保護 /admin 後台其他頁面
   if (pathname.startsWith("/admin")) {
     const adminAuth = request.cookies.get("admin_auth")?.value;
 
