@@ -32,69 +32,59 @@ export default function AuthCard({
     setLoading(true);
     setMsg("");
 
-    if (!email || !password) {
-      setMsg("請輸入 Email 與密碼");
-      setLoading(false);
-      return;
-    }
-
-    if (mode === "register") {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: "https://loanconnect-site.vercel.app/auth/callback",
-          data: {
-            phone,
-            line_id: lineId,
-            company,
-          },
-        },
-      });
-
-      if (error) {
-        setMsg(error.message);
+    try {
+      if (!email || !password) {
+        setMsg("請輸入 Email 與密碼");
         setLoading(false);
         return;
       }
 
-      const userId = data.user?.id;
-
-      if (userId) {
-        const { error: profileError } = await supabase.from("profiles").upsert({
-          id: userId,
+      if (mode === "register") {
+        const { error } = await supabase.auth.signUp({
           email,
-          phone,
-          line_id: lineId,
-          company,
-          role: "member",
+          password,
+          options: {
+            emailRedirectTo:
+              "https://loanconnect-site.vercel.app/auth/callback",
+            data: {
+              phone,
+              line_id: lineId,
+              company,
+              role: "customer",
+            },
+          },
         });
 
-        if (profileError) {
-          setMsg(`帳號已建立，但會員資料寫入失敗：${profileError.message}`);
+        if (error) {
+          setMsg(error.message);
           setLoading(false);
           return;
         }
+
+        setMsg("註冊成功，請到信箱驗證 Email");
+        setLoading(false);
+        return;
       }
 
-      setMsg("註冊成功，請到信箱驗證 Email");
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setMsg("登入失敗，請確認帳號、密碼，並先完成 Email 驗證");
+        setLoading(false);
+        return;
+      }
+
       setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setMsg("登入失敗，請確認帳號、密碼，並先完成 Email 驗證");
+      router.push("/dashboard");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "發生未知錯誤，請稍後再試";
+      setMsg(message);
       setLoading(false);
-      return;
     }
-
-    setLoading(false);
-    router.push("/dashboard");
   }
 
   return (
@@ -104,7 +94,7 @@ export default function AuthCard({
         <p className="mt-4 text-sm text-[#ddd3c7]">{desc}</p>
       </div>
 
-      <div className="rounded-[32px] border border-line bg-paper p-6 shadow-soft md:p-8 space-y-4">
+      <div className="space-y-4 rounded-[32px] border border-line bg-paper p-6 shadow-soft md:p-8">
         {mode === "register" && (
           <>
             <Field label="手機號碼" value={phone} onChange={setPhone} />
@@ -134,7 +124,15 @@ export default function AuthCard({
           {loading ? "處理中..." : primaryText}
         </button>
 
-        {msg && <p className="text-center text-sm text-red-500">{msg}</p>}
+        {msg && (
+          <p
+            className={`text-center text-sm ${
+              msg.includes("成功") ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {msg}
+          </p>
+        )}
       </div>
     </section>
   );
