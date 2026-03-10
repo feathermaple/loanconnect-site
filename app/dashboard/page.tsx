@@ -28,13 +28,18 @@ export default function DashboardPage() {
   }, [loading, user, router]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLeadLoading(false);
+      return;
+    }
+
+    const userId = user.id;
 
     async function fetchLeads() {
       const { data, error } = await supabase
         .from("customer_leads")
         .select("*")
-        .eq("customer_user_id", user.id)
+        .eq("customer_user_id", userId)
         .order("created_at", { ascending: false });
 
       if (!error && data) {
@@ -59,17 +64,18 @@ export default function DashboardPage() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-12">
-
       <h1 className="text-5xl font-black text-ink">會員中心</h1>
 
       <div className="mt-10 grid gap-5 md:grid-cols-3">
         <Card title="會員 Email" value={user.email ?? "-"} />
         <Card title="會員 UID" value={user.id} />
-        <Card title="驗證狀態" value={user.email_confirmed_at ? "已驗證" : "未驗證"} />
+        <Card
+          title="驗證狀態"
+          value={user.email_confirmed_at ? "已驗證" : "未驗證"}
+        />
       </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-
         <div className="rounded-[28px] border border-line bg-paper p-6 shadow-sm">
           <div className="mb-5 text-xl font-bold">我的貸款申請</div>
 
@@ -78,14 +84,11 @@ export default function DashboardPage() {
           )}
 
           {!leadLoading && leads.length === 0 && (
-            <div className="text-sm text-[#8a8178]">
-              尚未有申請紀錄
-            </div>
+            <div className="text-sm text-[#8a8178]">尚未有申請紀錄</div>
           )}
 
           {!leadLoading && leads.length > 0 && (
             <div className="space-y-4">
-
               {leads.map((lead) => (
                 <div
                   key={lead.id}
@@ -109,7 +112,6 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ))}
-
             </div>
           )}
         </div>
@@ -118,7 +120,6 @@ export default function DashboardPage() {
           <InfoCard title="客服追蹤" desc="客服回覆與案件追蹤紀錄。" />
           <InfoCard title="帳號設定" desc="修改會員資料與密碼設定。" />
         </div>
-
       </div>
     </section>
   );
