@@ -6,7 +6,16 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { name, phone, line_id, city, amount, message, company, customer_user_id } = body ?? {};
+    const {
+      name,
+      phone,
+      line_id,
+      city,
+      amount,
+      message,
+      company,
+      customer_user_id,
+    } = body ?? {};
 
     if (company) {
       return NextResponse.json({ success: true });
@@ -42,7 +51,7 @@ export async function POST(req: Request) {
         city: city || null,
         amount: amount || null,
         message: message || null,
-        status: "new"
+        status: "new",
       },
     ]);
 
@@ -70,7 +79,6 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "server error";
     return NextResponse.json({ error: message }, { status: 500 });

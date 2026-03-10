@@ -104,7 +104,7 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="mt-2 text-sm">
-                    申請金額：{lead.amount?.toLocaleString()} 元
+                    申請金額：{lead.amount || "-"}
                   </div>
 
                   <div className="mt-1 text-sm text-[#8a8178]">

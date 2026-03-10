@@ -1,11 +1,5 @@
 "use client";
 
-declare global {
-  interface Window {
-    dataLayer?: object[];
-  }
-}
-
 import { useState } from "react";
 import { cityOptions } from "@/lib/data";
 import SectionTitle from "@/components/SectionTitle";
@@ -71,8 +65,7 @@ export default function BorrowPage() {
         return;
       }
 
-      if (typeof window !== "undefined") {
-        window.dataLayer = window.dataLayer || [];
+      if (typeof window !== "undefined" && window.dataLayer) {
         window.dataLayer.push({
           event: "lead_submit",
           form_name: "borrow_form",
@@ -184,6 +177,7 @@ export default function BorrowPage() {
           </div>
 
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={loading}
             className="mt-6 w-full rounded-2xl bg-ink px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
