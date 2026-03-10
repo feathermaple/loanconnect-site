@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { name, phone, line_id, city, amount, message, company } = body ?? {};
+    const { name, phone, line_id, city, amount, message, company, customer_user_id } = body ?? {};
 
     if (company) {
       return NextResponse.json({ success: true });
@@ -33,14 +33,16 @@ export async function POST(req: Request) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { error } = await supabase.from("leads").insert([
+    const { error } = await supabase.from("customer_leads").insert([
       {
+        customer_user_id: customer_user_id || null,
         name,
         phone,
         line_id: line_id || null,
         city: city || null,
         amount: amount || null,
         message: message || null,
+        status: "new"
       },
     ]);
 
@@ -68,6 +70,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true });
+
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "server error";
     return NextResponse.json({ error: message }, { status: 500 });
