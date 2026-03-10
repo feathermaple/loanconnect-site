@@ -1,12 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/useAuth";
+import { supabase } from "@/lib/supabase";
+
+type Lead = {
+  id: string;
+  amount: number;
+  city: string;
+  district: string;
+  status: string;
+  created_at: string;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leadLoading, setLeadLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -14,9 +27,29 @@ export default function DashboardPage() {
     }
   }, [loading, user, router]);
 
+  useEffect(() => {
+    if (!user) return;
+
+    async function fetchLeads() {
+      const { data, error } = await supabase
+        .from("customer_leads")
+        .select("*")
+        .eq("customer_user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (!error && data) {
+        setLeads(data);
+      }
+
+      setLeadLoading(false);
+    }
+
+    fetchLeads();
+  }, [user]);
+
   if (loading) {
     return (
-      <main className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
+      <main className="mx-auto max-w-7xl px-4 py-12">
         <div className="text-sm text-[#8a8178]">載入會員資料中...</div>
       </main>
     );
@@ -25,15 +58,9 @@ export default function DashboardPage() {
   if (!user) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-      <div className="inline-flex rounded-full border border-line bg-paper px-4 py-1 text-sm text-[#8a8178]">
-        Dashboard
-      </div>
+    <section className="mx-auto max-w-7xl px-4 py-12">
 
-      <h1 className="mt-4 text-5xl font-black tracking-tight text-ink">會員中心</h1>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-        歡迎回來，這裡先顯示目前會員帳號資料。下一步可再接上借款申請紀錄、會員資料表與客服紀錄。
-      </p>
+      <h1 className="text-5xl font-black text-ink">會員中心</h1>
 
       <div className="mt-10 grid gap-5 md:grid-cols-3">
         <Card title="會員 Email" value={user.email ?? "-"} />
@@ -41,28 +68,57 @@ export default function DashboardPage() {
         <Card title="驗證狀態" value={user.email_confirmed_at ? "已驗證" : "未驗證"} />
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+
         <div className="rounded-[28px] border border-line bg-paper p-6 shadow-sm">
-          <div className="mb-5 text-xl font-bold text-ink">我的資料</div>
-          <div className="space-y-4 text-sm">
-            <InfoRow label="Email" value={user.email ?? "-"} />
-            <InfoRow label="會員 ID" value={user.id} />
-            <InfoRow
-              label="Email 驗證"
-              value={user.email_confirmed_at ? "已完成" : "尚未完成"}
-            />
-            <InfoRow
-              label="建立時間"
-              value={user.created_at ? new Date(user.created_at).toLocaleString("zh-TW") : "-"}
-            />
-          </div>
+          <div className="mb-5 text-xl font-bold">我的貸款申請</div>
+
+          {leadLoading && (
+            <div className="text-sm text-[#8a8178]">載入申請資料...</div>
+          )}
+
+          {!leadLoading && leads.length === 0 && (
+            <div className="text-sm text-[#8a8178]">
+              尚未有申請紀錄
+            </div>
+          )}
+
+          {!leadLoading && leads.length > 0 && (
+            <div className="space-y-4">
+
+              {leads.map((lead) => (
+                <div
+                  key={lead.id}
+                  className="rounded-xl border border-[#eee4d8] p-4"
+                >
+                  <div className="flex justify-between text-sm">
+                    <span className="font-bold">
+                      {lead.city} {lead.district}
+                    </span>
+                    <span className="text-[#8a8178]">
+                      {new Date(lead.created_at).toLocaleDateString("zh-TW")}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 text-sm">
+                    申請金額：{lead.amount?.toLocaleString()} 元
+                  </div>
+
+                  <div className="mt-1 text-sm text-[#8a8178]">
+                    狀態：{lead.status}
+                  </div>
+                </div>
+              ))}
+
+            </div>
+          )}
         </div>
 
         <div className="space-y-5">
-          <InfoCard title="借款申請" desc="下一步可接上 leads 資料，顯示會員自己的申請紀錄。" />
-          <InfoCard title="客服追蹤" desc="下一步可補上 LINE 客服、指派顧問與回覆紀錄。" />
-          <InfoCard title="帳號設定" desc="下一步可補修改密碼、會員資料與通知設定。" />
+          <InfoCard title="客服追蹤" desc="客服回覆與案件追蹤紀錄。" />
+          <InfoCard title="帳號設定" desc="修改會員資料與密碼設定。" />
         </div>
+
       </div>
     </section>
   );
@@ -77,20 +133,11 @@ function Card({ title, value }: { title: string; value: string }) {
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-b border-[#f0e9df] pb-4 last:border-b-0">
-      <div className="text-xs text-[#8a8178]">{label}</div>
-      <div className="mt-1 break-all text-sm text-muted">{value}</div>
-    </div>
-  );
-}
-
 function InfoCard({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="rounded-[28px] border border-line bg-paper p-6 shadow-sm">
-      <div className="text-lg font-bold text-ink">{title}</div>
-      <p className="mt-3 text-sm leading-6 text-muted">{desc}</p>
+      <div className="text-lg font-bold">{title}</div>
+      <p className="mt-3 text-sm text-[#8a8178]">{desc}</p>
     </div>
   );
 }
