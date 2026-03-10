@@ -2,15 +2,18 @@
 
 declare global {
   interface Window {
-    dataLayer?: Object[];
+    dataLayer?: object[];
   }
 }
 
 import { useState } from "react";
 import { cityOptions } from "@/lib/data";
 import SectionTitle from "@/components/SectionTitle";
+import { useAuth } from "@/components/useAuth";
 
 export default function BorrowPage() {
+  const { user } = useAuth();
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -57,28 +60,29 @@ export default function BorrowPage() {
         body: JSON.stringify({
           ...form,
           company: "",
+          customer_user_id: user?.id || null,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-  alert(data.error || "送出失敗，請稍後再試");
-  return;
-}
+        alert(data.error || "送出失敗，請稍後再試");
+        return;
+      }
 
-if (typeof window !== "undefined") {
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
-    event: "lead_submit",
-    form_name: "borrow_form",
-    page_path: "/borrow",
-  });
+      if (typeof window !== "undefined") {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "lead_submit",
+          form_name: "borrow_form",
+          page_path: "/borrow",
+        });
 
-  console.log("lead_submit pushed", window.dataLayer);
-}
+        console.log("lead_submit pushed", window.dataLayer);
+      }
 
-alert("申請已送出，我們會盡快與你聯繫");
+      alert("申請已送出，我們會盡快與你聯繫");
 
       setForm({
         name: "",
@@ -107,7 +111,6 @@ alert("申請已送出，我們會盡快與你聯繫");
       />
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-        {/* 表單 */}
         <div className="rounded-[32px] border border-line bg-paper p-6 shadow-soft md:p-8">
           <div className="grid gap-4 md:grid-cols-2">
             <Field
@@ -189,7 +192,6 @@ alert("申請已送出，我們會盡快與你聯繫");
           </button>
         </div>
 
-        {/* 右側說明 */}
         <div className="space-y-5">
           <InfoCard
             title="申請後流程"
