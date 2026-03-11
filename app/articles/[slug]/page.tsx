@@ -340,6 +340,31 @@ export default async function ArticleDetailPage({ params }: PageProps) {
         }
       : null;
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "首頁",
+        item: "https://loanconnect-site.vercel.app",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "知識專區",
+        item: "https://loanconnect-site.vercel.app/articles",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: article.title,
+        item: url,
+      },
+    ],
+  };
+
   return (
     <main className="bg-[#f8f5ef] text-[#2f2a25]">
       <script
@@ -357,6 +382,13 @@ export default async function ArticleDetailPage({ params }: PageProps) {
           }}
         />
       ) : null}
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd),
+        }}
+      />
 
       <section className="border-b border-[#e8e1d8] bg-[#fbf8f3]">
         <div className="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-20">
@@ -400,6 +432,18 @@ export default async function ArticleDetailPage({ params }: PageProps) {
 
       <section className="mx-auto max-w-4xl px-4 py-16 md:px-6">
         <div className="rounded-[32px] border border-[#e8e1d8] bg-white p-8 shadow-sm md:p-10">
+          <div className="mb-8 text-sm text-[#8a8178]">
+            <Link href="/" className="transition hover:text-[#2f2a25]">
+              首頁
+            </Link>
+            <span className="mx-2">/</span>
+            <Link href="/articles" className="transition hover:text-[#2f2a25]">
+              知識專區
+            </Link>
+            <span className="mx-2">/</span>
+            <span className="text-[#2f2a25]">{article.title}</span>
+          </div>
+
           {blocks.length > 0 ? (
             <div className="space-y-12">
               {blocks.map((block, index) => (
@@ -518,14 +562,17 @@ export default async function ArticleDetailPage({ params }: PageProps) {
                   <div className="text-xs font-semibold text-[#8a8178]">
                     {getCategory(item.title)}
                   </div>
-                  <h3 className="mt-2 line-clamp-2 text-xl font-black leading-snug text-[#2f2a25]">
+
+                  <h3 className="mt-3 line-clamp-2 text-xl font-black leading-snug transition group-hover:text-[#7a7269]">
                     {item.title}
                   </h3>
+
                   <p className="mt-3 line-clamp-3 text-sm leading-7 text-[#6f675f]">
-                    {item.excerpt || "查看更多貸款知識與申請重點整理。"}
+                    {item.excerpt?.trim() || "延伸閱讀更多貸款申請與評估重點。"}
                   </p>
+
                   <div className="mt-5 text-sm font-semibold text-[#2f2a25]">
-                    閱讀文章 →
+                    繼續閱讀 →
                   </div>
                 </div>
               </Link>
