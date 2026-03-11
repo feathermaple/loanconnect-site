@@ -6,16 +6,18 @@ const supabase = createClient(
 );
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export default async function ArticlePage({ params }: Props) {
+  const { slug } = await params;
+
   const { data: article } = await supabase
     .from("articles")
     .select("*")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .single();
 
   if (!article) {
