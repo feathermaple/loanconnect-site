@@ -23,10 +23,10 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
         <Link href="/" className="shrink-0 leading-tight">
           <div className="text-2xl font-bold tracking-tight text-[#2f2a25]">
-            LoanConnect
+            全台貸款服務
           </div>
           <div className="text-[12px] text-[#8a8178]">
-            暖白米色信任系平台網站
+            貸款媒合平台
           </div>
         </Link>
 

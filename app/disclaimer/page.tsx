@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "費用與風險揭露",
   description:
-    "了解貸款相關費用、利率計算方式與可能風險，LoanConnect 提供透明資訊說明。",
+    "了解貸款相關費用、利率計算方式與可能風險，本平台 提供透明資訊說明。",
 };
 
 export default function RiskPage() {
@@ -21,7 +21,7 @@ export default function RiskPage() {
 
           <p className="mt-6 max-w-3xl text-base leading-8 text-[#6f675f] md:text-lg">
             在申請貸款前，建議您充分了解貸款條件、利率計算方式與可能產生的費用與風險。
-            LoanConnect 提供資訊與需求媒合服務，實際貸款條件仍以審核結果為準。
+            本平台 提供資訊與需求媒合服務，實際貸款條件仍以審核結果為準。
           </p>
         </div>
       </section>
@@ -71,7 +71,7 @@ export default function RiskPage() {
           <section>
             <h2 className="text-2xl font-black">五、媒合服務說明</h2>
             <p className="mt-4 text-sm leading-8 text-[#6f675f] md:text-base">
-              LoanConnect 為貸款需求資訊媒合平台，
+              本平台 為貸款需求資訊媒合平台，
               提供貸款資訊整理與需求評估服務，
               並非直接放款機構。最終貸款條件與審核結果，
               仍由合作機構或相關單位決定。

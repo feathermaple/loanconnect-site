@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
         throw new Error(data?.error || "登入失敗");
       }
 
-      router.push("/dashboard/leads");
+      router.push("/admin/leads");
       router.refresh();
     } catch (err: any) {
       setError(err?.message || "登入失敗");

@@ -5,15 +5,15 @@ export default function Footer() {
     <footer className="border-t border-line bg-paper">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 md:grid-cols-3 md:px-6">
         <div>
-          <div className="text-lg font-black text-ink">LoanConnect</div>
+          <div className="text-lg font-black text-ink">貸款媒合平台</div>
           <p className="mt-3 text-sm leading-7 text-muted">
-            借款媒合型網站前端專案展示。適合承接 SEO、廣告與 LINE／社群流量，
-            讓使用者能更快了解借款條件與申請方向。
+            提供貸款資訊與媒合服務，協助用戶快速找到合適資金方案。
+            
           </p>
         </div>
 
         <div>
-          <div className="font-semibold text-ink">建議補齊頁面</div>
+          <div className="font-semibold text-ink">條款政策</div>
           <ul className="mt-4 space-y-3 text-sm text-muted">
             <li>
               <Link href="/terms" className="transition hover:text-ink">

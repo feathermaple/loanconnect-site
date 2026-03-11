@@ -6,11 +6,12 @@ import { channels, faq } from "@/lib/data";
 import { articles } from "@/lib/articles";
 import ProcessSection from "@/components/home/process-section";
 import CtaSection from "@/components/home/cta-section";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
+  title: "｜貸款評估、信用貸款、整合負債媒合平台",
   description:
-    "LoanConnect 提供信用貸款、整合負債與資金週轉需求評估服務，快速填表、專人聯繫，協助你找到適合的貸款方案。",
+    "本平台 提供信用貸款、整合負債與資金週轉需求評估服務，快速填表、專人聯繫，協助你找到適合的貸款方案。",
   keywords: [
     "貸款",
     "信用貸款",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     canonical: "https://loanconnect-site.vercel.app",
   },
   openGraph: {
-    title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
+    title: "｜貸款評估、信用貸款、整合負債媒合平台",
     description:
       "快速填表、專人聯繫，協助你找到適合的信用貸款與資金方案。",
     url: "https://loanconnect-site.vercel.app",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "LoanConnect｜貸款評估平台",
+    title: "｜貸款評估平台",
     description: "信用貸款、整合負債與資金週轉需求評估平台。",
   },
   robots: {
@@ -57,7 +58,15 @@ const faqSchema = {
   })),
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = createAdminClient();
+
+  const { data: stats } = await supabase
+    .from("site_stats")
+    .select("*")
+    .limit(1)
+    .single();
+
   return (
     <>
       <script
@@ -72,7 +81,7 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 md:grid-cols-[1.1fr_0.9fr] md:px-6 md:py-24">
           <div className="flex flex-col justify-center">
             <div className="mb-4 inline-flex w-fit rounded-full border border-[#e6dfd5] bg-white px-3 py-1 text-xs font-semibold text-[#7a7269]">
-              LoanConnect 貸款媒合平台
+              貸款媒合平台
             </div>
 
             <h1 className="max-w-3xl text-4xl font-black leading-tight text-[#2f2a25] md:text-5xl">
@@ -81,7 +90,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-[#6f675f] md:text-lg">
-              LoanConnect 提供信用貸款、整合負債與資金週轉需求媒合服務，
+              本平台提供信用貸款、整合負債與資金週轉需求媒合服務，
               只需填寫簡單資料，即可快速評估貸款方案，
               專人協助聯繫，讓資金需求更安心、更透明。
             </p>
@@ -111,18 +120,24 @@ export default function HomePage() {
 
             <div className="mt-10 grid grid-cols-3 gap-6 text-sm text-[#7a7269]">
               <div>
-                <div className="text-xl font-bold text-[#2f2a25]">1000+</div>
+                <div className="text-xl font-bold text-[#2f2a25]">
+                  {stats?.applied_count ?? 1000}+
+                </div>
                 <div>需求評估案例</div>
               </div>
 
               <div>
-                <div className="text-xl font-bold text-[#2f2a25]">30 分鐘</div>
-                <div>平均初步回覆</div>
+                <div className="text-xl font-bold text-[#2f2a25]">
+                  {stats?.member_count ?? 356}
+                </div>
+                <div>會員人數</div>
               </div>
 
               <div>
-                <div className="text-xl font-bold text-[#2f2a25]">多方案</div>
-                <div>媒合評估方向</div>
+                <div className="text-xl font-bold text-[#2f2a25]">
+                  {stats?.closed_count ?? 98}
+                </div>
+                <div>成功媒合</div>
               </div>
             </div>
 
@@ -448,7 +463,7 @@ export default function HomePage() {
         </h2>
 
         <p className="mb-8 max-w-4xl leading-8 text-[#5f5750]">
-          LoanConnect 提供貸款知識整理與信用貸款評估服務，
+          本平台 提供貸款知識整理與信用貸款評估服務，
           讓你在申請貸款前能先了解申請條件、利率與流程，
           再決定是否進一步申請。你可以先閱讀信用貸款介紹、查看貸款知識文章，
           或直接填寫需求進行免費貸款評估。

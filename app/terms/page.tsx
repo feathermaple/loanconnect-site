@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "服務條款",
   description:
-    "了解 LoanConnect 網站使用規範、服務內容、責任限制與相關條款說明。",
+    "了解 本平台 網站使用規範、服務內容、責任限制與相關條款說明。",
 };
 
 export default function TermsPage() {
@@ -18,7 +18,7 @@ export default function TermsPage() {
             服務條款
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-8 text-[#6f675f] md:text-lg">
-            歡迎使用 LoanConnect。本網站提供貸款需求評估、資訊整理與媒合相關服務。
+            歡迎使用 本平台。本網站提供貸款需求評估、資訊整理與媒合相關服務。
             當您使用本網站時，即表示您已閱讀、了解並同意遵守以下條款。
           </p>
         </div>
@@ -29,7 +29,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-black">一、服務內容</h2>
             <p className="mt-4 text-sm leading-8 text-[#6f675f] md:text-base">
-              LoanConnect 提供貸款需求評估、貸款資訊整理、線上表單填寫與媒合服務。
+              本平台 提供貸款需求評估、貸款資訊整理、線上表單填寫與媒合服務。
               本網站並非保證核貸之金融機構，實際貸款結果仍需依相關單位或合作方審核。
             </p>
           </section>
