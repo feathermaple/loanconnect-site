@@ -10,18 +10,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://loanconnect-site.vercel.app";
   const now = new Date();
 
-  const { data: articles } = await supabase
-    .from("articles")
-    .select("slug, created_at")
-    .eq("published", true);
+  let articleRoutes: MetadataRoute.Sitemap = [];
 
-  const articleRoutes =
-    articles?.map((article) => ({
-      url: `${baseUrl}/articles/${encodeURIComponent(article.slug)}`,
-      lastModified: new Date(article.created_at),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    })) || [];
+  try {
+    const { data: articles } = await supabase
+      .from("articles")
+      .select("slug, created_at")
+      .eq("published", true);
+
+    articleRoutes =
+      articles?.map((article) => ({
+        url: `${baseUrl}/articles/${encodeURIComponent(article.slug)}`,
+        lastModified: new Date(article.created_at),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      })) || [];
+  } catch (error) {
+    console.error("Sitemap articles fetch failed:", error);
+  }
 
   return [
     {
@@ -45,15 +51,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       url: `${baseUrl}/lenders`,
       lastModified: now,
-      changeFrequency: "weekly",
+      changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${baseUrl}/articles`,
       lastModified: now,
       changeFrequency: "daily",
-      priority: 0.8,
+      priority: 0.9,
     },
+    {
+      url: `${baseUrl}/login`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/register`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+
     ...articleRoutes,
   ];
 }
