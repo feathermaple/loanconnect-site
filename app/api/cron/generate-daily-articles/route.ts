@@ -11,10 +11,10 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-/**
- * SEO 專業版題庫
- * 可依主題、問題型、比較型、地區型、風險型、流程型、條件型混合生成
- */
+const DAILY_GENERATE_COUNT = 5;
+const RECENT_ARTICLE_LOOKBACK = 400;
+const RELATED_ARTICLE_FETCH = 80;
+
 const TOPIC_POOL = [
   // 汽車借款
   "汽車借款需要什麼資料",
@@ -182,7 +182,7 @@ const TOPIC_POOL = [
   "免留車借款適合短期周轉嗎",
   "免留車借款前注意事項",
 
-  // 問題型 / 風險型
+  // 風險 / 問題型
   "借款前必知的陷阱與注意事項",
   "借款平台怎麼判斷是否安全",
   "怎麼分辨借款詐騙",
@@ -235,7 +235,7 @@ const TOPIC_POOL = [
   "花蓮借款安全重點",
   "台東借款前必看指南",
 
-  // 長尾問題型
+  // 長尾型
   "沒有薪轉可以借款嗎",
   "沒有勞保可以貸款嗎",
   "學生可以申請借款嗎",
@@ -253,8 +253,12 @@ const TOPIC_POOL = [
   "借款顧問是真的還是詐騙",
 ];
 
-const DAILY_GENERATE_COUNT = 5;
-const RECENT_ARTICLE_LOOKBACK = 250;
+type ExistingArticleSignal = {
+  title?: string | null;
+  slug?: string | null;
+  category?: string | null;
+  tags?: string[] | null;
+};
 
 function slugify(text: string) {
   return text
@@ -292,35 +296,79 @@ function safeJsonParse(text: string) {
   return JSON.parse(cleaned);
 }
 
+function getTopicKeywords(topic: string) {
+  const rawKeywords = [
+    "汽車借款",
+    "機車借款",
+    "房屋二胎",
+    "信用貸款",
+    "信用不好",
+    "信用瑕疵",
+    "民間借款",
+    "當鋪借款",
+    "小額借款",
+    "手機借款",
+    "免留車借款",
+    "借款平台",
+    "借款詐騙",
+    "借款陷阱",
+    "借款利率",
+    "借款流程",
+    "借款條件",
+    "台北",
+    "新北",
+    "桃園",
+    "台中",
+    "台南",
+    "高雄",
+    "基隆",
+    "新竹",
+    "苗栗",
+    "彰化",
+    "南投",
+    "雲林",
+    "嘉義",
+    "屏東",
+    "宜蘭",
+    "花蓮",
+    "台東",
+  ];
+
+  return rawKeywords.filter((kw) => topic.includes(kw));
+}
+
 async function getRecentArticleSignals() {
   const { data, error } = await supabase
     .from("articles")
-    .select("title, slug, created_at")
+    .select("title, slug, category, tags")
     .order("created_at", { ascending: false })
     .limit(RECENT_ARTICLE_LOOKBACK);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
-  const signals = new Set<string>();
-
-  for (const article of data ?? []) {
-    if (article.title) signals.add(normalizeText(article.title));
-    if (article.slug) signals.add(normalizeText(article.slug));
-  }
-
-  return signals;
+  return (data ?? []) as ExistingArticleSignal[];
 }
 
-function isTopicTooSimilar(topic: string, existingSignals: Set<string>) {
+function isTopicTooSimilar(topic: string, existingArticles: ExistingArticleSignal[]) {
   const normalizedTopic = normalizeText(topic);
+  const topicKeywords = getTopicKeywords(topic);
 
-  for (const signal of existingSignals) {
+  for (const article of existingArticles) {
+    const normalizedTitle = normalizeText(article.title || "");
+    const normalizedSlug = normalizeText(article.slug || "");
+
     if (
-      signal.includes(normalizedTopic) ||
-      normalizedTopic.includes(signal)
+      normalizedTitle.includes(normalizedTopic) ||
+      normalizedTopic.includes(normalizedTitle) ||
+      normalizedSlug.includes(normalizedTopic)
     ) {
+      return true;
+    }
+
+    const articleText = `${article.title || ""} ${article.slug || ""} ${article.category || ""} ${(article.tags || []).join(" ")}`;
+    const matchedKeywords = topicKeywords.filter((kw) => articleText.includes(kw));
+
+    if (topicKeywords.length >= 2 && matchedKeywords.length >= 2) {
       return true;
     }
   }
@@ -329,15 +377,14 @@ function isTopicTooSimilar(topic: string, existingSignals: Set<string>) {
 }
 
 async function pickTopicsForToday(count: number) {
-  const existingSignals = await getRecentArticleSignals();
+  const existingArticles = await getRecentArticleSignals();
   const shuffled = shuffleArray(TOPIC_POOL);
-
   const selected: string[] = [];
 
   for (const topic of shuffled) {
     if (selected.length >= count) break;
 
-    const duplicatedInDb = isTopicTooSimilar(topic, existingSignals);
+    const duplicatedInDb = isTopicTooSimilar(topic, existingArticles);
     const duplicatedInSelected = selected.some(
       (item) => normalizeText(item) === normalizeText(topic)
     );
@@ -375,6 +422,8 @@ function buildPrompt(topic: string) {
   "excerpt": "120字內摘要",
   "seo_title": "30~60字，適合Google搜尋結果",
   "seo_description": "70~160字，適合Google搜尋結果",
+  "category": "從以下分類擇一：汽車借款、機車借款、房屋二胎、信用貸款、民間借款、當鋪借款、小額借款、借款安全、借款流程、地區借款",
+  "tags": ["標籤1", "標籤2", "標籤3", "標籤4"],
   "content": "完整 Markdown 文章內容",
   "faq": [
     { "question": "問題1", "answer": "答案1" },
@@ -410,7 +459,46 @@ function buildPrompt(topic: string) {
 11. 內文結尾前加一段「如何挑選安全借款管道」或相近提醒段落。
 12. 如果主題適合比較，請自然加入比較段落。
 13. 如果主題含地區詞，內容要自然帶出台灣在地使用情境。
+14. category 必須從指定分類中擇一。
+15. tags 必須和主題高度相關，避免太空泛。
 `;
+}
+
+async function getRelatedSlugs(category: string, tags: string[], currentSlug: string) {
+  const { data, error } = await supabase
+    .from("articles")
+    .select("slug, category, tags, created_at")
+    .order("created_at", { ascending: false })
+    .limit(RELATED_ARTICLE_FETCH);
+
+  if (error) {
+    return [];
+  }
+
+  const scored = (data ?? [])
+    .filter((article) => article.slug && article.slug !== currentSlug)
+    .map((article) => {
+      let score = 0;
+
+      if (article.category && article.category === category) {
+        score += 3;
+      }
+
+      const articleTags: string[] = Array.isArray(article.tags) ? article.tags : [];
+      const overlap = articleTags.filter((tag) => tags.includes(tag)).length;
+      score += overlap * 2;
+
+      return {
+        slug: article.slug as string,
+        score,
+      };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map((item) => item.slug);
+
+  return scored;
 }
 
 async function generateOneArticle(topic: string) {
@@ -429,6 +517,21 @@ async function generateOneArticle(topic: string) {
   const slugBase = slugify(finalTitle);
   const slug = `${slugBase}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
+  const category =
+    typeof parsed.category === "string" && parsed.category.trim()
+      ? parsed.category.trim()
+      : "借款安全";
+
+  const tags: string[] =
+  Array.isArray(parsed.tags)
+    ? parsed.tags
+        .filter((tag: unknown): tag is string => typeof tag === "string" && tag.trim().length > 0)
+        .map((tag: string) => tag.trim())
+        .slice(0, 6)
+    : [];
+
+  const relatedSlugs = await getRelatedSlugs(category, tags, slug);
+
   const { error } = await supabase.from("articles").insert([
     {
       title: finalTitle,
@@ -438,6 +541,9 @@ async function generateOneArticle(topic: string) {
       seo_title: parsed.seo_title || finalTitle,
       seo_description: parsed.seo_description || parsed.excerpt || "",
       faq: Array.isArray(parsed.faq) ? parsed.faq : [],
+      category,
+      tags,
+      related_slugs: relatedSlugs,
       published: true,
     },
   ]);
@@ -450,6 +556,9 @@ async function generateOneArticle(topic: string) {
     topic,
     title: finalTitle,
     slug,
+    category,
+    tags,
+    relatedSlugs,
   };
 }
 
@@ -463,11 +572,15 @@ export async function GET(req: Request) {
 
   try {
     const topics = await pickTopicsForToday(DAILY_GENERATE_COUNT);
+
     const results: Array<{
       topic: string;
       success: boolean;
       title?: string;
       slug?: string;
+      category?: string;
+      tags?: string[];
+      relatedSlugs?: string[];
       error?: string;
     }> = [];
 
@@ -479,6 +592,9 @@ export async function GET(req: Request) {
           success: true,
           title: result.title,
           slug: result.slug,
+          category: result.category,
+          tags: result.tags,
+          relatedSlugs: result.relatedSlugs,
         });
       } catch (error) {
         results.push({
