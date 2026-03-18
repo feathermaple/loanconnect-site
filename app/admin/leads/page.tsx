@@ -62,11 +62,66 @@ async function updateLeadStatus(formData: FormData) {
 
   const { error } = await supabase
     .from("customer_leads")
-    .update({ status })
+    .update({
+      status,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id);
 
   if (error) {
     console.error("更新狀態失敗：", error.message);
+  }
+
+  revalidatePath("/admin/leads");
+  revalidatePath("/admin/dashboard");
+}
+
+async function updateLeadAssign(formData: FormData) {
+  "use server";
+
+  const id = String(formData.get("id") || "");
+  const assigned_to = String(formData.get("assigned_to") || "");
+
+  if (!id) return;
+
+  const supabase = createAdminClient();
+
+  const { error } = await supabase
+    .from("customer_leads")
+    .update({
+      assigned_to,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("更新負責人失敗：", error.message);
+  }
+
+  revalidatePath("/admin/leads");
+  revalidatePath("/admin/dashboard");
+}
+
+async function updateLeadNote(formData: FormData) {
+  "use server";
+
+  const id = String(formData.get("id") || "");
+  const note = String(formData.get("note") || "");
+
+  if (!id) return;
+
+  const supabase = createAdminClient();
+
+  const { error } = await supabase
+    .from("customer_leads")
+    .update({
+      note,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("更新備註失敗：", error.message);
   }
 
   revalidatePath("/admin/leads");
@@ -119,6 +174,8 @@ export default async function AdminLeadsPage({
         `city.ilike.%${q}%`,
         `district.ilike.%${q}%`,
         `email.ilike.%${q}%`,
+        `assigned_to.ilike.%${q}%`,
+        `note.ilike.%${q}%`,
       ].join(",")
     );
   }
@@ -185,7 +242,7 @@ export default async function AdminLeadsPage({
         <div>
           <h1 className="text-3xl font-bold text-[#2f2a25]">貸款申請名單</h1>
           <p className="mt-2 text-sm text-[#7a7065]">
-            管理表單名單、更新狀態、快速聯絡與匯出資料
+            管理表單名單、更新狀態、快速聯絡、備註追蹤與匯出資料
           </p>
         </div>
 
@@ -218,7 +275,7 @@ export default async function AdminLeadsPage({
           type="text"
           name="q"
           defaultValue={q}
-          placeholder="搜尋姓名、電話、LINE、地區、Email"
+          placeholder="搜尋姓名、電話、LINE、地區、Email、負責人、備註"
           className="h-14 rounded-2xl border border-[#d9d1c7] bg-white px-4 text-base outline-none focus:border-[#8f7f6b]"
         />
 
@@ -258,7 +315,7 @@ export default async function AdminLeadsPage({
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[#ddd6cc] bg-white shadow-sm">
-        <table className="min-w-full text-sm">
+        <table className="min-w-[1800px] w-full text-sm">
           <thead className="bg-[#f3f1ee] text-[#2f2a25]">
             <tr>
               <th className="px-4 py-4 text-left">姓名</th>
@@ -271,8 +328,11 @@ export default async function AdminLeadsPage({
               <th className="px-4 py-4 text-left">貸款類型</th>
               <th className="px-4 py-4 text-left">需求</th>
               <th className="px-4 py-4 text-left">狀態</th>
+              <th className="px-4 py-4 text-left">負責人</th>
+              <th className="px-4 py-4 text-left">備註</th>
               <th className="px-4 py-4 text-left">來源</th>
-              <th className="px-4 py-4 text-left">時間</th>
+              <th className="px-4 py-4 text-left">建立時間</th>
+              <th className="px-4 py-4 text-left">更新時間</th>
               <th className="px-4 py-4 text-left">操作</th>
             </tr>
           </thead>
@@ -315,7 +375,9 @@ export default async function AdminLeadsPage({
                 <td className="px-4 py-4">{lead.district || "-"}</td>
                 <td className="px-4 py-4">{lead.amount || "-"}</td>
                 <td className="px-4 py-4">{lead.loan_type || "-"}</td>
-                <td className="px-4 py-4 whitespace-pre-wrap">{lead.message || "-"}</td>
+                <td className="px-4 py-4 whitespace-pre-wrap">
+                  {lead.message || "-"}
+                </td>
 
                 <td className="px-4 py-4">
                   <div className="mb-2">
@@ -349,11 +411,55 @@ export default async function AdminLeadsPage({
                   </form>
                 </td>
 
+                <td className="px-4 py-4">
+                  <form action={updateLeadAssign} className="flex flex-col gap-2">
+                    <input type="hidden" name="id" value={lead.id} />
+                    <input
+                      type="text"
+                      name="assigned_to"
+                      defaultValue={lead.assigned_to || ""}
+                      placeholder="輸入負責人"
+                      className="min-w-[120px] rounded-lg border border-[#d9d1c7] px-3 py-2"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-lg bg-[#4b433b] px-3 py-2 text-white transition hover:opacity-90"
+                    >
+                      儲存
+                    </button>
+                  </form>
+                </td>
+
+                <td className="px-4 py-4">
+                  <form action={updateLeadNote} className="flex flex-col gap-2">
+                    <input type="hidden" name="id" value={lead.id} />
+                    <textarea
+                      name="note"
+                      defaultValue={lead.note || ""}
+                      placeholder="輸入備註內容"
+                      rows={4}
+                      className="min-w-[220px] rounded-lg border border-[#d9d1c7] px-3 py-2"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-lg bg-[#4b433b] px-3 py-2 text-white transition hover:opacity-90"
+                    >
+                      儲存
+                    </button>
+                  </form>
+                </td>
+
                 <td className="px-4 py-4">{lead.source || "-"}</td>
 
                 <td className="px-4 py-4">
                   {lead.created_at
                     ? new Date(lead.created_at).toLocaleString("zh-TW")
+                    : "-"}
+                </td>
+
+                <td className="px-4 py-4">
+                  {lead.updated_at
+                    ? new Date(lead.updated_at).toLocaleString("zh-TW")
                     : "-"}
                 </td>
 
@@ -373,7 +479,7 @@ export default async function AdminLeadsPage({
 
             {list.length === 0 && (
               <tr>
-                <td colSpan={13} className="px-4 py-10 text-center text-[#7a7065]">
+                <td colSpan={16} className="px-4 py-10 text-center text-[#7a7065]">
                   目前沒有符合條件的資料
                 </td>
               </tr>

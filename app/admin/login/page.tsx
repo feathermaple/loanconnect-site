@@ -1,13 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+
   const router = useRouter();
+
+  // ✅ 新增：檢查是否已登入
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const res = await fetch("/api/admin/me");
+
+        if (res.ok) {
+          // 已登入 → 直接跳後台
+          router.replace("/admin/leads");
+          return;
+        }
+      } catch (err) {
+        // ignore
+      }
+
+      setChecking(false);
+    };
+
+    checkLogin();
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,6 +52,7 @@ export default function AdminLoginPage() {
         throw new Error(data?.error || "登入失敗");
       }
 
+      // ✅ 成功後直接進後台
       router.push("/admin/leads");
       router.refresh();
     } catch (err: any) {
@@ -37,6 +61,15 @@ export default function AdminLoginPage() {
       setLoading(false);
     }
   };
+
+  // ✅ 還在檢查登入狀態時
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f5ef]">
+        <div className="text-sm text-[#8a8178]">檢查登入狀態中...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f5ef] px-4 py-16">

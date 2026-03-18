@@ -1,32 +1,35 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+const PASSWORD =
+  process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+
+export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json();
 
-    if (!password) {
-      return NextResponse.json({ error: "請輸入密碼" }, { status: 400 });
+    if (!PASSWORD) {
+      return NextResponse.json(
+        { error: "尚未設定 ADMIN_PASSWORD 或 NEXT_PUBLIC_ADMIN_PASSWORD" },
+        { status: 500 }
+      );
     }
 
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (password !== PASSWORD) {
       return NextResponse.json({ error: "密碼錯誤" }, { status: 401 });
     }
 
-    const response = NextResponse.json({ success: true });
+    const res = NextResponse.json({ ok: true });
 
-    response.cookies.set("admin_auth", "ok", {
+    res.cookies.set("admin_auth", "ok", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
       path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 8,
     });
 
-    return response;
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: err?.message || "server error" },
-      { status: 500 }
-    );
+    return res;
+  } catch {
+    return NextResponse.json({ error: "登入失敗" }, { status: 500 });
   }
 }

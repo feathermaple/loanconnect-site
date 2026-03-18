@@ -118,7 +118,73 @@ export default async function AdminDashboardPage() {
   const closeRate =
     totalCount > 0 ? ((closedCount / totalCount) * 100).toFixed(1) : "0.0";
 
+  const contactRate =
+    totalCount > 0
+      ? (((contactedCount + closedCount) / totalCount) * 100).toFixed(1)
+      : "0.0";
+
   const recentLeads = list.slice(0, 8);
+
+  const recentUpdatedLeads = [...list]
+    .filter((lead: any) => lead.updated_at)
+    .sort(
+      (a: any, b: any) =>
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+    )
+    .slice(0, 8);
+
+  const followUpLeads = list
+    .filter((lead: any) => {
+      if (!lead.created_at) return false;
+      if (lead.status && lead.status !== "new") return false;
+
+      const createdAt = new Date(lead.created_at).getTime();
+      const diffDays = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
+
+      return diffDays >= 3;
+    })
+    .slice(0, 8);
+
+  const sourceMap = new Map<string, number>();
+  list.forEach((lead: any) => {
+    const key = lead.source?.trim() || "未知來源";
+    sourceMap.set(key, (sourceMap.get(key) || 0) + 1);
+  });
+
+  const sourceRanking = Array.from(sourceMap.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
+
+  const cityMap = new Map<string, number>();
+  list.forEach((lead: any) => {
+    const city = lead.city?.trim() || "未知城市";
+    cityMap.set(city, (cityMap.get(city) || 0) + 1);
+  });
+
+  const cityRanking = Array.from(cityMap.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
+
+  const ownerMap = new Map<string, number>();
+  const ownerClosedMap = new Map<string, number>();
+
+  list.forEach((lead: any) => {
+    const owner = lead.assigned_to?.trim() || "未指派";
+    ownerMap.set(owner, (ownerMap.get(owner) || 0) + 1);
+
+    if (lead.status === "closed") {
+      ownerClosedMap.set(owner, (ownerClosedMap.get(owner) || 0) + 1);
+    }
+  });
+
+  const ownerRanking = Array.from(ownerMap.entries())
+    .map(([name, total]) => ({
+      name,
+      total,
+      closed: ownerClosedMap.get(name) || 0,
+    }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 6);
 
   return (
     <div className="space-y-6">
@@ -126,7 +192,7 @@ export default async function AdminDashboardPage() {
         <div>
           <h1 className="text-3xl font-bold text-[#2f2a25]">後台儀表板</h1>
           <p className="mt-2 text-sm text-[#7a7065]">
-            查看整體名單表現與最新申請狀況
+            查看整體名單表現、來源分布、跟進狀況與最新申請動態
           </p>
         </div>
 
@@ -160,6 +226,13 @@ export default async function AdminDashboardPage() {
         <StatCard title="已成交" value={closedCount} />
         <StatCard title="無效名單" value={invalidCount} />
         <StatCard title="成交率" value={`${closeRate}%`} />
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard title="聯絡率" value={`${contactRate}%`} />
+        <StatCard title="待跟進名單" value={followUpLeads.length} />
+        <StatCard title="有指派名單" value={list.filter((lead: any) => !!lead.assigned_to).length} />
+        <StatCard title="有備註名單" value={list.filter((lead: any) => !!lead.note).length} />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
@@ -289,7 +362,196 @@ export default async function AdminDashboardPage() {
               <p>今日新進名單：{todayCount} 筆</p>
               <p>本月累積名單：{monthCount} 筆</p>
               <p>累積成交率：{closeRate}%</p>
+              <p>累積聯絡率：{contactRate}%</p>
+              <p>待跟進名單：{followUpLeads.length} 筆</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-3">
+        <div className="rounded-2xl border border-[#ddd6cc] bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-bold text-[#2f2a25]">來源排行</h2>
+          <div className="mt-4 space-y-3 text-sm text-[#6f665d]">
+            {sourceRanking.length > 0 ? (
+              sourceRanking.map(([source, count], index) => (
+                <div
+                  key={source}
+                  className="flex items-center justify-between rounded-lg bg-[#f7f4ef] px-4 py-3"
+                >
+                  <span>
+                    {index + 1}. {source}
+                  </span>
+                  <span>{count}</span>
+                </div>
+              ))
+            ) : (
+              <p>目前沒有來源資料</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#ddd6cc] bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-bold text-[#2f2a25]">城市排行</h2>
+          <div className="mt-4 space-y-3 text-sm text-[#6f665d]">
+            {cityRanking.length > 0 ? (
+              cityRanking.map(([city, count], index) => (
+                <div
+                  key={city}
+                  className="flex items-center justify-between rounded-lg bg-[#f7f4ef] px-4 py-3"
+                >
+                  <span>
+                    {index + 1}. {city}
+                  </span>
+                  <span>{count}</span>
+                </div>
+              ))
+            ) : (
+              <p>目前沒有城市資料</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#ddd6cc] bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-bold text-[#2f2a25]">業務排行</h2>
+          <div className="mt-4 space-y-3 text-sm text-[#6f665d]">
+            {ownerRanking.length > 0 ? (
+              ownerRanking.map((owner, index) => (
+                <div
+                  key={`${owner.name}-${index}`}
+                  className="rounded-lg bg-[#f7f4ef] px-4 py-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span>
+                      {index + 1}. {owner.name}
+                    </span>
+                    <span>總筆數：{owner.total}</span>
+                  </div>
+                  <div className="mt-1 text-xs text-[#7a7065]">
+                    已成交：{owner.closed}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>目前沒有負責人資料</p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-2">
+        <div className="rounded-2xl border border-[#ddd6cc] bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-[#ebe5dd] px-5 py-4">
+            <h2 className="text-lg font-bold text-[#2f2a25]">待跟進名單</h2>
+            <Link
+              href="/admin/leads?status=new"
+              className="text-sm font-medium text-[#4b433b] underline"
+            >
+              查看未聯絡
+            </Link>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-[#f3f1ee] text-[#2f2a25]">
+                <tr>
+                  <th className="px-4 py-4 text-left">姓名</th>
+                  <th className="px-4 py-4 text-left">電話</th>
+                  <th className="px-4 py-4 text-left">城市</th>
+                  <th className="px-4 py-4 text-left">負責人</th>
+                  <th className="px-4 py-4 text-left">建立時間</th>
+                </tr>
+              </thead>
+              <tbody>
+                {followUpLeads.map((lead: any) => (
+                  <tr key={lead.id} className="border-t border-[#ebe5dd]">
+                    <td className="px-4 py-4">{lead.name || "-"}</td>
+                    <td className="px-4 py-4">
+                      {lead.phone ? (
+                        <a
+                          href={`tel:${lead.phone}`}
+                          className="text-blue-600 underline"
+                        >
+                          {lead.phone}
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
+                      {[lead.city, lead.district].filter(Boolean).join(" ") || "-"}
+                    </td>
+                    <td className="px-4 py-4">{lead.assigned_to || "未指派"}</td>
+                    <td className="px-4 py-4">{formatDateTime(lead.created_at)}</td>
+                  </tr>
+                ))}
+
+                {followUpLeads.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-4 py-10 text-center text-[#7a7065]"
+                    >
+                      目前沒有待跟進名單
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#ddd6cc] bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-[#ebe5dd] px-5 py-4">
+            <h2 className="text-lg font-bold text-[#2f2a25]">最近更新名單</h2>
+            <Link
+              href="/admin/leads"
+              className="text-sm font-medium text-[#4b433b] underline"
+            >
+              查看全部
+            </Link>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-[#f3f1ee] text-[#2f2a25]">
+                <tr>
+                  <th className="px-4 py-4 text-left">姓名</th>
+                  <th className="px-4 py-4 text-left">狀態</th>
+                  <th className="px-4 py-4 text-left">負責人</th>
+                  <th className="px-4 py-4 text-left">更新時間</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentUpdatedLeads.map((lead: any) => (
+                  <tr key={lead.id} className="border-t border-[#ebe5dd]">
+                    <td className="px-4 py-4">{lead.name || "-"}</td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusBadgeClass(
+                          lead.status
+                        )}`}
+                      >
+                        {getStatusText(lead.status)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">{lead.assigned_to || "未指派"}</td>
+                    <td className="px-4 py-4">{formatDateTime(lead.updated_at)}</td>
+                  </tr>
+                ))}
+
+                {recentUpdatedLeads.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-4 py-10 text-center text-[#7a7065]"
+                    >
+                      目前沒有更新紀錄
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
