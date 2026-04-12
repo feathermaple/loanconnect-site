@@ -10,15 +10,14 @@ export default function Footer() {
             <Image
               src="/logo.png"
               alt="秒貸通"
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-xl object-contain"
+              width={720}
+              height={160}
+              className="h-22 md:h-28 w-auto"
+              priority
             />
 
             <div>
-              <div className="text-lg font-black text-ink">
-                秒貸通
-              </div>
+             
               <div className="text-[11px] text-muted">
                 快速貸款評估平台
               </div>
