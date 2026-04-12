@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -31,12 +32,23 @@ export default function Navbar() {
     <>
       <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
-          <Link href="/" className="shrink-0 leading-tight">
-            <div className="text-xl font-bold tracking-tight text-[#2f2a25] md:text-2xl">
-              秒貸通
-            </div>
-            <div className="text-[11px] text-[#8a8178] md:text-[12px]">
-              貸款評估與媒合平台
+          <Link href="/" className="flex shrink-0 items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="秒貸通"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-xl object-contain"
+              priority
+            />
+
+            <div className="leading-tight">
+              <div className="text-xl font-bold tracking-tight text-[#2f2a25] md:text-2xl">
+                秒貸通
+              </div>
+              <div className="text-[11px] text-[#8a8178] md:text-[12px]">
+                貸款評估與媒合平台
+              </div>
             </div>
           </Link>
 
@@ -108,10 +120,21 @@ export default function Navbar() {
           }`}
         >
           <div className="flex items-center justify-between border-b border-[#e9e2d8] px-5 py-4">
-            <div>
-              <div className="text-lg font-bold text-[#2f2a25]">秒貸通</div>
-              <div className="text-[11px] text-[#8a8178]">
-                 快速貸款評估平台
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.png"
+                alt="秒貸通"
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-xl object-contain"
+                priority
+              />
+
+              <div>
+                <div className="text-lg font-bold text-[#2f2a25]">秒貸通</div>
+                <div className="text-[11px] text-[#8a8178]">
+                  快速貸款評估平台
+                </div>
               </div>
             </div>
 
@@ -139,8 +162,6 @@ export default function Navbar() {
                 </Link>
               ))}
             </div>
-
-            
           </nav>
 
           <div className="border-t border-[#e9e2d8] px-5 py-4">
