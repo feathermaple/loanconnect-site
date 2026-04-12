@@ -1,159 +1,166 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/components/useAuth";
+import { useEffect, useState } from "react";
+
+const navLinks = [
+  { label: "首頁", href: "/" },
+  { label: "免費評估", href: "/borrow" },
+  { label: "信用貸款", href: "/credit-loan" },
+  { label: "貸款條件", href: "/loan-info" },
+  { label: "知識專區", href: "/articles" },
+  { label: "聯繫客服", href: "/contact" },
+];
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
-  const { user, loading } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    setOpen(false);
-    router.push("/");
-    router.refresh();
-  }
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        <Link href="/" className="shrink-0 leading-tight">
-          <div className="text-2xl font-bold tracking-tight text-[#2f2a25]">
-            全台貸款服務
-          </div>
-          <div className="text-[12px] text-[#8a8178]">
-            貸款媒合平台
-          </div>
-        </Link>
+    <>
+      <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+          <Link href="/" className="shrink-0 leading-tight">
+            <div className="text-xl font-bold tracking-tight text-[#2f2a25] md:text-2xl">
+              LoanConnect
+            </div>
+            <div className="text-[11px] text-[#8a8178] md:text-[12px]">
+              貸款評估與媒合平台
+            </div>
+          </Link>
 
-        <nav className="hidden flex-1 items-center justify-center gap-10 lg:flex">
-          <Link href="/" className="text-sm font-medium text-[#5f5750] transition hover:text-[#2f2a25]">
-            首頁
-          </Link>
-          <Link href="/borrow" className="text-sm font-medium text-[#5f5750] transition hover:text-[#2f2a25]">
-            立即申請
-          </Link>
-          <Link href="/lenders" className="text-sm font-medium text-[#5f5750] transition hover:text-[#2f2a25]">
-            服務據點
-          </Link>
-          <Link href="/articles" className="text-sm font-medium text-[#5f5750] transition hover:text-[#2f2a25]">
-            知識專區
-          </Link>
-        </nav>
-
-        <div className="hidden shrink-0 items-center gap-3 lg:flex">
-          {!loading && !user && (
-            <>
+          {/* Desktop Nav */}
+          <nav className="hidden items-center gap-8 lg:flex">
+            {navLinks.map((item) => (
               <Link
-                href="/login"
-                className="rounded-full border border-[#e8e1d8] px-5 py-2 text-sm font-medium text-[#5f5750] transition hover:bg-[#f3eee7]"
+                key={item.label}
+                href={item.href}
+                className="text-sm font-medium text-[#5f5750] transition hover:text-[#2f2a25]"
               >
-                登入
+                {item.label}
               </Link>
+            ))}
 
-              <Link
-                href="/register"
-                className="rounded-full bg-[#3e3a34] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-95"
-              >
-                會員註冊
-              </Link>
-            </>
-          )}
+            <Link
+              href="/borrow"
+              className="rounded-full bg-[#3e3a34] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+            >
+              立即免費評估
+            </Link>
+          </nav>
 
-          {!loading && user && (
-            <>
-              <Link
-                href="/dashboard"
-                className="rounded-full border border-[#e8e1d8] px-5 py-2 text-sm font-medium text-[#5f5750] transition hover:bg-[#f3eee7]"
-              >
-                會員中心
-              </Link>
-
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="rounded-full bg-[#3e3a34] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-95"
-              >
-                登出
-              </button>
-            </>
-          )}
+          {/* Mobile Hamburger */}
+          <button
+            type="button"
+            aria-label={menuOpen ? "關閉選單" : "開啟選單"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((prev) => !prev)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#e6dfd5] bg-white text-[#2f2a25] lg:hidden"
+          >
+            <span className="relative block h-4 w-5">
+              <span
+                className={`absolute left-0 top-0 h-[2px] w-5 rounded bg-current transition ${
+                  menuOpen ? "translate-y-[7px] rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-[7px] h-[2px] w-5 rounded bg-current transition ${
+                  menuOpen ? "opacity-0" : ""
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-[14px] h-[2px] w-5 rounded bg-current transition ${
+                  menuOpen ? "-translate-y-[7px] -rotate-45" : ""
+                }`}
+              />
+            </span>
+          </button>
         </div>
+      </header>
 
-        <button
-          onClick={() => setOpen(!open)}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e5ddd2] lg:hidden"
-          type="button"
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-[60] lg:hidden ${
+          menuOpen ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+      >
+        <div
+          onClick={() => setMenuOpen(false)}
+          className={`absolute inset-0 bg-black/30 transition ${
+            menuOpen ? "opacity-100" : "opacity-0"
+          }`}
+        />
+
+        <aside
+          className={`absolute right-0 top-0 flex h-full w-[86%] max-w-[360px] flex-col bg-[#fbf8f3] shadow-2xl transition-transform duration-300 ${
+            menuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
         >
-          {open ? "✕" : "☰"}
-        </button>
-      </div>
-
-      {open && (
-        <div className="border-t border-[#e9e2d8] bg-[#fbf8f3] lg:hidden">
-          <div className="flex flex-col px-6 py-4">
-            <Link href="/" className="py-3 text-sm font-medium text-[#5f5750]" onClick={() => setOpen(false)}>
-              首頁
-            </Link>
-
-            <Link href="/borrow" className="py-3 text-sm font-medium text-[#5f5750]" onClick={() => setOpen(false)}>
-              立即申請
-            </Link>
-
-            <Link href="/lenders" className="py-3 text-sm font-medium text-[#5f5750]" onClick={() => setOpen(false)}>
-              服務據點
-            </Link>
-
-            <Link href="/articles" className="py-3 text-sm font-medium text-[#5f5750]" onClick={() => setOpen(false)}>
-              知識專區
-            </Link>
-
-            {!loading && !user && (
-              <div className="mt-4 flex gap-3">
-                <Link
-                  href="/login"
-                  className="flex-1 rounded-full border border-[#e8e1d8] px-4 py-2 text-center text-sm font-medium text-[#5f5750]"
-                  onClick={() => setOpen(false)}
-                >
-                  登入
-                </Link>
-
-                <Link
-                  href="/register"
-                  className="flex-1 rounded-full bg-[#3e3a34] px-4 py-2 text-center text-sm font-semibold text-white"
-                  onClick={() => setOpen(false)}
-                >
-                  註冊
-                </Link>
+          <div className="flex items-center justify-between border-b border-[#e9e2d8] px-5 py-4">
+            <div>
+              <div className="text-lg font-bold text-[#2f2a25]">LoanConnect</div>
+              <div className="text-[11px] text-[#8a8178]">
+                貸款評估與媒合平台
               </div>
-            )}
+            </div>
 
-            {!loading && user && (
-              <div className="mt-4 flex gap-3">
-                <Link
-                  href="/dashboard"
-                  className="flex-1 rounded-full border border-[#e8e1d8] px-4 py-2 text-center text-sm font-medium text-[#5f5750]"
-                  onClick={() => setOpen(false)}
-                >
-                  會員中心
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex-1 rounded-full bg-[#3e3a34] px-4 py-2 text-center text-sm font-semibold text-white"
-                >
-                  登出
-                </button>
-              </div>
-            )}
+            <button
+              type="button"
+              aria-label="關閉選單"
+              onClick={() => setMenuOpen(false)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e6dfd5] bg-white text-[#2f2a25]"
+            >
+              ✕
+            </button>
           </div>
-        </div>
-      )}
-    </header>
+
+          <nav className="flex-1 overflow-y-auto px-5 py-5">
+            <div className="space-y-3">
+              {navLinks.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center justify-between rounded-2xl border border-[#ece4da] bg-white px-4 py-4 text-sm font-semibold text-[#2f2a25] transition hover:bg-[#f7f2eb]"
+                >
+                  <span>{item.label}</span>
+                  <span className="text-[#8a8178]">→</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-6 rounded-[24px] border border-[#ece4da] bg-white p-4">
+              <div className="text-sm font-bold text-[#2f2a25]">
+                手機首頁已精簡顯示
+              </div>
+              <p className="mt-2 text-xs leading-6 text-[#6f675f]">
+                更多內容可從這裡快速進入，不用把所有資訊都擠在首頁。
+              </p>
+            </div>
+          </nav>
+
+          <div className="border-t border-[#e9e2d8] px-5 py-4">
+            <Link
+              href="/borrow"
+              onClick={() => setMenuOpen(false)}
+              className="flex w-full items-center justify-center rounded-full bg-[#3e3a34] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-95"
+            >
+              立即免費評估
+            </Link>
+          </div>
+        </aside>
+      </div>
+    </>
   );
 }
