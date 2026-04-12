@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     "秒貸通",
   ],
   alternates: {
-    canonical: "https://秒貸通-site.vercel.app",
+    canonical: "https://loanconnect-site.vercel.app/",
   },
   openGraph: {
     title: "秒貸通｜貸款評估、信用貸款、整合負債媒合平台",
@@ -103,6 +103,15 @@ export default async function HomePage() {
               >
                 立即免費評估
               </Link>
+
+              <a
+                href="https://lin.ee/WPqaDbx"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-[#b7e4c7] bg-[#f3fff7] px-6 py-3 text-sm font-semibold text-[#2f7d4a] transition hover:bg-[#e8f8ee]"
+              >
+                LINE快速諮詢
+              </a>
 
               <Link
                 href="/credit-loan"
