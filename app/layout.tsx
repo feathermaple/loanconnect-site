@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/app/globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdminEntryButton from "@/components/AdminEntryButton";
 import { GoogleTagManager } from "@next/third-parties/google";
+import MobileCTA from "@/components/MobileCTA";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://loanconnect-site.vercel.app"),
+  metadataBase: new URL("https://秒貸通-site.vercel.app"),
 
   title: {
-    default: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
-    template: "%s｜LoanConnect",
+    default: "秒貸通｜貸款評估、信用貸款、整合負債媒合平台",
+    template: "%s｜秒貸通",
   },
 
   description:
-    "LoanConnect 提供信用貸款、整合負債、小額借款與貸款需求評估服務，快速填表、專人聯繫，協助你找到合適方案。",
+    "秒貸通 提供信用貸款、整合負債、小額借款與貸款需求評估服務，快速填表、專人聯繫，協助你找到合適方案。",
 
   keywords: [
     "貸款",
@@ -24,32 +25,32 @@ export const metadata: Metadata = {
     "借款評估",
     "貸款平台",
     "貸款媒合",
-    "LoanConnect",
+    "秒貸通",
   ],
 
-  authors: [{ name: "LoanConnect" }],
-  creator: "LoanConnect",
-  publisher: "LoanConnect",
+  authors: [{ name: "秒貸通" }],
+  creator: "秒貸通",
+  publisher: "秒貸通",
 
   openGraph: {
-    title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
+    title: "秒貸通｜貸款評估、信用貸款、整合負債媒合平台",
     description:
       "快速填表、專人聯繫，協助你找到合適的信用貸款、整合負債與小額借款方案。",
-    url: "https://loanconnect-site.vercel.app",
-    siteName: "LoanConnect",
+    url: "https://秒貸通-site.vercel.app",
+    siteName: "秒貸通",
     locale: "zh_TW",
     type: "website",
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "LoanConnect｜貸款評估、信用貸款、整合負債媒合平台",
+    title: "秒貸通｜貸款評估、信用貸款、整合負債媒合平台",
     description:
       "快速填表、專人聯繫，協助你找到合適的信用貸款、整合負債與小額借款方案。",
   },
 
   alternates: {
-    canonical: "https://loanconnect-site.vercel.app",
+    canonical: "https://秒貸通-site.vercel.app",
   },
 
   robots: {
@@ -78,6 +79,7 @@ export default function RootLayout({
         {children}
         <AdminEntryButton />
         <Footer />
+        <MobileCTA />
       </body>
     </html>
   );
