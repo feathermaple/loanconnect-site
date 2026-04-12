@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import AdminEntryButton from "@/components/AdminEntryButton";
 import { GoogleTagManager } from "@next/third-parties/google";
 import MobileCTA from "@/components/MobileCTA";
+import FloatingLine from "@/components/FloatingLine";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://秒貸通-site.vercel.app"),
@@ -80,6 +81,7 @@ export default function RootLayout({
         <AdminEntryButton />
         <Footer />
         <MobileCTA />
+        <FloatingLine />
       </body>
     </html>
   );
