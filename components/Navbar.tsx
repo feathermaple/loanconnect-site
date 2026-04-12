@@ -140,14 +140,7 @@ export default function Navbar() {
               ))}
             </div>
 
-            <div className="mt-6 rounded-[24px] border border-[#ece4da] bg-white p-4">
-              <div className="text-sm font-bold text-[#2f2a25]">
-                手機首頁已精簡顯示
-              </div>
-              <p className="mt-2 text-xs leading-6 text-[#6f675f]">
-                更多內容可從這裡快速進入，不用把所有資訊都擠在首頁。
-              </p>
-            </div>
+            
           </nav>
 
           <div className="border-t border-[#e9e2d8] px-5 py-4">
