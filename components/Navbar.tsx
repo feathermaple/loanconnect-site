@@ -31,27 +31,25 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6 md:px-5">
-          <Link href="/" className="flex shrink-0 items-center gap-3">
+        <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-5 md:px-8 md:py-6">
+          <Link href="/" className="flex shrink-0 items-center">
             <Image
               src="/logo.png"
               alt="秒貸通"
-              width={320}
-              height={80}
-              className="h-12 md:h-14 w-auto"
+              width={420}
+              height={110}
+              className="h-14 w-auto md:h-20"
               priority
             />
-
-            
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-10 lg:flex">
             {navLinks.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-sm font-medium text-[#5f5750] transition hover:text-[#2f2a25]"
+                className="text-base font-medium text-[#5f5750] transition hover:text-[#2f2a25]"
               >
                 {item.label}
               </Link>
@@ -59,7 +57,7 @@ export default function Navbar() {
 
             <Link
               href="/borrow"
-              className="rounded-full bg-[#3e3a34] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+              className="rounded-full bg-[#3e3a34] px-7 py-3 text-base font-semibold text-white transition hover:opacity-95"
             >
               立即免費評估
             </Link>
@@ -71,7 +69,7 @@ export default function Navbar() {
             aria-label={menuOpen ? "關閉選單" : "開啟選單"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#e6dfd5] bg-white text-[#2f2a25] lg:hidden"
+            className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#e6dfd5] bg-white text-[#2f2a25] lg:hidden"
           >
             <span className="relative block h-4 w-5">
               <span
@@ -117,18 +115,11 @@ export default function Navbar() {
               <Image
                 src="/logo.png"
                 alt="秒貸通"
-                width={36}
-                height={36}
-                className="h-9 w-9 rounded-xl object-contain"
+                width={180}
+                height={48}
+                className="h-10 w-auto"
                 priority
               />
-
-              <div>
-                <div className="text-lg font-bold text-[#2f2a25]">秒貸通</div>
-                <div className="text-[11px] text-[#8a8178]">
-                  快速貸款評估平台
-                </div>
-              </div>
             </div>
 
             <button
@@ -148,7 +139,7 @@ export default function Navbar() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center justify-between rounded-2xl border border-[#ece4da] bg-white px-4 py-4 text-sm font-semibold text-[#2f2a25] transition hover:bg-[#f7f2eb]"
+                  className="flex items-center justify-between rounded-2xl border border-[#ece4da] bg-white px-4 py-4 text-base font-semibold text-[#2f2a25] transition hover:bg-[#f7f2eb]"
                 >
                   <span>{item.label}</span>
                   <span className="text-[#8a8178]">→</span>
@@ -161,7 +152,7 @@ export default function Navbar() {
             <Link
               href="/borrow"
               onClick={() => setMenuOpen(false)}
-              className="flex w-full items-center justify-center rounded-full bg-[#3e3a34] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-95"
+              className="flex w-full items-center justify-center rounded-full bg-[#3e3a34] px-5 py-3.5 text-base font-semibold text-white transition hover:opacity-95"
             >
               立即免費評估
             </Link>
