@@ -31,13 +31,13 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-5 md:px-8 md:py-6">
+        <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-3 md:px-8 md:py-4">
           <Link href="/" className="flex shrink-0 items-center">
             <Image
               src="/logo.png"
               alt="秒貸通"
-              width={520}
-              height={140}
+              width={720}
+              height={160}
               className="h-14 w-auto md:h-24 drop-shadow-sm"
               priority
             />
