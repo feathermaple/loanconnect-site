@@ -33,7 +33,7 @@ export default function Navbar() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
           <Link href="/" className="shrink-0 leading-tight">
             <div className="text-xl font-bold tracking-tight text-[#2f2a25] md:text-2xl">
-              LoanConnect
+              秒貸通
             </div>
             <div className="text-[11px] text-[#8a8178] md:text-[12px]">
               貸款評估與媒合平台
@@ -109,7 +109,7 @@ export default function Navbar() {
         >
           <div className="flex items-center justify-between border-b border-[#e9e2d8] px-5 py-4">
             <div>
-              <div className="text-lg font-bold text-[#2f2a25]">LoanConnect</div>
+              <div className="text-lg font-bold text-[#2f2a25]">秒貸通</div>
               <div className="text-[11px] text-[#8a8178]">
                 貸款評估與媒合平台
               </div>
