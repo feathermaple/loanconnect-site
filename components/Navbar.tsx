@@ -111,7 +111,7 @@ export default function Navbar() {
             <div>
               <div className="text-lg font-bold text-[#2f2a25]">秒貸通</div>
               <div className="text-[11px] text-[#8a8178]">
-                貸款評估與媒合平台
+                 快速貸款評估平台
               </div>
             </div>
 

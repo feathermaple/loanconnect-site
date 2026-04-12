@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="border-t border-line bg-paper">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 md:grid-cols-3 md:px-6">
         <div>
-          <div className="text-lg font-black text-ink">貸款媒合平台</div>
+          <div className="text-lg font-black text-ink"> 秒貸通|快速貸款評估平台</div>
           <p className="mt-3 text-sm leading-7 text-muted">
             提供貸款資訊與媒合服務，協助用戶快速找到合適資金方案。
             
@@ -65,7 +65,7 @@ export default function Footer() {
 
       <div className="border-t border-line/80">
         <div className="mx-auto max-w-7xl px-4 py-4 text-xs text-muted md:px-6">
-          © {new Date().getFullYear()} LoanConnect. All rights reserved.
+          © {new Date().getFullYear()} 秒貸通. All rights reserved.
         </div>
       </div>
     </footer>
