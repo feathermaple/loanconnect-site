@@ -38,7 +38,7 @@ export default function Navbar() {
               alt="秒貸通"
               width={160}
               height={50}
-              className="h-10 w-auto"
+              className="h-12 w-auto"
               priority
             />
 
