@@ -8,7 +8,7 @@ import CtaSection from "@/components/home/cta-section";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: "｜貸款評估、信用貸款、整合負債媒合平台",
+  title: "秒貸通｜貸款評估、信用貸款、整合負債媒合平台",
   description:
     "本平台 提供信用貸款、整合負債與資金週轉需求評估服務，快速填表、專人聯繫，協助你找到適合的貸款方案。",
   keywords: [
@@ -19,23 +19,23 @@ export const metadata: Metadata = {
     "借款評估",
     "貸款平台",
     "貸款媒合",
-    "LoanConnect",
+    "秒貸通",
   ],
   alternates: {
-    canonical: "https://loanconnect-site.vercel.app",
+    canonical: "https://秒貸通-site.vercel.app",
   },
   openGraph: {
-    title: "｜貸款評估、信用貸款、整合負債媒合平台",
+    title: "秒貸通｜貸款評估、信用貸款、整合負債媒合平台",
     description:
       "快速填表、專人聯繫，協助你找到適合的信用貸款與資金方案。",
-    url: "https://loanconnect-site.vercel.app",
-    siteName: "LoanConnect",
+    url: "https://秒貸通-site.vercel.app",
+    siteName: "秒貸通",
     locale: "zh_TW",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "｜貸款評估平台",
+    title: "秒貸通｜貸款評估平台",
     description: "信用貸款、整合負債與資金週轉需求評估平台。",
   },
   robots: {
