@@ -58,6 +58,78 @@ const faqSchema = {
   })),
 };
 
+const loanEntryItems = [
+  {
+    title: "信用貸款",
+    desc: "適合有穩定收入、想比較貸款方案與額度條件的人。",
+    href: "/credit-loan",
+  },
+  {
+    title: "整合負債",
+    desc: "整合多筆債務、降低月付壓力，改善整體資金配置。",
+    href: "/loan-info",
+  },
+  {
+    title: "資金週轉",
+    desc: "有短期週轉需求時，先了解可行方案與申辦方向。",
+    href: "/borrow",
+  },
+  {
+    title: "貸款知識",
+    desc: "先看懂貸款條件、流程與注意事項，再決定下一步。",
+    href: "/articles",
+  },
+];
+
+const popularNeedsItems = [
+  {
+    title: "信用貸款評估",
+    desc: "適合有穩定收入、想快速比較貸款方案的人。",
+    href: "/credit-loan",
+  },
+  {
+    title: "整合負債規劃",
+    desc: "將多筆債務整合，降低月付壓力，改善資金配置。",
+    href: "/loan-info",
+  },
+  {
+    title: "短期資金週轉",
+    desc: "臨時需要週轉金時，先評估可行方案與申辦方向。",
+    href: "/borrow",
+  },
+  {
+    title: "借款流程諮詢",
+    desc: "不確定自己適合哪一種方案，可先由專人協助判斷。",
+    href: "/borrow",
+  },
+];
+
+const featureItems = [
+  [
+    "01 先了解再申請",
+    "先釐清資金用途、額度需求與條件方向，避免盲目申請造成額外負擔。",
+  ],
+  [
+    "02 專人協助說明",
+    "有疑問可先了解流程與評估方式，再決定是否進一步申請。",
+  ],
+  [
+    "03 依條件媒合評估",
+    "依個人情況與需求內容，協助判斷較適合的方案方向。",
+  ],
+  [
+    "04 流程透明安心",
+    "申請前先了解條件、聯繫流程與注意事項，降低資訊不對稱。",
+  ],
+] as const;
+
+const targetUserItems = [
+  "上班族有資金需求",
+  "想整合多筆債務者",
+  "需要短期週轉者",
+  "第一次申請貸款者",
+];
+
 export default async function HomePage() {
   const supabase = createAdminClient();
 
@@ -161,33 +233,12 @@ export default async function HomePage() {
             center
           />
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {[
-              {
-                title: "信用貸款",
-                desc: "適合有穩定收入、想比較貸款方案與額度條件的人。",
-                href: "/credit-loan",
-              },
-              {
-                title: "整合負債",
-                desc: "整合多筆債務、降低月付壓力，改善整體資金配置。",
-                href: "/loan-info",
-              },
-              {
-                title: "資金週轉",
-                desc: "有短期週轉需求時，先了解可行方案與申辦方向。",
-                href: "/borrow",
-              },
-              {
-                title: "貸款知識",
-                desc: "先看懂貸款條件、流程與注意事項，再決定下一步。",
-                href: "/articles",
-              },
-            ].map((item) => (
+          <div className="mt-10 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 xl:grid-cols-4">
+            {loanEntryItems.map((item) => (
               <Link
                 key={item.title}
                 href={item.href}
-                className="group rounded-[28px] border border-line bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="group min-w-[85%] snap-center rounded-[28px] border border-line bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md md:min-w-0"
               >
                 <div className="text-lg font-bold text-ink transition group-hover:text-[#3e3a34]">
                   {item.title}
@@ -211,33 +262,12 @@ export default async function HomePage() {
             desc="先從你的情況出發，快速找到適合的了解方向與申請入口。"
           />
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {[
-              {
-                title: "信用貸款評估",
-                desc: "適合有穩定收入、想快速比較貸款方案的人。",
-                href: "/credit-loan",
-              },
-              {
-                title: "整合負債規劃",
-                desc: "將多筆債務整合，降低月付壓力，改善資金配置。",
-                href: "/loan-info",
-              },
-              {
-                title: "短期資金週轉",
-                desc: "臨時需要週轉金時，先評估可行方案與申辦方向。",
-                href: "/borrow",
-              },
-              {
-                title: "借款流程諮詢",
-                desc: "不確定自己適合哪一種方案，可先由專人協助判斷。",
-                href: "/borrow",
-              },
-            ].map((item) => (
+          <div className="mt-10 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 xl:grid-cols-4">
+            {popularNeedsItems.map((item) => (
               <Link
                 key={item.title}
                 href={item.href}
-                className="group rounded-[28px] border border-line bg-paper p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="group min-w-[85%] snap-center rounded-[28px] border border-line bg-paper p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md md:min-w-0"
               >
                 <div className="text-lg font-bold text-ink transition group-hover:text-[#3e3a34]">
                   {item.title}
@@ -280,28 +310,11 @@ export default async function HomePage() {
             desc="從需求了解、條件說明到後續媒合，讓借款流程更清楚，也更安心。"
           />
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {[
-              [
-                "01 先了解再申請",
-                "先釐清資金用途、額度需求與條件方向，避免盲目申請造成額外負擔。",
-              ],
-              [
-                "02 專人協助說明",
-                "有疑問可先了解流程與評估方式，再決定是否進一步申請。",
-              ],
-              [
-                "03 依條件媒合評估",
-                "依個人情況與需求內容，協助判斷較適合的方案方向。",
-              ],
-              [
-                "04 流程透明安心",
-                "申請前先了解條件、聯繫流程與注意事項，降低資訊不對稱。",
-              ],
-            ].map(([title, desc]) => (
+          <div className="mt-10 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 xl:grid-cols-4">
+            {featureItems.map(([title, desc]) => (
               <div
                 key={title}
-                className="min-h-[190px] rounded-[28px] border border-line bg-gradient-to-b from-paper to-soft p-6 shadow-sm"
+                className="min-h-[190px] min-w-[85%] snap-center rounded-[28px] border border-line bg-gradient-to-b from-paper to-soft p-6 shadow-sm md:min-w-0"
               >
                 <div className="text-lg font-bold text-ink">{title}</div>
                 <p className="mt-3 text-sm leading-7 text-muted">{desc}</p>
@@ -357,16 +370,11 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              "上班族有資金需求",
-              "想整合多筆債務者",
-              "需要短期週轉者",
-              "第一次申請貸款者",
-            ].map((item) => (
+          <div className="-mx-2 flex snap-x snap-mandatory gap-4 overflow-x-auto px-2 pb-2 sm:grid sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-2">
+            {targetUserItems.map((item) => (
               <div
                 key={item}
-                className="rounded-[24px] border border-[#efe7de] bg-[#f9f6f1] p-5"
+                className="min-w-[85%] snap-center rounded-[24px] border border-[#efe7de] bg-[#f9f6f1] p-5 sm:min-w-0"
               >
                 <div className="text-base font-bold text-ink">{item}</div>
                 <p className="mt-2 text-sm leading-6 text-muted">
@@ -387,11 +395,11 @@ export default async function HomePage() {
             desc="可透過網站表單留下需求、由專人協助說明，或透過客服管道進一步了解流程。"
           />
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-3">
+          <div className="mt-8 -mx-2 flex snap-x snap-mandatory gap-4 overflow-x-auto px-2 pb-2 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0">
             {channels.map(([title, desc]) => (
               <div
                 key={title}
-                className="rounded-[24px] border border-[#efe7de] bg-[#f9f6f1] p-5"
+                className="min-w-[85%] snap-center rounded-[24px] border border-[#efe7de] bg-[#f9f6f1] p-5 lg:min-w-0"
               >
                 <div className="text-base font-bold text-ink">{title}</div>
                 <p className="mt-2 text-sm leading-6 text-muted">{desc}</p>
@@ -419,12 +427,12 @@ export default async function HomePage() {
             desc="整理常見貸款觀念、申請流程與注意事項，幫助你做出更穩的資金決策。"
           />
 
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
+          <div className="mt-10 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0">
             {articles.slice(0, 3).map((article) => (
               <Link
                 key={article.slug}
                 href={`/articles/${article.slug}`}
-                className="rounded-[28px] border border-line bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="min-w-[85%] snap-center rounded-[28px] border border-line bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md md:min-w-0"
               >
                 <div className="text-sm font-semibold text-[#8a8178]">
                   {article.category}
