@@ -78,81 +78,92 @@ export default async function HomePage() {
       />
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-[#fbf8f3]">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:px-6 md:py-24">
-          <div className="flex flex-col justify-center">
-            <div className="mb-4 inline-flex w-fit rounded-full border border-[#e6dfd5] bg-white px-3 py-1 text-xs font-semibold text-[#7a7269]">
-              貸款媒合平台
-            </div>
+<section className="relative overflow-hidden bg-[#f7f4ef]">
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(216,194,168,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(230,223,213,0.45),transparent_35%)]" />
 
-            <h1 className="max-w-3xl text-3xl font-black leading-tight text-[#2f2a25] md:text-5xl">
-              快速評估貸款需求
-              <span className="block">找到適合你的資金方案</span>
-            </h1>
+  <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-[1.05fr_0.95fr] md:gap-12 md:px-6 md:py-24">
+    <div className="flex flex-col justify-center">
+      <div className="mb-4 inline-flex w-fit rounded-full border border-[#e6dfd5] bg-white/90 px-3 py-1 text-xs font-semibold text-[#7a7269] shadow-sm">
+        免費貸款評估平台
+      </div>
 
-            <p className="mt-4 max-w-xl text-sm leading-7 text-[#6f675f] md:mt-6 md:text-lg md:leading-8">
-              本平台提供信用貸款、整合負債與資金週轉需求媒合服務，
-              只需填寫簡單資料，即可快速評估貸款方案，
-              專人協助聯繫，讓資金需求更安心、更透明。
-            </p>
+      <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-tight text-[#2f2a25] md:text-6xl">
+        快速評估貸款需求
+        <span className="mt-2 block text-[#6b5642]">
+          找到適合你的資金方案
+        </span>
+      </h1>
 
-            <div className="mt-6 flex flex-wrap gap-3 md:mt-8 md:gap-4">
-              <Link
-                href="/borrow"
-                className="rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-95"
-              >
-                立即免費評估
-              </Link>
+      <p className="mt-5 max-w-xl text-base leading-8 text-[#6f675f] md:mt-6 md:text-lg">
+        提供信用貸款、整合負債與資金週轉需求媒合服務，
+        只需填寫簡單資料，即可快速評估可行方向，
+        專人協助聯繫，讓資金需求更安心、更透明。
+      </p>
 
-              <a
-                href="https://lin.ee/WPqaDbx"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border border-[#b7e4c7] bg-[#f3fff7] px-6 py-3 text-sm font-semibold text-[#2f7d4a] transition hover:bg-[#e8f8ee]"
-              >
-                LINE快速諮詢
-              </a>
+      <div className="mt-8 flex flex-wrap gap-3 md:gap-4">
+        <Link
+          href="/borrow"
+          className="rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-95"
+        >
+          立即免費評估
+        </Link>
 
-              <Link
-                href="/credit-loan"
-                className="rounded-full border border-[#d8c2a8] bg-[#fffaf4] px-6 py-3 text-sm font-semibold text-[#6b5642] transition hover:bg-[#f8efe4]"
-              >
-                信用貸款專區
-              </Link>
-            </div>
+        <a
+          href="https://lin.ee/WPqaDbx"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-full border border-[#b9d8c3] bg-[#edf8f0] px-6 py-3 text-sm font-semibold text-[#3f6f52] transition hover:bg-[#e4f3e8]"
+        >
+          LINE快速諮詢
+        </a>
 
-            <div className="mt-8 grid grid-cols-3 gap-3 text-center text-xs text-[#7a7269] md:mt-10 md:gap-6 md:text-sm">
-              <div className="rounded-2xl bg-white/70 px-3 py-3 md:bg-transparent md:px-0 md:py-0">
-                <div className="text-lg font-bold text-[#2f2a25] md:text-xl">
-                  {stats?.applied_count ?? 1000}+
-                </div>
-                <div>需求評估案例</div>
-              </div>
+        <Link
+          href="/credit-loan"
+          className="rounded-full border border-[#d8c2a8] bg-[#fffaf4] px-6 py-3 text-sm font-semibold text-[#6b5642] transition hover:bg-[#f8efe4]"
+        >
+          信用貸款專區
+        </Link>
+      </div>
 
-              <div className="rounded-2xl bg-white/70 px-3 py-3 md:bg-transparent md:px-0 md:py-0">
-                <div className="text-lg font-bold text-[#2f2a25] md:text-xl">
-                  {stats?.member_count ?? 356}
-                </div>
-                <div>會員人數</div>
-              </div>
-
-              <div className="rounded-2xl bg-white/70 px-3 py-3 md:bg-transparent md:px-0 md:py-0">
-                <div className="text-lg font-bold text-[#2f2a25] md:text-xl">
-                  {stats?.closed_count ?? 98}
-                </div>
-                <div>成功媒合</div>
-              </div>
-            </div>
-
-            <p className="mt-4 max-w-2xl text-[11px] leading-5 text-[#8a8178] md:mt-6 md:text-xs md:leading-6">
-              提醒：本站提供需求評估與資訊媒合服務，實際申辦條件、額度、利率與核准結果，
-              仍需依個人條件與合作單位最終審核為準。
-            </p>
+      <div className="mt-10 grid max-w-xl grid-cols-3 gap-3 text-center text-xs text-[#7a7269] md:gap-6 md:text-sm">
+        <div className="rounded-2xl border border-[#ece4da] bg-white/80 px-3 py-4 shadow-sm">
+          <div className="text-2xl font-bold text-[#2f2a25] md:text-3xl">
+            {stats?.applied_count ?? 3000}+
           </div>
-
-          <QuickApplyCard />
+          <div className="mt-1">需求評估案例</div>
         </div>
-      </section>
+
+        <div className="rounded-2xl border border-[#ece4da] bg-white/80 px-3 py-4 shadow-sm">
+          <div className="text-2xl font-bold text-[#2f2a25] md:text-3xl">
+            {stats?.member_count ?? 555}
+          </div>
+          <div className="mt-1">會員人數</div>
+        </div>
+
+        <div className="rounded-2xl border border-[#ece4da] bg-white/80 px-3 py-4 shadow-sm">
+          <div className="text-2xl font-bold text-[#2f2a25] md:text-3xl">
+            {stats?.closed_count ?? 188}
+          </div>
+          <div className="mt-1">成功媒合</div>
+        </div>
+      </div>
+
+      <p className="mt-5 max-w-2xl text-[11px] leading-6 text-[#8a8178] md:text-xs">
+        提醒：本站提供需求評估與資訊媒合服務，實際申辦條件、額度、利率與核准結果，
+        仍需依個人條件與合作單位最終審核為準。
+      </p>
+    </div>
+
+    <div className="relative">
+      <div className="absolute -left-6 top-8 hidden h-24 w-24 rounded-full bg-[#e9ddcc] blur-2xl md:block" />
+      <div className="absolute -right-4 bottom-8 hidden h-28 w-28 rounded-full bg-[#efe7de] blur-2xl md:block" />
+
+      <div className="relative rounded-[32px] border border-[#eadfd3] bg-white/92 p-3 shadow-[0_24px_60px_rgba(62,58,52,0.10)] backdrop-blur md:p-4">
+        <QuickApplyCard />
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* POPULAR NEEDS - Desktop only */}
       <section className="hidden border-t border-line/70 bg-white md:block">
