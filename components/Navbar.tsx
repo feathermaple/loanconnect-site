@@ -36,20 +36,13 @@ export default function Navbar() {
             <Image
               src="/logo.png"
               alt="秒貸通"
-              width={160}
-              height={50}
-              className="h-12 w-auto"
+              width={220}
+              height={70}
+              className="h-12 md:h-14 w-auto"
               priority
             />
 
-            <div className="leading-tight">
-              <div className="text-xl font-bold tracking-tight text-[#2f2a25] md:text-2xl">
-                秒貸通
-              </div>
-              <div className="text-[11px] text-[#8a8178] md:text-[12px]">
-                
-              </div>
-            </div>
+            
           </Link>
 
           {/* Desktop Nav */}
