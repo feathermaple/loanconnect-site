@@ -3,7 +3,6 @@ import Link from "next/link";
 import QuickApplyCard from "@/components/QuickApplyCard";
 import SectionTitle from "@/components/SectionTitle";
 import { channels, faq } from "@/lib/data";
-import { articles } from "@/lib/articles";
 import ProcessSection from "@/components/home/process-section";
 import CtaSection from "@/components/home/cta-section";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -58,48 +57,6 @@ const faqSchema = {
   })),
 };
 
-const loanEntryItems = [
-  {
-    title: "信用貸款",
-    desc: "適合有穩定收入、想比較貸款方案與額度條件的人。",
-    href: "/credit-loan",
-  },
-  {
-    title: "整合負債",
-    desc: "整合多筆債務、降低月付壓力，改善整體資金配置。",
-    href: "/loan-info",
-  },
-  {
-    title: "資金週轉",
-    desc: "有短期週轉需求時，先了解可行方案與申辦方向。",
-    href: "/borrow",
-  },
-  {
-    title: "貸款知識",
-    desc: "先看懂貸款條件、流程與注意事項，再決定下一步。",
-    href: "/articles",
-  },
-];
-
-const featureItems = [
-  [
-    "01 先了解再申請",
-    "先釐清資金用途、額度需求與條件方向，避免盲目申請造成額外負擔。",
-  ],
-  [
-    "02 專人協助說明",
-    "有疑問可先了解流程與評估方式，再決定是否進一步申請。",
-  ],
-  [
-    "03 依條件媒合評估",
-    "依個人情況與需求內容，協助判斷較適合的方案方向。",
-  ],
-  [
-    "04 流程透明安心",
-    "申請前先了解條件、聯繫流程與注意事項，降低資訊不對稱。",
-  ],
-] as const;
-
 export default async function HomePage() {
   const supabase = createAdminClient();
 
@@ -110,9 +67,6 @@ export default async function HomePage() {
     .single();
 
   const mobileFaq = faq.slice(0, 3);
-  const mobileArticles = articles.slice(0, 2);
-  const desktopArticles = articles.slice(0, 3);
-  const mobileFeatureItems = featureItems.slice(0, 2);
 
   return (
     <>
@@ -191,38 +145,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* LOAN ENTRY */}
-      <section className="border-t border-line/70 bg-[#fcfaf7]">
-        <div className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-          <SectionTitle
-            badge="貸款入口"
-            title="依需求快速找到適合的貸款方向"
-            desc="把首頁流量導向主要貸款分類，讓使用者更快找到對應資訊。"
-            center
-          />
-
-          <div className="mt-8 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mt-10 md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 xl:grid-cols-4">
-            {loanEntryItems.map((item) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="group min-w-[85%] snap-center rounded-[24px] border border-line bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md md:min-w-0 md:rounded-[28px] md:p-6"
-              >
-                <div className="text-base font-bold text-ink transition group-hover:text-[#3e3a34] md:text-lg">
-                  {item.title}
-                </div>
-                <p className="mt-2 text-sm leading-6 text-muted md:mt-3">
-                  {item.desc}
-                </p>
-                <div className="mt-4 text-sm font-semibold text-[#5c534c] md:mt-5">
-                  立即查看 →
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* POPULAR NEEDS - Desktop only */}
       <section className="hidden border-t border-line/70 bg-white md:block">
         <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
@@ -277,73 +199,6 @@ export default async function HomePage() {
       <div className="hidden md:block">
         <ProcessSection />
       </div>
-
-      {/* FEATURES - Mobile simplified */}
-      <section className="border-y border-line/80 bg-paper/70 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 pt-6 md:gap-3 md:px-6 md:pt-8">
-          {[
-            "快速需求評估",
-            "一對一協助說明",
-            "資料保密處理",
-            "條件透明了解",
-          ].map((item) => (
-            <div
-              key={item}
-              className="rounded-full border border-line bg-paper px-3 py-2 text-[11px] font-semibold text-muted shadow-sm md:px-4 md:text-xs"
-            >
-              {item}
-            </div>
-          ))}
-        </div>
-
-        <div className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-          <SectionTitle
-            badge="平台優勢"
-            title="不只填表，更幫你釐清適合的借款方向"
-            desc="從需求了解、條件說明到後續媒合，讓借款流程更清楚。"
-          />
-
-          {/* Mobile */}
-          <div className="mt-8 grid gap-4 md:hidden">
-            {mobileFeatureItems.map(([title, desc]) => (
-              <div
-                key={title}
-                className="rounded-[24px] border border-line bg-gradient-to-b from-paper to-soft p-5 shadow-sm"
-              >
-                <div className="text-base font-bold text-ink">{title}</div>
-                <p className="mt-2 text-sm leading-6 text-muted">{desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Desktop */}
-          <div className="mt-10 hidden gap-5 md:grid md:grid-cols-2 xl:grid-cols-4">
-            {featureItems.map(([title, desc]) => (
-              <div
-                key={title}
-                className="min-h-[190px] rounded-[28px] border border-line bg-gradient-to-b from-paper to-soft p-6 shadow-sm"
-              >
-                <div className="text-lg font-bold text-ink">{title}</div>
-                <p className="mt-3 text-sm leading-7 text-muted">{desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-4 text-sm md:mt-8 md:gap-6">
-            <Link href="/borrow" className="font-semibold text-[#5c534c]">
-              立即免費評估 →
-            </Link>
-
-            <Link href="/credit-loan" className="font-semibold text-[#5c534c]">
-              前往信用貸款專區 →
-            </Link>
-
-            <Link href="/loan-info" className="font-semibold text-[#5c534c]">
-              先了解貸款條件 →
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* TARGET USERS - Desktop only */}
       <section className="mx-auto hidden max-w-7xl px-4 py-16 md:block md:px-6">
@@ -425,80 +280,6 @@ export default async function HomePage() {
             </Link>
             <Link href="/contact" className="font-semibold text-[#5c534c]">
               聯繫客服 →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* KNOWLEDGE */}
-      <section className="border-y border-line/70 bg-[#fcfaf7]">
-        <div className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-          <SectionTitle
-            badge="知識專區"
-            title="先看懂借款重點，再做選擇"
-            desc="整理常見貸款觀念、申請流程與注意事項。"
-          />
-
-          {/* Mobile */}
-          <div className="mt-8 grid gap-4 md:hidden">
-            {mobileArticles.map((article) => (
-              <Link
-                key={article.slug}
-                href={`/articles/${article.slug}`}
-                className="rounded-[24px] border border-line bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-              >
-                <div className="text-sm font-semibold text-[#8a8178]">
-                  {article.category}
-                </div>
-
-                <div className="mt-2 text-base font-bold text-ink">
-                  {article.title}
-                </div>
-
-                <p className="mt-2 text-sm leading-6 text-muted">
-                  {article.description}
-                </p>
-
-                <div className="mt-4 text-sm font-semibold text-[#5c534c]">
-                  前往閱讀 →
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Desktop */}
-          <div className="mt-10 hidden gap-5 md:grid md:grid-cols-3">
-            {desktopArticles.map((article) => (
-              <Link
-                key={article.slug}
-                href={`/articles/${article.slug}`}
-                className="rounded-[28px] border border-line bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-              >
-                <div className="text-sm font-semibold text-[#8a8178]">
-                  {article.category}
-                </div>
-
-                <div className="mt-2 text-lg font-bold text-ink">
-                  {article.title}
-                </div>
-
-                <p className="mt-3 text-sm leading-6 text-muted">
-                  {article.description}
-                </p>
-
-                <div className="mt-5 text-sm font-semibold text-[#5c534c]">
-                  前往閱讀 →
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-8 md:mt-10">
-            <Link
-              href="/articles"
-              className="inline-flex rounded-full border border-[#e6dfd5] bg-white px-6 py-3 text-sm font-semibold text-[#5f5750] transition hover:bg-[#f5f1eb]"
-            >
-              查看所有文章
             </Link>
           </div>
         </div>
