@@ -31,7 +31,7 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6 md:px-5">
           <Link href="/" className="flex shrink-0 items-center gap-3">
             <Image
               src="/logo.png"
