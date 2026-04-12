@@ -18,11 +18,7 @@ export default function Footer() {
 
             <div>
              
-              <div className="text-[11px] text-muted">
-                快速貸款評估平台
-              </div>
-            </div>
-          </div>
+             
 
           <p className="mt-3 text-sm leading-7 text-muted">
             提供貸款資訊與媒合服務，協助用戶快速找到合適資金方案。
