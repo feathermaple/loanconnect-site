@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -5,10 +6,27 @@ export default function Footer() {
     <footer className="border-t border-line bg-paper">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 md:grid-cols-3 md:px-6">
         <div>
-          <div className="text-lg font-black text-ink"> 秒貸通|快速貸款評估平台</div>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="秒貸通"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-xl object-contain"
+            />
+
+            <div>
+              <div className="text-lg font-black text-ink">
+                秒貸通
+              </div>
+              <div className="text-[11px] text-muted">
+                快速貸款評估平台
+              </div>
+            </div>
+          </div>
+
           <p className="mt-3 text-sm leading-7 text-muted">
             提供貸款資訊與媒合服務，協助用戶快速找到合適資金方案。
-            
           </p>
         </div>
 
