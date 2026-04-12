@@ -47,7 +47,7 @@ export default function Navbar() {
                 秒貸通
               </div>
               <div className="text-[11px] text-[#8a8178] md:text-[12px]">
-                貸款評估與媒合平台
+                
               </div>
             </div>
           </Link>
