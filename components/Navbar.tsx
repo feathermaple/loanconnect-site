@@ -36,9 +36,9 @@ export default function Navbar() {
             <Image
               src="/logo.png"
               alt="秒貸通"
-              width={120}
-              height={40}
-              className="h-10 w-10 rounded-xl object-contain"
+              width={160}
+              height={50}
+              className="h-10 w-auto"
               priority
             />
 
