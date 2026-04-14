@@ -6,6 +6,7 @@ import AdminEntryButton from "@/components/AdminEntryButton";
 import { GoogleTagManager } from "@next/third-parties/google";
 import MobileCTA from "@/components/MobileCTA";
 import FloatingLine from "@/components/FloatingLine";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://秒貸通-site.vercel.app"),
@@ -82,6 +83,7 @@ export default function RootLayout({
         <Footer />
         <MobileCTA />
         <FloatingLine />
+        <SpeedInsights />
       </body>
     </html>
   );
