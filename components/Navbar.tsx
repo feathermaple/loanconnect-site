@@ -31,8 +31,11 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.documentElement.style.overflow = menuOpen ? "hidden" : "";
+
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [menuOpen]);
 
@@ -205,81 +208,94 @@ export default function Navbar() {
             onClick={() => setMenuOpen(true)}
             className="text-2xl lg:hidden"
             aria-label="開啟選單"
+            type="button"
           >
             ☰
           </button>
         </div>
       </header>
 
-     {menuOpen && (
-  <div className="fixed inset-0 z-[60] lg:hidden">
-    <button
-      type="button"
-      aria-label="關閉選單背景"
-      className="absolute inset-0 bg-black/40"
-      onClick={() => setMenuOpen(false)}
-    />
+      {menuOpen && (
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          <button
+            type="button"
+            aria-label="關閉選單背景"
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMenuOpen(false)}
+          />
 
-    <div
-      className="absolute right-0 top-0 flex h-dvh w-[80%] max-w-[360px] flex-col bg-white p-5 shadow-xl overflow-y-auto overscroll-contain"
-      style={{ WebkitOverflowScrolling: "touch" }}
-    >
-      <div className="mb-6 flex items-center justify-between shrink-0">
-        <div className="text-lg font-semibold">選單</div>
-        <button onClick={() => setMenuOpen(false)} aria-label="關閉選單">
-          關閉
-        </button>
-      </div>
-
-      <div className="flex min-h-0 flex-1 flex-col gap-4 pb-32">
-              {navLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="border-b border-gray-100 pb-3 text-base text-[#5f5750]"
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              <Link
-                href="/apply-loan"
-                onClick={() => setMenuOpen(false)}
-                className="mt-2 rounded-full bg-red-600 px-5 py-3 text-center text-sm font-semibold text-white"
-              >
-                我要借錢
-              </Link>
-
-              <Link
-                href="/post-lender"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-full bg-blue-600 px-5 py-3 text-center text-sm font-semibold text-white"
-              >
-                我要放款
-              </Link>
-
-              {!authReady ? (
-                <div className="rounded-full border px-5 py-3 text-center text-sm text-gray-400">
-                  載入中...
-                </div>
-              ) : isLoggedIn ? (
+          <div className="absolute right-0 top-0 h-dvh w-[80%] max-w-[360px] bg-white shadow-xl">
+            <div className="flex h-full flex-col">
+              <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-5 py-4">
+                <div className="text-lg font-semibold">選單</div>
                 <button
-                  onClick={handleLogout}
-                  disabled={loggingOut}
-                  className="rounded-full border px-5 py-3 text-sm disabled:opacity-60"
-                >
-                  {loggingOut ? "登出中..." : "登出"}
-                </button>
-              ) : (
-                <Link
-                  href="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-full border px-5 py-3 text-center text-sm"
+                  aria-label="關閉選單"
+                  type="button"
                 >
-                  登入
-                </Link>
-              )}
+                  關閉
+                </button>
+              </div>
+
+              <div
+                className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 pb-32"
+                style={{
+                  WebkitOverflowScrolling: "touch",
+                  touchAction: "pan-y",
+                }}
+              >
+                <div className="flex flex-col gap-4">
+                  {navLinks.map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="border-b border-gray-100 pb-3 text-base text-[#5f5750]"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+
+                  <Link
+                    href="/apply-loan"
+                    onClick={() => setMenuOpen(false)}
+                    className="mt-2 rounded-full bg-red-600 px-5 py-3 text-center text-sm font-semibold text-white"
+                  >
+                    我要借錢
+                  </Link>
+
+                  <Link
+                    href="/post-lender"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-full bg-blue-600 px-5 py-3 text-center text-sm font-semibold text-white"
+                  >
+                    我要放款
+                  </Link>
+
+                  {!authReady ? (
+                    <div className="rounded-full border px-5 py-3 text-center text-sm text-gray-400">
+                      載入中...
+                    </div>
+                  ) : isLoggedIn ? (
+                    <button
+                      onClick={handleLogout}
+                      disabled={loggingOut}
+                      className="rounded-full border px-5 py-3 text-sm disabled:opacity-60"
+                      type="button"
+                    >
+                      {loggingOut ? "登出中..." : "登出"}
+                    </button>
+                  ) : (
+                    <Link
+                      href="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="rounded-full border px-5 py-3 text-center text-sm"
+                    >
+                      登入
+                    </Link>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
