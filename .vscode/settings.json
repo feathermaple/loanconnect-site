@@ -1,0 +1,7 @@
+{
+    "search.exclude": {
+        "title: `${region}金主`": true
+    },
+    "search.useGlobalIgnoreFiles": true,
+    "search.useParentIgnoreFiles": true
+}

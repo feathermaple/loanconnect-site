@@ -1,12 +1,15 @@
+import { Suspense } from "react";
 import AuthCard from "@/components/AuthCard";
 
 export default function RegisterPage() {
   return (
-    <AuthCard
-      mode="register"
-      title="建立帳號"
-      desc="建立會員帳號後，可使用登入、會員中心與後續媒合服務功能。"
-      primaryText="註冊會員"
-    />
+    <Suspense fallback={<div className="p-6">載入中...</div>}>
+      <AuthCard
+        mode="register"
+        title="會員註冊"
+        desc="註冊後即可開始使用平台功能，查看借款需求並管理會員資料。"
+        primaryText="立即註冊"
+      />
+    </Suspense>
   );
 }
