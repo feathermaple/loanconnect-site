@@ -221,7 +221,7 @@ export default function Navbar() {
               </button>
             </div>
 
-            <div className="flex flex-1 flex-col gap-4">
+            <div className="flex flex-1 flex-col gap-4 pb-32">
               {navLinks.map((item) => (
                 <Link
                   key={item.label}
