@@ -3,7 +3,6 @@ import "@/app/globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { GoogleTagManager } from "@next/third-parties/google";
-import MobileCTA from "@/components/MobileCTA";
 import FloatingLine from "@/components/FloatingLine";
 
 const SITE_URL = "https://loanconnect-site.vercel.app";
