@@ -139,7 +139,7 @@ export default async function AdminDashboardPage() {
             sub={adsCount.table || "未找到資料表"}
           />
           <StatCard
-            title="各區金主"
+            title="各區放款資訊"
             value={lendersCount.count}
             sub={lendersCount.table || "未找到資料表"}
           />
@@ -162,7 +162,7 @@ export default async function AdminDashboardPage() {
             fields={["created_at", "region", "title", "contact_name", "contact_person"]}
           />
           <RecentCard
-            title="最新各區金主"
+            title="最新各區放款資訊"
             rows={recentLenders.rows}
             fields={["created_at", "region", "name", "title", "contact_name"]}
           />

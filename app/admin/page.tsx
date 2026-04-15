@@ -12,7 +12,7 @@ const adminCards = [
   },
   {
     title: "名單管理",
-    description: "查看與管理借款需求、放款廣告、各區金主名單",
+    description: "查看與管理借款需求、放款廣告、各區放款資訊名單",
     href: "/admin/leads",
   },
   {

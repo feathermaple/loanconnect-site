@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 type TabKey = "borrower" | "ads" | "lenders";
 type RowData = Record<string, any>;
@@ -12,7 +11,7 @@ const TABLE_MAP: Record<
 > = {
   borrower: { label: "借款需求", table: "loan_requests", pk: "id" },
   ads: { label: "放款廣告", table: "lender_ads", pk: "id" },
-  lenders: { label: "各區金主", table: "profiles", pk: "id" },
+  lenders: { label: "各區放款資訊", table: "profiles", pk: "id" },
 };
 
 const HIDDEN_FIELDS = ["password", "hashed_password"];
@@ -31,8 +30,6 @@ function isEditableField(key: string) {
 }
 
 export default function AdminLeadsPage() {
-  const supabase = createClient();
-
   const [activeTab, setActiveTab] = useState<TabKey>("borrower");
   const [rows, setRows] = useState<RowData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,44 +47,21 @@ export default function AdminLeadsPage() {
     setError("");
 
     try {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        setRows([]);
-        setError(`讀取 session 失敗：${sessionError.message}`);
-        setLoading(false);
-        return;
-      }
-
-      if (!session?.user) {
-        setRows([]);
-        setError("目前沒有登入 session，請重新登入後再試。");
-        setLoading(false);
-        return;
-      }
-
-      const config = TABLE_MAP[tab];
-      let query = supabase.from(config.table).select("*");
-
-      if (tab === "lenders") {
-        query = query.eq("role", "lender");
-      }
-
-      const { data, error } = await query.order("created_at", {
-        ascending: false,
+      const res = await fetch(`/api/admin/leads?type=${tab}`, {
+        method: "GET",
+        cache: "no-store",
       });
 
-      if (error) {
+      const json = await res.json();
+
+      if (!res.ok) {
         setRows([]);
-        setError(error.message || "讀取資料失敗");
+        setError(json?.error || "讀取資料失敗");
         setLoading(false);
         return;
       }
 
-      setRows(data || []);
+      setRows(json?.rows || []);
       setLoading(false);
     } catch (err: any) {
       setRows([]);
@@ -98,16 +72,6 @@ export default function AdminLeadsPage() {
 
   useEffect(() => {
     fetchRows(activeTab);
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      fetchRows(activeTab);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
   }, [activeTab]);
 
   const columns = useMemo(() => {
@@ -161,27 +125,33 @@ export default function AdminLeadsPage() {
       }
     });
 
-    const { data, error } = await supabase
-      .from(currentConfig.table)
-      .update(payload)
-      .eq(pk, rowPkValue)
-      .select("*");
+    try {
+      const res = await fetch(`/api/admin/leads/${rowPkValue}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: activeTab,
+          payload,
+        }),
+      });
 
-    setSaving(false);
+      const json = await res.json();
+      setSaving(false);
 
-    if (error) {
-      alert(`更新失敗：${error.message}`);
-      return;
+      if (!res.ok) {
+        alert(json?.error || "更新失敗");
+        return;
+      }
+
+      closeEdit();
+      await fetchRows(activeTab);
+      alert("儲存成功");
+    } catch (err: any) {
+      setSaving(false);
+      alert(err?.message || "更新失敗");
     }
-
-    if (!data || data.length === 0) {
-      alert("更新失敗：沒有任何資料被更新，請檢查資料表主鍵或 Supabase 權限設定。");
-      return;
-    }
-
-    closeEdit();
-    await fetchRows(activeTab);
-    alert("儲存成功");
   }
 
   async function handleDelete(row: RowData) {
@@ -198,26 +168,28 @@ export default function AdminLeadsPage() {
 
     setDeletingId(rowPkValue);
 
-    const { data, error } = await supabase
-      .from(currentConfig.table)
-      .delete()
-      .eq(pk, rowPkValue)
-      .select("*");
+    try {
+      const res = await fetch(
+        `/api/admin/leads/${rowPkValue}?type=${activeTab}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-    setDeletingId(null);
+      const json = await res.json();
+      setDeletingId(null);
 
-    if (error) {
-      alert(`刪除失敗：${error.message}`);
-      return;
+      if (!res.ok) {
+        alert(json?.error || "刪除失敗");
+        return;
+      }
+
+      await fetchRows(activeTab);
+      alert("刪除成功");
+    } catch (err: any) {
+      setDeletingId(null);
+      alert(err?.message || "刪除失敗");
     }
-
-    if (!data || data.length === 0) {
-      alert("刪除失敗：沒有任何資料被刪除，請檢查資料表主鍵或 Supabase 權限設定。");
-      return;
-    }
-
-    await fetchRows(activeTab);
-    alert("刪除成功");
   }
 
   return (
@@ -227,7 +199,7 @@ export default function AdminLeadsPage() {
           名單管理
         </h1>
         <p className="mt-2 text-sm text-slate-600">
-          可查看、編輯、刪除借款需求、放款廣告、各區金主資料。
+          可查看、編輯、刪除借款需求、放款廣告、各區放款資訊資料。
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">

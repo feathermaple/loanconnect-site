@@ -18,12 +18,15 @@ const regionMap: Record<string, string> = {
 
 export const dynamic = "force-dynamic";
 
-export default async function RegionLendersPage({
-  params,
-}: {
-  params: { region: string };
-}) {
-  const regionName = regionMap[params.region];
+type PageProps = {
+  params: Promise<{
+    region: string;
+  }>;
+};
+
+export default async function RegionLendersPage({ params }: PageProps) {
+  const { region } = await params;
+  const regionName = regionMap[region];
 
   if (!regionName) {
     return (
@@ -34,7 +37,7 @@ export default async function RegionLendersPage({
             href="/lenders"
             className="mt-4 inline-flex rounded-full bg-[#3e3a34] px-5 py-3 text-white"
           >
-            回各區金主
+            回各區放款資訊
           </Link>
         </div>
       </main>
@@ -69,7 +72,7 @@ export default async function RegionLendersPage({
               href="/lenders"
               className="inline-flex items-center justify-center rounded-full border border-[#d8cfc3] bg-white px-5 py-3 text-sm font-bold text-[#3e3a34]"
             >
-              回各區金主
+              回各區放款資訊
             </Link>
             <Link
               href="/post-lender"

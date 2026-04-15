@@ -16,7 +16,7 @@ export default function LendersPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-[#2f2a25] md:text-4xl">
-            各區金主
+            各區放款資訊
           </h1>
           <p className="mt-3 text-base text-[#6b6258] md:text-lg">
             依照地區快速查看放款資訊，協助借款方更快找到適合的放款方。

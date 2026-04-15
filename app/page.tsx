@@ -605,7 +605,7 @@ export default async function HomePage() {
       {/* REGIONS */}
       <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-16">
         <SectionTitle
-          badge="各區金主"
+          badge="各區放款資訊"
           title="依地區快速查看放款資訊"
           desc="先從你所在區域開始查看，更快找到合適的放款方。"
         />

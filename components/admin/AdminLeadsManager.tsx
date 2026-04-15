@@ -17,7 +17,7 @@ type ApiResponse = {
 const SOURCE_LABELS: Record<SourceKey, string> = {
   needs: "借款需求",
   ads: "放款廣告",
-  lenders: "各區金主",
+  lenders: "各區放款資訊",
 };
 
 const SOURCE_FIELDS: Record<SourceKey, string[]> = {
