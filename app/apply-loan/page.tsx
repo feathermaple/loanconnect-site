@@ -76,94 +76,122 @@ export default function ApplyLoanPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f8f5ef] px-4 py-10">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="text-3xl font-bold text-center mb-6">
-          免費刊登借款需求
+    <main className="min-h-screen bg-[#f6f2ec] text-[#2b2b2b]">
+      {/* 🔥 上方轉換區 */}
+      <section className="bg-[#f3ede4] px-4 py-12 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold">
+          快速刊登借款需求
         </h1>
+        <p className="mt-3 text-[#6b6257]">
+          免費刊登，讓資金主動找上你
+        </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-2xl space-y-4"
-        >
-          <input
-            placeholder="稱呼"
-            value={form.nickname}
-            onChange={(e) => handleChange("nickname", e.target.value)}
-            className="w-full border p-3 rounded"
-          />
+        <div className="mt-5 flex flex-wrap justify-center gap-3 text-sm">
+          <span className="bg-[#fff4dd] px-3 py-1 rounded-full">不用跑銀行</span>
+          <span className="bg-[#fff4dd] px-3 py-1 rounded-full">不限條件評估</span>
+          <span className="bg-[#fff4dd] px-3 py-1 rounded-full">快速媒合</span>
+        </div>
+      </section>
 
-          <select
-            value={form.region}
-            onChange={(e) => handleChange("region", e.target.value)}
-            className="w-full border p-3 rounded"
-          >
-            <option value="">選擇地區</option>
-            <option>台北基隆</option>
-            <option>桃竹苗</option>
-            <option>中彰投</option>
-            <option>雲嘉南</option>
-            <option>高屏</option>
-            <option>宜花東</option>
-            <option>澎金馬</option>
-          </select>
+      {/* 🔒 信任區 */}
+      <section className="px-4 mt-6">
+        <div className="max-w-3xl mx-auto bg-white p-4 rounded-xl text-sm text-[#6b6257]">
+          🔒 本平台僅提供資訊媒合服務  
+          <br />
+          ✔ 不收前期費用  
+          <br />
+          ✔ 不會要求提供證件正本  
+        </div>
+      </section>
 
-          <input
-            type="number"
-            placeholder="借款金額"
-            value={form.amount}
-            onChange={(e) => handleChange("amount", e.target.value)}
-            className="w-full border p-3 rounded"
-          />
-
-          <input
-            placeholder="借款用途"
-            value={form.purpose}
-            onChange={(e) => handleChange("purpose", e.target.value)}
-            className="w-full border p-3 rounded"
-          />
-
-          <input
-            placeholder="電話"
-            value={form.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
-            className="w-full border p-3 rounded"
-          />
-
-          <input
-            placeholder="LINE ID"
-            value={form.line_id}
-            onChange={(e) => handleChange("line_id", e.target.value)}
-            className="w-full border p-3 rounded"
-          />
-
-          <textarea
-            placeholder="需求說明"
-            value={form.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            className="w-full border p-3 rounded"
-          />
-
-          <label className="flex items-center gap-2 text-sm">
+      {/* 🧾 表單 */}
+      <section className="px-4 py-10">
+        <div className="max-w-3xl mx-auto bg-white p-6 rounded-2xl space-y-4 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <input
-              type="checkbox"
-              checked={form.is_agreed}
-              onChange={(e) =>
-                handleChange("is_agreed", e.target.checked)
-              }
+              placeholder="稱呼（怎麼稱呼您）"
+              value={form.nickname}
+              onChange={(e) => handleChange("nickname", e.target.value)}
+              className="w-full border p-4 rounded-xl"
             />
-            我同意平台媒合條款
-          </label>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-3 rounded-xl"
-          >
-            {loading ? "送出中..." : "送出借款需求"}
-          </button>
-        </form>
-      </div>
+            <select
+              value={form.region}
+              onChange={(e) => handleChange("region", e.target.value)}
+              className="w-full border p-4 rounded-xl"
+            >
+              <option value="">選擇地區</option>
+              <option>台北基隆</option>
+              <option>桃竹苗</option>
+              <option>中彰投</option>
+              <option>雲嘉南</option>
+              <option>高屏</option>
+              <option>宜花東</option>
+              <option>澎金馬</option>
+            </select>
+
+            <input
+              type="number"
+              placeholder="借款金額（例如：5萬、10萬）"
+              value={form.amount}
+              onChange={(e) => handleChange("amount", e.target.value)}
+              className="w-full border p-4 rounded-xl"
+            />
+
+            <input
+              placeholder="借款用途（例如：週轉、整合債務）"
+              value={form.purpose}
+              onChange={(e) => handleChange("purpose", e.target.value)}
+              className="w-full border p-4 rounded-xl"
+            />
+
+            <input
+              placeholder="聯絡電話（方便資金方聯繫）"
+              value={form.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
+              className="w-full border p-4 rounded-xl"
+            />
+
+            <input
+              placeholder="LINE ID（建議填寫）"
+              value={form.line_id}
+              onChange={(e) => handleChange("line_id", e.target.value)}
+              className="w-full border p-4 rounded-xl"
+            />
+
+            <textarea
+              placeholder="需求說明（越詳細越容易媒合）"
+              value={form.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              className="w-full border p-4 rounded-xl"
+            />
+
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.is_agreed}
+                onChange={(e) =>
+                  handleChange("is_agreed", e.target.checked)
+                }
+              />
+              我同意平台媒合條款
+            </label>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#c89b45] text-white py-4 rounded-xl font-bold"
+            >
+              {loading ? "送出中..." : "立即免費刊登需求"}
+            </button>
+          </form>
+
+          {/* 🔐 安全補強 */}
+          <div className="text-xs text-center text-[#8a8175] mt-4">
+            資料僅用於媒合用途，不會公開個人資訊
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

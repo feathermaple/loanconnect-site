@@ -73,7 +73,7 @@ export default function RootLayout({
         <Navbar />
         {children}
         <Footer />
-        <MobileCTA />
+        
         <FloatingLine />
       </body>
     </html>

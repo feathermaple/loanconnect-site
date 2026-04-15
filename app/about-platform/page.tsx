@@ -2,383 +2,371 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "關於平台｜秒貸通 MIAO DAI TONG",
+  title: "我要借錢｜免費刊登借款需求｜秒貸通 MIAO DAI TONG",
   description:
-    "秒貸通是貸款資訊與資金媒合平台，提供借款需求刊登、放款資訊曝光、會員服務與借款知識內容，幫助用戶更快速找到適合的資金方案。",
+    "秒貸通提供免費刊登借款需求服務，幫助有資金需求的用戶快速媒合合適方案。流程簡單、操作方便，讓借款評估更有效率。",
   keywords: [
-    "關於平台",
-    "秒貸通",
-    "貸款媒合平台",
-    "借款平台",
-    "民間借款",
+    "我要借錢",
+    "借款需求",
+    "免費刊登借款需求",
     "資金媒合",
-    "放款資訊",
+    "民間借款",
     "借錢平台",
+    "借款評估",
   ],
   openGraph: {
-    title: "關於平台｜秒貸通 MIAO DAI TONG",
+    title: "我要借錢｜免費刊登借款需求｜秒貸通 MIAO DAI TONG",
     description:
-      "提供借款資訊與資金媒合服務，幫助用戶更快速找到適合的資金方案。",
-    url: "https://loanconnect-site.vercel.app/about-platform",
+      "免費刊登借款需求，讓資金更快找到你。流程簡單、操作方便、快速開始評估。",
+    url: "https://loanconnect-site.vercel.app/apply-loan",
     siteName: "秒貸通 MIAO DAI TONG",
     locale: "zh_TW",
     type: "website",
   },
 };
 
-const features = [
+const areaOptions = [
+  "台北市",
+  "新北市",
+  "基隆市",
+  "桃園市",
+  "新竹市",
+  "新竹縣",
+  "苗栗縣",
+  "台中市",
+  "彰化縣",
+  "南投縣",
+  "雲林縣",
+  "嘉義市",
+  "嘉義縣",
+  "台南市",
+  "高雄市",
+  "屏東縣",
+  "宜蘭縣",
+  "花蓮縣",
+  "台東縣",
+  "澎湖縣",
+  "金門縣",
+  "連江縣",
+];
+
+const strengthList = [
+  "免費刊登借款需求",
+  "流程簡單，幾分鐘即可完成",
+  "可先刊登，再等待合適資金方聯繫",
+];
+
+const trustList = [
+  "本平台提供資訊刊登與媒合服務",
+  "不收取前期諮詢費、保證金或代辦費",
+  "不會要求您提供證件正本",
+  "送出資料前請先確認借款條件與自身還款能力",
+];
+
+const faqList = [
   {
-    title: "借款需求刊登",
-    desc: "有資金需求的用戶，可以快速刊登需求，讓合適的資金方看見。",
+    q: "刊登借款需求要收費嗎？",
+    a: "目前提供免費刊登借款需求，讓有資金需求的用戶可先快速開始媒合。",
   },
   {
-    title: "放款資訊曝光",
-    desc: "放款方可刊登服務內容，提升曝光度，接觸更精準的需求客群。",
+    q: "送出表單後會怎麼處理？",
+    a: "您送出資料後，系統會建立借款需求，後續由平台流程或合適的資金方進一步查看與聯繫。",
   },
   {
-    title: "會員服務機制",
-    desc: "透過會員制度，提供更多查看資訊、刊登曝光與平台使用權限。",
+    q: "一定會成功借到錢嗎？",
+    a: "不一定。實際是否能媒合成功，仍需視條件、需求內容、聯繫狀況與雙方評估結果而定。",
   },
   {
-    title: "借款知識整理",
-    desc: "提供借貸、風險、流程與注意事項，幫助用戶更安心做決定。",
+    q: "個人資料會被公開嗎？",
+    a: "建議只填寫必要聯絡資訊，資料將以平台用途處理，不建議提供過多敏感資訊。",
   },
 ];
 
-const steps = [
-  {
-    step: "01",
-    title: "選擇您的需求",
-    desc: "您可以依照自身情況，選擇借款、放款、刊登需求或加入會員。",
-  },
-  {
-    step: "02",
-    title: "填寫或瀏覽資訊",
-    desc: "借款人可刊登需求，放款方可提供資訊，雙方都能更快找到合適對象。",
-  },
-  {
-    step: "03",
-    title: "進一步聯繫與評估",
-    desc: "平台提供資訊媒合，實際合作條件、利率、費用與審核方式，需由雙方自行確認。",
-  },
-];
-
-const reasons = [
-  "頁面簡單清楚，長輩也看得懂",
-  "借款、放款、會員功能整合在同一平台",
-  "可快速增加需求曝光與資金曝光",
-  "提供借款知識與風險提醒，降低資訊落差",
-  "平台定位清楚，以資訊媒合為核心，不誇大不誤導",
-];
-
-const notices = [
-  "本平台提供的是資訊刊登與媒合服務，並非銀行，也非直接放款機構。",
-  "實際借款條件、額度、利率、還款方式、費用與核貸結果，仍以雙方洽談內容為準。",
-  "借款前請務必詳閱條件，確認總費用年百分率、違約責任與還款能力。",
-  "若遇到不合理費用、證件押留、要求先匯款等情形，請提高警覺並停止交易。",
-];
-
-export default function AboutPlatformPage() {
+export default function ApplyLoanPage() {
   return (
-    <main className="min-h-screen bg-[#f8f5ef] text-[#2b2b2b]">
-      {/* Hero */}
-      <section className="border-b border-[#e8dfd2] bg-gradient-to-b from-[#f8f5ef] to-[#f3ede3]">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-20">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+    <main className="min-h-screen bg-[#f6f2ec] text-[#2b2b2b]">
+      <section className="border-b border-[#e7ddd0] bg-gradient-to-b from-[#f8f4ee] to-[#f3ede4]">
+        <div className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
-              <div className="mb-4 inline-flex items-center rounded-full border border-[#d8c5a2] bg-[#fff8ea] px-4 py-2 text-sm font-semibold text-[#9a6b18]">
-                關於秒貸通｜貸款資訊與資金媒合平台
+              <div className="inline-flex rounded-full border border-[#e6d4b2] bg-[#fff8ea] px-4 py-2 text-sm font-semibold text-[#9d6d1d]">
+                我要借錢｜免費刊登借款需求
               </div>
 
-              <h1 className="text-3xl font-bold leading-tight text-[#1f1f1f] md:text-5xl">
-                讓借款更快找到方向，
+              <h1 className="mt-5 text-3xl font-bold leading-tight text-[#1f1f1f] md:text-5xl">
+                快速刊登借款需求，
                 <br className="hidden md:block" />
-                讓資金更容易被看見
+                讓資金更快找到你
               </h1>
 
-              <p className="mt-5 max-w-2xl text-base leading-8 text-[#5b5146] md:text-lg">
-                秒貸通提供借款資訊、需求刊登、放款曝光與會員服務，
-                協助有資金需求的用戶，更快速找到合適方案；
-                也讓放款服務方更有效率接觸精準客群。
+              <p className="mt-5 max-w-2xl text-base leading-8 text-[#61584d] md:text-lg">
+                若您有資金需求，可先透過秒貸通免費刊登借款需求。
+                流程簡單、填寫快速，幫助您更有效率開始評估適合的借款方向。
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/apply-loan"
-                  className="inline-flex items-center justify-center rounded-2xl bg-[#c89b45] px-6 py-4 text-base font-bold text-white shadow-sm transition hover:scale-[1.02] hover:bg-[#b98c35]"
-                >
-                  我要借錢
-                </Link>
-
-                <Link
-                  href="/register"
-                  className="inline-flex items-center justify-center rounded-2xl border border-[#d8c5a2] bg-white px-6 py-4 text-base font-bold text-[#6b4d1f] transition hover:bg-[#fff9ef]"
-                >
-                  立即加入會員
-                </Link>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {strengthList.map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full bg-[#fff2d8] px-4 py-2 text-sm font-medium text-[#805a16]"
+                  >
+                    {item}
+                  </span>
+                ))}
               </div>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 <div className="rounded-2xl border border-[#eadfce] bg-white p-4 shadow-sm">
-                  <div className="text-xl font-bold text-[#b8842c]">借款方</div>
-                  <div className="mt-1 text-sm text-[#6b6257]">
-                    快速刊登需求，提升被看見機會
-                  </div>
+                  <div className="text-lg font-bold text-[#b8842c]">步驟簡單</div>
+                  <p className="mt-1 text-sm leading-6 text-[#6c6257]">
+                    填寫基本需求即可開始
+                  </p>
                 </div>
-
                 <div className="rounded-2xl border border-[#eadfce] bg-white p-4 shadow-sm">
-                  <div className="text-xl font-bold text-[#b8842c]">放款方</div>
-                  <div className="mt-1 text-sm text-[#6b6257]">
-                    提升曝光，接觸更精準名單
-                  </div>
+                  <div className="text-lg font-bold text-[#b8842c]">免費刊登</div>
+                  <p className="mt-1 text-sm leading-6 text-[#6c6257]">
+                    降低開始評估的門檻
+                  </p>
                 </div>
-
                 <div className="rounded-2xl border border-[#eadfce] bg-white p-4 shadow-sm">
-                  <div className="text-xl font-bold text-[#b8842c]">會員服務</div>
-                  <div className="mt-1 text-sm text-[#6b6257]">
-                    解鎖更多平台功能與資訊權限
-                  </div>
+                  <div className="text-lg font-bold text-[#b8842c]">快速開始</div>
+                  <p className="mt-1 text-sm leading-6 text-[#6c6257]">
+                    現在就能送出需求
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
               <div className="mb-4 text-sm font-semibold text-[#b8842c]">
-                平台核心定位
+                借款前先看這裡
               </div>
 
-              <div className="space-y-4">
-                <div className="rounded-2xl bg-[#faf6ef] p-4">
-                  <div className="text-lg font-bold text-[#2f2a24]">
-                    我們做的是資訊媒合
+              <div className="space-y-3">
+                {trustList.map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-2xl bg-[#faf6ef] px-4 py-3 text-sm leading-7 text-[#5e554a]"
+                  >
+                    {item}
                   </div>
-                  <p className="mt-2 text-sm leading-7 text-[#665d52]">
-                    平台主要提供借款資訊整理、需求刊登、放款曝光與會員服務，
-                    幫助雙方更有效率找到合適對象。
-                  </p>
-                </div>
+                ))}
+              </div>
 
-                <div className="rounded-2xl bg-[#faf6ef] p-4">
-                  <div className="text-lg font-bold text-[#2f2a24]">
-                    我們重視的是清楚與安全
-                  </div>
-                  <p className="mt-2 text-sm leading-7 text-[#665d52]">
-                    借款前先了解流程、費用、條件與風險，比急著成交更重要。
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-[#faf6ef] p-4">
-                  <div className="text-lg font-bold text-[#2f2a24]">
-                    我們希望讓每一位用戶都更好理解
-                  </div>
-                  <p className="mt-2 text-sm leading-7 text-[#665d52]">
-                    不管您是第一次借款、想刊登需求，還是想增加放款曝光，
-                    都能用更簡單的方式操作。
-                  </p>
-                </div>
+              <div className="mt-6 rounded-2xl border border-[#f0e2c8] bg-[#fff8ec] p-4 text-sm leading-7 text-[#6a573d]">
+                提醒您：若遇到要求先付款、押證件、保證核貸、來路不明聯絡方式等情形，請提高警覺並停止往來。
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 平台提供什麼 */}
-      <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
-            平台提供哪些服務
-          </div>
-          <h2 className="mt-3 text-2xl font-bold text-[#1f1f1f] md:text-4xl">
-            一個平台，整合借款需求、放款曝光與資訊內容
-          </h2>
-          <p className="mt-4 text-base leading-8 text-[#665d52]">
-            不只是單一表單，也不只是單純廣告頁，
-            而是把使用者真正會需要的功能整合在一起。
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {features.map((item) => (
-            <div
-              key={item.title}
-              className="rounded-[28px] border border-[#eadfce] bg-white p-6 shadow-sm"
-            >
-              <div className="mb-3 inline-flex rounded-full bg-[#fff4dd] px-3 py-1 text-sm font-bold text-[#9a6b18]">
-                核心服務
+      <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
+        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="space-y-6">
+            <div className="rounded-[28px] border border-[#eadfce] bg-white p-6 shadow-sm">
+              <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
+                刊登前說明
               </div>
-              <h3 className="text-xl font-bold text-[#2a241d]">{item.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-[#665d52]">
-                {item.desc}
+              <h2 className="mt-3 text-2xl font-bold text-[#1f1f1f]">
+                填寫幾項基本資料，就能開始刊登需求
+              </h2>
+              <p className="mt-4 text-sm leading-7 text-[#655c51]">
+                建議您填寫正確且方便聯繫的資料，這樣後續處理與媒合效率會比較好。
+                若目前還不確定完整條件，也可以先填寫基本需求再進一步評估。
               </p>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* 使用流程 */}
-      <section className="border-y border-[#eadfce] bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
-              使用方式很簡單
-            </div>
-            <h2 className="mt-3 text-2xl font-bold text-[#1f1f1f] md:text-4xl">
-              3 個步驟，快速開始使用平台
-            </h2>
-            <p className="mt-4 text-base leading-8 text-[#665d52]">
-              不用複雜流程，也不用看不懂的專業術語，
-              照著步驟走，就能快速開始。
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {steps.map((item) => (
-              <div
-                key={item.step}
-                className="rounded-[28px] border border-[#eadfce] bg-[#fcfaf7] p-6 shadow-sm"
-              >
-                <div className="text-3xl font-extrabold text-[#d0a55a]">
-                  {item.step}
-                </div>
-                <h3 className="mt-4 text-xl font-bold text-[#2a241d]">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-[#665d52]">
-                  {item.desc}
-                </p>
+            <div className="rounded-[28px] border border-[#eadfce] bg-white p-6 shadow-sm">
+              <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
+                送出後會怎麼進行
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 為什麼選擇我們 */}
-      <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-20">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
-          <div className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
-            <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
-              為什麼選擇秒貸通
+              <div className="mt-4 space-y-4">
+                <div className="rounded-2xl bg-[#faf6ef] p-4">
+                  <div className="font-bold text-[#2a241d]">1. 建立借款需求</div>
+                  <p className="mt-1 text-sm leading-7 text-[#62584d]">
+                    您送出表單後，系統會建立需求資料。
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-[#faf6ef] p-4">
+                  <div className="font-bold text-[#2a241d]">2. 等待後續媒合</div>
+                  <p className="mt-1 text-sm leading-7 text-[#62584d]">
+                    後續依平台流程與需求內容進行媒合或查看。
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-[#faf6ef] p-4">
+                  <div className="font-bold text-[#2a241d]">3. 進一步評估條件</div>
+                  <p className="mt-1 text-sm leading-7 text-[#62584d]">
+                    實際借款條件、額度、利率與費用，仍以後續雙方洽談為準。
+                  </p>
+                </div>
+              </div>
             </div>
-            <h2 className="mt-3 text-2xl font-bold text-[#1f1f1f] md:text-4xl">
-              我們不是把資訊堆給您看，
-              <br className="hidden md:block" />
-              而是幫您更快看懂、找到方向
-            </h2>
 
-            <div className="mt-8 space-y-4">
-              {reasons.map((item) => (
-                <div
-                  key={item}
-                  className="flex items-start gap-3 rounded-2xl bg-[#faf6ef] p-4"
-                >
-                  <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#c89b45] text-sm font-bold text-white">
-                    ✓
+            <div className="rounded-[28px] border border-[#eadfce] bg-white p-6 shadow-sm">
+              <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
+                常見問題
+              </div>
+              <div className="mt-4 space-y-4">
+                {faqList.map((item) => (
+                  <div key={item.q} className="border-b border-[#f1e8db] pb-4 last:border-b-0 last:pb-0">
+                    <div className="font-bold text-[#2a241d]">{item.q}</div>
+                    <p className="mt-2 text-sm leading-7 text-[#645b50]">{item.a}</p>
                   </div>
-                  <div className="text-sm leading-7 text-[#554d43]">{item}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[32px] border border-[#eadfce] bg-gradient-to-b from-[#fff8ec] to-[#f8f2e7] p-6 shadow-sm md:p-8">
-            <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
-              適合哪些人使用
-            </div>
-            <h2 className="mt-3 text-2xl font-bold text-[#1f1f1f] md:text-3xl">
-              不管您是借款方還是放款方，
-              都能找到適合自己的入口
-            </h2>
-
-            <div className="mt-8 space-y-5">
-              <div className="rounded-2xl bg-white/90 p-5">
-                <div className="text-lg font-bold text-[#2a241d]">借款需求用戶</div>
-                <p className="mt-2 text-sm leading-7 text-[#665d52]">
-                  適合想快速了解方案、刊登需求、提高曝光，
-                  並希望用更簡單方式找到資金方向的用戶。
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-white/90 p-5">
-                <div className="text-lg font-bold text-[#2a241d]">放款服務方</div>
-                <p className="mt-2 text-sm leading-7 text-[#665d52]">
-                  適合希望增加品牌曝光、擴大名單來源、
-                  接觸精準借款需求的服務方。
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-white/90 p-5">
-                <div className="text-lg font-bold text-[#2a241d]">想先了解的人</div>
-                <p className="mt-2 text-sm leading-7 text-[#665d52]">
-                  若您還沒決定是否借款，也可以先從知識專區開始，
-                  先了解流程、風險與注意事項。
-                </p>
+                ))}
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* 重要提醒 */}
-      <section className="border-y border-[#eadfce] bg-[#fffdf9]">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
-              重要提醒
+          <div className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+            <div className="mb-2 text-sm font-semibold tracking-wide text-[#b8842c]">
+              免費刊登借款需求
             </div>
-            <h2 className="mt-3 text-2xl font-bold text-[#1f1f1f] md:text-4xl">
-              借款前，先看懂條件與風險
-            </h2>
-            <p className="mt-4 text-base leading-8 text-[#665d52]">
-              我們希望每一位使用者都在清楚了解資訊後，再做下一步決定。
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-4 md:grid-cols-2">
-            {notices.map((item) => (
-              <div
-                key={item}
-                className="rounded-[24px] border border-[#f0e2c8] bg-[#fff8ec] p-5"
-              >
-                <p className="text-sm leading-7 text-[#6b5840]">{item}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-20">
-        <div className="rounded-[36px] border border-[#e2d3bb] bg-[#2d2418] px-6 py-10 text-white shadow-sm md:px-10 md:py-14">
-          <div className="mx-auto max-w-4xl text-center">
-            <div className="text-sm font-semibold tracking-[0.2em] text-[#f2d29a]">
-              START NOW
-            </div>
-            <h2 className="mt-4 text-3xl font-bold leading-tight md:text-5xl">
-              現在就開始使用秒貸通
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-[#f7ead2] md:text-lg">
-              不管您是想借錢、想增加曝光、想刊登需求，
-              或只是想先了解流程，現在就可以開始。
+            <h2 className="text-3xl font-bold text-[#1f1f1f]">立即填寫基本資料</h2>
+            <p className="mt-3 text-sm leading-7 text-[#675d52]">
+              請填寫方便聯繫的資料與借款需求內容，送出後即可開始建立需求。
             </p>
 
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link
-                href="/apply-loan"
-                className="inline-flex items-center justify-center rounded-2xl bg-[#c89b45] px-6 py-4 text-base font-bold text-white transition hover:scale-[1.02] hover:bg-[#b98c35]"
-              >
-                我要借錢
-              </Link>
+            <form className="mt-8 space-y-4">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="mb-2 block text-sm font-medium text-[#4e463d]"
+                >
+                  稱呼
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="請輸入您的稱呼"
+                  className="w-full rounded-2xl border border-[#d9d1c6] bg-[#fcfbf9] px-4 py-4 text-base outline-none transition focus:border-[#c79d57] focus:bg-white"
+                />
+              </div>
 
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center rounded-2xl border border-[#f0d39c] bg-transparent px-6 py-4 text-base font-bold text-[#fff4df] transition hover:bg-white/10"
-              >
-                註冊會員
-              </Link>
+              <div>
+                <label
+                  htmlFor="area"
+                  className="mb-2 block text-sm font-medium text-[#4e463d]"
+                >
+                  地區
+                </label>
+                <select
+                  id="area"
+                  name="area"
+                  defaultValue=""
+                  className="w-full rounded-2xl border border-[#d9d1c6] bg-[#fcfbf9] px-4 py-4 text-base outline-none transition focus:border-[#c79d57] focus:bg-white"
+                >
+                  <option value="" disabled>
+                    請選擇地區
+                  </option>
+                  {areaOptions.map((area) => (
+                    <option key={area} value={area}>
+                      {area}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
+              <div>
+                <label
+                  htmlFor="amount"
+                  className="mb-2 block text-sm font-medium text-[#4e463d]"
+                >
+                  借款金額
+                </label>
+                <input
+                  id="amount"
+                  name="amount"
+                  type="text"
+                  placeholder="例如：5萬、10萬、30萬"
+                  className="w-full rounded-2xl border border-[#d9d1c6] bg-[#fcfbf9] px-4 py-4 text-base outline-none transition focus:border-[#c79d57] focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="purpose"
+                  className="mb-2 block text-sm font-medium text-[#4e463d]"
+                >
+                  借款用途
+                </label>
+                <input
+                  id="purpose"
+                  name="purpose"
+                  type="text"
+                  placeholder="例如：週轉、繳費、整合債務、創業"
+                  className="w-full rounded-2xl border border-[#d9d1c6] bg-[#fcfbf9] px-4 py-4 text-base outline-none transition focus:border-[#c79d57] focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="mb-2 block text-sm font-medium text-[#4e463d]"
+                >
+                  電話
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="請輸入聯絡電話（方便後續聯繫）"
+                  className="w-full rounded-2xl border border-[#d9d1c6] bg-[#fcfbf9] px-4 py-4 text-base outline-none transition focus:border-[#c79d57] focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="lineId"
+                  className="mb-2 block text-sm font-medium text-[#4e463d]"
+                >
+                  LINE ID
+                </label>
+                <input
+                  id="lineId"
+                  name="lineId"
+                  type="text"
+                  placeholder="建議填寫 LINE ID，回覆通常會更方便"
+                  className="w-full rounded-2xl border border-[#d9d1c6] bg-[#fcfbf9] px-4 py-4 text-base outline-none transition focus:border-[#c79d57] focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="description"
+                  className="mb-2 block text-sm font-medium text-[#4e463d]"
+                >
+                  需求說明
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  rows={5}
+                  placeholder="請簡單說明您的需求，例如目前情況、希望借款金額、方便聯繫時間等"
+                  className="w-full rounded-2xl border border-[#d9d1c6] bg-[#fcfbf9] px-4 py-4 text-base outline-none transition focus:border-[#c79d57] focus:bg-white"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full rounded-2xl bg-[#c89b45] px-6 py-4 text-base font-bold text-white transition hover:bg-[#b98c35]"
+              >
+                立即免費刊登需求
+              </button>
+
+              <div className="rounded-2xl bg-[#faf6ef] px-4 py-4 text-center text-sm leading-7 text-[#665c50]">
+                您送出的資料將作為借款需求建立與後續媒合用途使用。
+                <br />
+                請勿填寫與借款無關的敏感個資，送出前請再次確認內容正確。
+              </div>
+            </form>
+
+            <div className="mt-6 text-center text-sm text-[#7a7165]">
+              想先了解借款流程與注意事項？
               <Link
                 href="/articles"
-                className="inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-6 py-4 text-base font-bold text-white transition hover:bg-white/15"
+                className="ml-1 font-semibold text-[#9d6d1d] hover:underline"
               >
                 先看借錢知識
               </Link>
@@ -387,31 +375,26 @@ export default function AboutPlatformPage() {
         </div>
       </section>
 
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "AboutPage",
-            name: "關於平台｜秒貸通 MIAO DAI TONG",
-            url: "https://loanconnect-site.vercel.app/about-platform",
-            description:
-              "秒貸通是貸款資訊與資金媒合平台，提供借款需求刊登、放款資訊曝光、會員服務與借款知識內容。",
-            isPartOf: {
-              "@type": "WebSite",
-              name: "秒貸通 MIAO DAI TONG",
-              url: "https://loanconnect-site.vercel.app",
-            },
-            about: {
-              "@type": "Service",
-              name: "貸款資訊與資金媒合服務",
-              description:
-                "提供借款需求刊登、放款資訊曝光、會員服務與借款知識內容。",
-            },
-          }),
-        }}
-      />
+      <section className="border-t border-[#e7ddd0] bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-12 text-center md:px-6 md:py-16">
+          <div className="text-sm font-semibold tracking-[0.2em] text-[#b8842c]">
+            START NOW
+          </div>
+          <h2 className="mt-4 text-3xl font-bold text-[#1f1f1f] md:text-4xl">
+            現在就開始刊登借款需求
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[#655c51]">
+            若您現在就有資金需求，填寫基本資料後即可開始建立需求，
+            讓後續評估與媒合更快開始。
+          </p>
+          <a
+            href="#top"
+            className="mt-8 inline-flex rounded-2xl bg-[#c89b45] px-6 py-4 text-base font-bold text-white transition hover:bg-[#b98c35]"
+          >
+            立即開始填寫
+          </a>
+        </div>
+      </section>
     </main>
   );
 }
