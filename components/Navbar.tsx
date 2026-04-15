@@ -211,17 +211,27 @@ export default function Navbar() {
         </div>
       </header>
 
-      {menuOpen && (
-        <div className="fixed inset-0 z-[60] bg-black/40 lg:hidden">
-          <div className="absolute right-0 top-0 flex h-full w-[80%] flex-col bg-white p-5 shadow-xl">
-            <div className="mb-6 flex items-center justify-between">
-              <div className="text-lg font-semibold">選單</div>
-              <button onClick={() => setMenuOpen(false)} aria-label="關閉選單">
-                關閉
-              </button>
-            </div>
+     {menuOpen && (
+  <div className="fixed inset-0 z-[60] lg:hidden">
+    <button
+      type="button"
+      aria-label="關閉選單背景"
+      className="absolute inset-0 bg-black/40"
+      onClick={() => setMenuOpen(false)}
+    />
 
-            <div className="flex flex-1 flex-col gap-4 pb-32">
+    <div
+      className="absolute right-0 top-0 flex h-dvh w-[80%] max-w-[360px] flex-col bg-white p-5 shadow-xl overflow-y-auto overscroll-contain"
+      style={{ WebkitOverflowScrolling: "touch" }}
+    >
+      <div className="mb-6 flex items-center justify-between shrink-0">
+        <div className="text-lg font-semibold">選單</div>
+        <button onClick={() => setMenuOpen(false)} aria-label="關閉選單">
+          關閉
+        </button>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col gap-4 pb-32">
               {navLinks.map((item) => (
                 <Link
                   key={item.label}
