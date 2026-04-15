@@ -1,54 +1,52 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  const menu = [
+    { name: "後台首頁", href: "/admin/dashboard" },
+    { name: "網站文章", href: "/admin/articles" },
+    { name: "會員管理", href: "/admin/members" }, // ⭐ 新增
+  ];
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      
+    <div className="flex min-h-screen bg-slate-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r">
-        <div className="p-6 text-xl font-bold border-b">
-          LoanConnect 後台
+      <aside className="w-60 border-r border-slate-200 bg-white p-4">
+        <div className="mb-6 text-lg font-bold text-slate-900">
+          管理後台
         </div>
 
-        <nav className="flex flex-col gap-2 p-4 text-sm">
+        <nav className="space-y-1">
+          {menu.map((item) => {
+            const isActive = pathname.startsWith(item.href);
 
-          <Link
-            href="/admin/dashboard"
-            className="px-3 py-2 rounded hover:bg-gray-100"
-          >
-            📊 儀表板
-          </Link>
-
-          <Link
-            href="/admin/leads"
-            className="px-3 py-2 rounded hover:bg-gray-100"
-          >
-            📋 名單管理
-          </Link>
-
-          <Link
-            href="/admin/analytics"
-            className="px-3 py-2 rounded hover:bg-gray-100"
-          >
-            📈 首頁數據
-          </Link>
-
-          <Link
-            href="/admin/articles"
-            className="px-3 py-2 rounded hover:bg-gray-100"
-          >
-            📝 網站文章
-          </Link>
-
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`block rounded-lg px-3 py-2 text-sm transition ${
+                  isActive
+                    ? "bg-slate-200 text-slate-900 font-medium"
+                    : "text-slate-700 hover:bg-slate-100"
+                }`}
+              >
+                {item.name}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
 
-      {/* Content */}
-      <main className="flex-1 p-8">{children}</main>
+      {/* Main */}
+      <main className="flex-1 p-6">{children}</main>
     </div>
   );
 }

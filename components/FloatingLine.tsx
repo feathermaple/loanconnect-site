@@ -6,7 +6,8 @@ export default function FloatingLine() {
       href="https://lin.ee/WPqaDbx"
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 right-4 z-[999] flex items-center gap-2 rounded-full bg-[#06C755] px-4 py-3 text-white shadow-lg transition hover:scale-105 md:bottom-6 md:right-6"
+      className="fixed bottom-24 right-4 z-40 flex items-center gap-2 rounded-full bg-[#06C755] px-4 py-3 text-white shadow-lg transition hover:scale-105 md:bottom-10 md:right-6"
+      aria-label="LINE諮詢"
     >
       {/* LINE icon */}
       <svg

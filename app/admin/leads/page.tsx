@@ -1,492 +1,412 @@
-import { revalidatePath } from "next/cache";
-import { createAdminClient } from "@/lib/supabase/admin";
+"use client";
 
-type SearchParams = {
-  q?: string;
-  status?: string;
+import { useEffect, useMemo, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+type TabKey = "borrower" | "ads" | "lenders";
+type RowData = Record<string, any>;
+
+const TABLE_MAP: Record<
+  TabKey,
+  { label: string; table: string; pk: string }
+> = {
+  borrower: { label: "借款需求", table: "loan_requests", pk: "id" },
+  ads: { label: "放款廣告", table: "lender_ads", pk: "id" },
+  lenders: { label: "各區金主", table: "profiles", pk: "id" },
 };
 
-function getStatusText(status: string | null | undefined) {
-  switch (status) {
-    case "new":
-      return "未聯絡";
-    case "contacted":
-      return "已聯絡";
-    case "closed":
-      return "已成交";
-    case "invalid":
-      return "無效";
-    default:
-      return "未聯絡";
-  }
+const HIDDEN_FIELDS = ["password", "hashed_password"];
+
+function formatValue(value: any) {
+  if (value === null || value === undefined) return "-";
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
 }
 
-function getStatusBadgeClass(status: string | null | undefined) {
-  switch (status) {
-    case "contacted":
-      return "bg-blue-100 text-blue-700";
-    case "closed":
-      return "bg-green-100 text-green-700";
-    case "invalid":
-      return "bg-red-100 text-red-700";
-    case "new":
-    default:
-      return "bg-gray-100 text-gray-700";
-  }
+function isEditableField(key: string) {
+  if (["id", "created_at", "updated_at"].includes(key)) return false;
+  if (HIDDEN_FIELDS.includes(key)) return false;
+  return true;
 }
 
-function StatCard({
-  title,
-  value,
-}: {
-  title: string;
-  value: string | number;
-}) {
+export default function AdminLeadsPage() {
+  const supabase = createClient();
+
+  const [activeTab, setActiveTab] = useState<TabKey>("borrower");
+  const [rows, setRows] = useState<RowData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [editingRow, setEditingRow] = useState<RowData | null>(null);
+  const [editForm, setEditForm] = useState<RowData>({});
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
+
+  const currentConfig = TABLE_MAP[activeTab];
+
+  async function fetchRows(tab: TabKey) {
+    setLoading(true);
+    setError("");
+
+    try {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        setRows([]);
+        setError(`讀取 session 失敗：${sessionError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      if (!session?.user) {
+        setRows([]);
+        setError("目前沒有登入 session，請重新登入後再試。");
+        setLoading(false);
+        return;
+      }
+
+      const config = TABLE_MAP[tab];
+      let query = supabase.from(config.table).select("*");
+
+      if (tab === "lenders") {
+        query = query.eq("role", "lender");
+      }
+
+      const { data, error } = await query.order("created_at", {
+        ascending: false,
+      });
+
+      if (error) {
+        setRows([]);
+        setError(error.message || "讀取資料失敗");
+        setLoading(false);
+        return;
+      }
+
+      setRows(data || []);
+      setLoading(false);
+    } catch (err: any) {
+      setRows([]);
+      setError(err?.message || "讀取資料失敗");
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchRows(activeTab);
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      fetchRows(activeTab);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [activeTab]);
+
+  const columns = useMemo(() => {
+    if (!rows.length) return [];
+    return Object.keys(rows[0]).filter((key) => !HIDDEN_FIELDS.includes(key));
+  }, [rows]);
+
+  function openEdit(row: RowData) {
+    setEditingRow(row);
+    setEditForm({ ...row });
+  }
+
+  function closeEdit() {
+    setEditingRow(null);
+    setEditForm({});
+  }
+
+  function handleInputChange(key: string, value: string) {
+    let parsed: any = value;
+    const currentValue = editingRow?.[key];
+
+    if (typeof currentValue === "number") {
+      parsed = value === "" ? null : Number(value);
+    } else if (typeof currentValue === "boolean") {
+      parsed = value === "true";
+    }
+
+    setEditForm((prev) => ({
+      ...prev,
+      [key]: parsed,
+    }));
+  }
+
+  async function handleSave() {
+    if (!editingRow) return;
+
+    const pk = currentConfig.pk;
+    const rowPkValue = editingRow?.[pk];
+
+    if (!rowPkValue) {
+      alert(`這筆資料沒有 ${pk}，無法編輯`);
+      return;
+    }
+
+    setSaving(true);
+
+    const payload: RowData = {};
+    Object.keys(editForm).forEach((key) => {
+      if (isEditableField(key)) {
+        payload[key] = editForm[key];
+      }
+    });
+
+    const { data, error } = await supabase
+      .from(currentConfig.table)
+      .update(payload)
+      .eq(pk, rowPkValue)
+      .select("*");
+
+    setSaving(false);
+
+    if (error) {
+      alert(`更新失敗：${error.message}`);
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      alert("更新失敗：沒有任何資料被更新，請檢查資料表主鍵或 Supabase 權限設定。");
+      return;
+    }
+
+    closeEdit();
+    await fetchRows(activeTab);
+    alert("儲存成功");
+  }
+
+  async function handleDelete(row: RowData) {
+    const pk = currentConfig.pk;
+    const rowPkValue = row?.[pk];
+
+    if (!rowPkValue) {
+      alert(`這筆資料沒有 ${pk}，無法刪除`);
+      return;
+    }
+
+    const ok = window.confirm("確定要刪除這筆資料嗎？刪除後無法恢復。");
+    if (!ok) return;
+
+    setDeletingId(rowPkValue);
+
+    const { data, error } = await supabase
+      .from(currentConfig.table)
+      .delete()
+      .eq(pk, rowPkValue)
+      .select("*");
+
+    setDeletingId(null);
+
+    if (error) {
+      alert(`刪除失敗：${error.message}`);
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      alert("刪除失敗：沒有任何資料被刪除，請檢查資料表主鍵或 Supabase 權限設定。");
+      return;
+    }
+
+    await fetchRows(activeTab);
+    alert("刪除成功");
+  }
+
   return (
-    <div className="rounded-2xl border border-[#ddd6cc] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <div className="text-sm text-[#7a7065]">{title}</div>
-      <div className="mt-2 text-4xl font-bold text-[#2f2a25]">{value}</div>
-    </div>
-  );
-}
-
-async function updateLeadStatus(formData: FormData) {
-  "use server";
-
-  const id = String(formData.get("id") || "");
-  const status = String(formData.get("status") || "new");
-
-  if (!id) return;
-
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("customer_leads")
-    .update({
-      status,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id);
-
-  if (error) {
-    console.error("更新狀態失敗：", error.message);
-  }
-
-  revalidatePath("/admin/leads");
-  revalidatePath("/admin/dashboard");
-}
-
-async function updateLeadAssign(formData: FormData) {
-  "use server";
-
-  const id = String(formData.get("id") || "");
-  const assigned_to = String(formData.get("assigned_to") || "");
-
-  if (!id) return;
-
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("customer_leads")
-    .update({
-      assigned_to,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id);
-
-  if (error) {
-    console.error("更新負責人失敗：", error.message);
-  }
-
-  revalidatePath("/admin/leads");
-  revalidatePath("/admin/dashboard");
-}
-
-async function updateLeadNote(formData: FormData) {
-  "use server";
-
-  const id = String(formData.get("id") || "");
-  const note = String(formData.get("note") || "");
-
-  if (!id) return;
-
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("customer_leads")
-    .update({
-      note,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id);
-
-  if (error) {
-    console.error("更新備註失敗：", error.message);
-  }
-
-  revalidatePath("/admin/leads");
-  revalidatePath("/admin/dashboard");
-}
-
-async function deleteLead(formData: FormData) {
-  "use server";
-
-  const id = String(formData.get("id") || "");
-  if (!id) return;
-
-  const supabase = createAdminClient();
-
-  const { error } = await supabase
-    .from("customer_leads")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    console.error("刪除名單失敗：", error.message);
-  }
-
-  revalidatePath("/admin/leads");
-  revalidatePath("/admin/dashboard");
-}
-
-export default async function AdminLeadsPage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) {
-  const params = await searchParams;
-  const q = params.q?.trim() || "";
-  const statusFilter = params.status?.trim() || "";
-
-  const supabase = createAdminClient();
-
-  let query = supabase
-    .from("customer_leads")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (q) {
-    query = query.or(
-      [
-        `name.ilike.%${q}%`,
-        `phone.ilike.%${q}%`,
-        `line_id.ilike.%${q}%`,
-        `city.ilike.%${q}%`,
-        `district.ilike.%${q}%`,
-        `email.ilike.%${q}%`,
-        `assigned_to.ilike.%${q}%`,
-        `note.ilike.%${q}%`,
-      ].join(",")
-    );
-  }
-
-  if (statusFilter) {
-    query = query.eq("status", statusFilter);
-  }
-
-  const { data: leads, error } = await query;
-
-  const { data: allLeads, error: allError } = await supabase
-    .from("customer_leads")
-    .select("*");
-
-  if (error || allError) {
-    return (
-      <div>
-        <h1 className="text-3xl font-bold text-[#2f2a25]">貸款申請名單</h1>
-        <p className="mt-4 text-red-600">
-          讀取失敗：{error?.message || allError?.message}
+    <div className="min-h-screen bg-[#f6f7fb] px-4 py-8 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+          名單管理
+        </h1>
+        <p className="mt-2 text-sm text-slate-600">
+          可查看、編輯、刪除借款需求、放款廣告、各區金主資料。
         </p>
-      </div>
-    );
-  }
 
-  const list = leads ?? [];
-  const allList = allLeads ?? [];
-
-  const now = new Date();
-  const todayStr = now.toLocaleDateString("en-CA");
-  const month = now.getMonth();
-  const year = now.getFullYear();
-
-  const todayCount = allList.filter((lead: any) => {
-    if (!lead.created_at) return false;
-    return new Date(lead.created_at).toLocaleDateString("en-CA") === todayStr;
-  }).length;
-
-  const monthCount = allList.filter((lead: any) => {
-    if (!lead.created_at) return false;
-    const d = new Date(lead.created_at);
-    return d.getFullYear() === year && d.getMonth() === month;
-  }).length;
-
-  const newCount = allList.filter(
-    (lead: any) => !lead.status || lead.status === "new"
-  ).length;
-
-  const contactedCount = allList.filter(
-    (lead: any) => lead.status === "contacted"
-  ).length;
-
-  const closedCount = allList.filter(
-    (lead: any) => lead.status === "closed"
-  ).length;
-
-  const invalidCount = allList.filter(
-    (lead: any) => lead.status === "invalid"
-  ).length;
-
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-[#2f2a25]">貸款申請名單</h1>
-          <p className="mt-2 text-sm text-[#7a7065]">
-            管理表單名單、更新狀態、快速聯絡、備註追蹤與匯出資料
-          </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          {(Object.keys(TABLE_MAP) as TabKey[]).map((key) => {
+            const active = activeTab === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={`rounded-full border px-5 py-3 text-sm font-medium transition ${
+                  active
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {TABLE_MAP[key].label}
+              </button>
+            );
+          })}
         </div>
 
-        <a
-          href="/api/admin/export-leads"
-          className="inline-flex items-center justify-center rounded-xl bg-green-600 px-5 py-3 text-white transition hover:opacity-90"
-        >
-          匯出 CSV
-        </a>
-      </div>
-
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <StatCard title="今日名單" value={todayCount} />
-        <StatCard title="本月名單" value={monthCount} />
-        <StatCard title="未聯絡" value={newCount} />
-        <StatCard title="已聯絡" value={contactedCount} />
-        <StatCard title="已成交" value={closedCount} />
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-2">
-        <StatCard title="無效名單" value={invalidCount} />
-        <StatCard title="目前顯示筆數" value={list.length} />
-      </section>
-
-      <form
-        method="GET"
-        className="grid gap-4 rounded-2xl border border-[#ddd6cc] bg-white p-4 shadow-sm md:grid-cols-[1fr_320px]"
-      >
-        <input
-          type="text"
-          name="q"
-          defaultValue={q}
-          placeholder="搜尋姓名、電話、LINE、地區、Email、負責人、備註"
-          className="h-14 rounded-2xl border border-[#d9d1c7] bg-white px-4 text-base outline-none focus:border-[#8f7f6b]"
-        />
-
-        <select
-          name="status"
-          defaultValue={statusFilter}
-          className="h-14 rounded-2xl border border-[#d9d1c7] bg-white px-4 text-base outline-none focus:border-[#8f7f6b]"
-        >
-          <option value="">全部狀態</option>
-          <option value="new">未聯絡</option>
-          <option value="contacted">已聯絡</option>
-          <option value="closed">已成交</option>
-          <option value="invalid">無效</option>
-        </select>
-
-        <div className="flex gap-3 md:col-span-2">
-          <button
-            type="submit"
-            className="rounded-xl bg-[#4b433b] px-5 py-3 text-white transition hover:opacity-90"
-          >
-            搜尋
-          </button>
-
-          <a
-            href="/admin/leads"
-            className="rounded-xl border border-[#d9d1c7] bg-white px-5 py-3 text-[#4b433b] transition hover:bg-[#f7f4ef]"
-          >
-            清除條件
-          </a>
+        <div className="mt-6 text-sm text-slate-500">
+          目前資料表：
+          <span className="font-semibold text-slate-700">
+            {" "}{currentConfig.table}
+          </span>
         </div>
-      </form>
 
-      <div className="rounded-2xl border border-[#ddd6cc] bg-white p-4 text-sm text-[#6f665d] shadow-sm">
-        共 {list.length} 筆名單
-        {q ? `，關鍵字：「${q}」` : ""}
-        {statusFilter ? `，狀態：${getStatusText(statusFilter)}` : ""}
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          {loading ? (
+            <div className="p-8 text-sm text-slate-500">讀取中...</div>
+          ) : error ? (
+            <div className="p-8 text-sm text-red-500">讀取失敗：{error}</div>
+          ) : rows.length === 0 ? (
+            <div className="p-8 text-sm text-slate-500">目前沒有資料</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-slate-50">
+                  <tr>
+                    {columns.map((col) => (
+                      <th
+                        key={col}
+                        className="whitespace-nowrap border-b border-slate-200 px-4 py-3 font-semibold text-slate-700"
+                      >
+                        {col}
+                      </th>
+                    ))}
+                    <th className="sticky right-0 z-10 whitespace-nowrap border-b border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-700">
+                      操作
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {rows.map((row, index) => {
+                    const rowPkValue = row?.[currentConfig.pk];
+
+                    return (
+                      <tr
+                        key={rowPkValue ?? index}
+                        className="border-b border-slate-100 align-top"
+                      >
+                        {columns.map((col) => (
+                          <td
+                            key={col}
+                            className="max-w-[220px] whitespace-pre-wrap px-4 py-3 text-slate-700"
+                          >
+                            {formatValue(row[col])}
+                          </td>
+                        ))}
+
+                        <td className="sticky right-0 z-10 whitespace-nowrap bg-white px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => openEdit(row)}
+                              className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                            >
+                              編輯
+                            </button>
+
+                            <button
+                              onClick={() => handleDelete(row)}
+                              disabled={deletingId === rowPkValue}
+                              className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+                            >
+                              {deletingId === rowPkValue ? "刪除中..." : "刪除"}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[#ddd6cc] bg-white shadow-sm">
-        <table className="min-w-[1800px] w-full text-sm">
-          <thead className="bg-[#f3f1ee] text-[#2f2a25]">
-            <tr>
-              <th className="px-4 py-4 text-left">姓名</th>
-              <th className="px-4 py-4 text-left">電話</th>
-              <th className="px-4 py-4 text-left">LINE</th>
-              <th className="px-4 py-4 text-left">Email</th>
-              <th className="px-4 py-4 text-left">城市</th>
-              <th className="px-4 py-4 text-left">區域</th>
-              <th className="px-4 py-4 text-left">金額</th>
-              <th className="px-4 py-4 text-left">貸款類型</th>
-              <th className="px-4 py-4 text-left">需求</th>
-              <th className="px-4 py-4 text-left">狀態</th>
-              <th className="px-4 py-4 text-left">負責人</th>
-              <th className="px-4 py-4 text-left">備註</th>
-              <th className="px-4 py-4 text-left">來源</th>
-              <th className="px-4 py-4 text-left">建立時間</th>
-              <th className="px-4 py-4 text-left">更新時間</th>
-              <th className="px-4 py-4 text-left">操作</th>
-            </tr>
-          </thead>
+      {editingRow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-900">編輯資料</h2>
+              <button
+                onClick={closeEdit}
+                className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+              >
+                關閉
+              </button>
+            </div>
 
-          <tbody>
-            {list.map((lead: any) => (
-              <tr key={lead.id} className="border-t border-[#ebe5dd] align-top">
-                <td className="px-4 py-4">{lead.name || "-"}</td>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {Object.keys(editForm)
+                .filter((key) => !HIDDEN_FIELDS.includes(key))
+                .map((key) => {
+                  const value = editForm[key];
+                  const editable = isEditableField(key);
+                  const originalValue = editingRow[key];
+                  const isBoolean = typeof originalValue === "boolean";
 
-                <td className="px-4 py-4">
-                  {lead.phone ? (
-                    <a
-                      href={`tel:${lead.phone}`}
-                      className="text-blue-600 underline"
-                    >
-                      {lead.phone}
-                    </a>
-                  ) : (
-                    "-"
-                  )}
-                </td>
+                  return (
+                    <div key={key} className="space-y-1">
+                      <label className="block text-sm font-medium text-slate-700">
+                        {key}
+                      </label>
 
-                <td className="px-4 py-4">
-                  {lead.line_id ? (
-                    <a
-                      href={`https://line.me/ti/p/~${lead.line_id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-green-600 underline"
-                    >
-                      {lead.line_id}
-                    </a>
-                  ) : (
-                    "-"
-                  )}
-                </td>
+                      {!editable ? (
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500">
+                          {formatValue(value)}
+                        </div>
+                      ) : isBoolean ? (
+                        <select
+                          value={String(value)}
+                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                        >
+                          <option value="true">true</option>
+                          <option value="false">false</option>
+                        </select>
+                      ) : String(value ?? "").length > 80 ? (
+                        <textarea
+                          value={value ?? ""}
+                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          rows={4}
+                          className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                        />
+                      ) : (
+                        <input
+                          value={value ?? ""}
+                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
 
-                <td className="px-4 py-4">{lead.email || "-"}</td>
-                <td className="px-4 py-4">{lead.city || "-"}</td>
-                <td className="px-4 py-4">{lead.district || "-"}</td>
-                <td className="px-4 py-4">{lead.amount || "-"}</td>
-                <td className="px-4 py-4">{lead.loan_type || "-"}</td>
-                <td className="px-4 py-4 whitespace-pre-wrap">
-                  {lead.message || "-"}
-                </td>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={closeEdit}
+                className="rounded-xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+              >
+                取消
+              </button>
 
-                <td className="px-4 py-4">
-                  <div className="mb-2">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusBadgeClass(
-                        lead.status
-                      )}`}
-                    >
-                      {getStatusText(lead.status)}
-                    </span>
-                  </div>
-
-                  <form action={updateLeadStatus} className="flex flex-col gap-2">
-                    <input type="hidden" name="id" value={lead.id} />
-                    <select
-                      name="status"
-                      defaultValue={lead.status || "new"}
-                      className="rounded-lg border border-[#d9d1c7] px-3 py-2"
-                    >
-                      <option value="new">未聯絡</option>
-                      <option value="contacted">已聯絡</option>
-                      <option value="closed">已成交</option>
-                      <option value="invalid">無效</option>
-                    </select>
-                    <button
-                      type="submit"
-                      className="rounded-lg bg-[#4b433b] px-3 py-2 text-white transition hover:opacity-90"
-                    >
-                      更新
-                    </button>
-                  </form>
-                </td>
-
-                <td className="px-4 py-4">
-                  <form action={updateLeadAssign} className="flex flex-col gap-2">
-                    <input type="hidden" name="id" value={lead.id} />
-                    <input
-                      type="text"
-                      name="assigned_to"
-                      defaultValue={lead.assigned_to || ""}
-                      placeholder="輸入負責人"
-                      className="min-w-[120px] rounded-lg border border-[#d9d1c7] px-3 py-2"
-                    />
-                    <button
-                      type="submit"
-                      className="rounded-lg bg-[#4b433b] px-3 py-2 text-white transition hover:opacity-90"
-                    >
-                      儲存
-                    </button>
-                  </form>
-                </td>
-
-                <td className="px-4 py-4">
-                  <form action={updateLeadNote} className="flex flex-col gap-2">
-                    <input type="hidden" name="id" value={lead.id} />
-                    <textarea
-                      name="note"
-                      defaultValue={lead.note || ""}
-                      placeholder="輸入備註內容"
-                      rows={4}
-                      className="min-w-[220px] rounded-lg border border-[#d9d1c7] px-3 py-2"
-                    />
-                    <button
-                      type="submit"
-                      className="rounded-lg bg-[#4b433b] px-3 py-2 text-white transition hover:opacity-90"
-                    >
-                      儲存
-                    </button>
-                  </form>
-                </td>
-
-                <td className="px-4 py-4">{lead.source || "-"}</td>
-
-                <td className="px-4 py-4">
-                  {lead.created_at
-                    ? new Date(lead.created_at).toLocaleString("zh-TW")
-                    : "-"}
-                </td>
-
-                <td className="px-4 py-4">
-                  {lead.updated_at
-                    ? new Date(lead.updated_at).toLocaleString("zh-TW")
-                    : "-"}
-                </td>
-
-                <td className="px-4 py-4">
-                  <form action={deleteLead}>
-                    <input type="hidden" name="id" value={lead.id} />
-                    <button
-                      type="submit"
-                      className="rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
-                    >
-                      刪除
-                    </button>
-                  </form>
-                </td>
-              </tr>
-            ))}
-
-            {list.length === 0 && (
-              <tr>
-                <td colSpan={16} className="px-4 py-10 text-center text-[#7a7065]">
-                  目前沒有符合條件的資料
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {saving ? "儲存中..." : "儲存修改"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

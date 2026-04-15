@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import AdminEntryButton from "@/components/AdminEntryButton";
 import { GoogleTagManager } from "@next/third-parties/google";
 import MobileCTA from "@/components/MobileCTA";
 import FloatingLine from "@/components/FloatingLine";
 
+const SITE_URL = "https://loanconnect-site.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://秒貸通-site.vercel.app"),
+  metadataBase: new URL(SITE_URL),
 
   title: {
     default: "秒貸通｜貸款評估、信用貸款、整合負債媒合平台",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    "秒貸通 提供信用貸款、整合負債、小額借款與貸款需求評估服務，快速填表、專人聯繫，協助你找到合適方案。",
+    "秒貸通提供信用貸款、整合負債、小額借款與貸款需求評估服務，快速填表、專人聯繫，協助你找到合適方案。",
 
   keywords: [
     "貸款",
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     title: "秒貸通｜貸款評估、信用貸款、整合負債媒合平台",
     description:
       "快速填表、專人聯繫，協助你找到合適的信用貸款、整合負債與小額借款方案。",
-    url: "https://秒貸通-site.vercel.app",
+    url: SITE_URL,
     siteName: "秒貸通",
     locale: "zh_TW",
     type: "website",
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: "https://秒貸通-site.vercel.app",
+    canonical: SITE_URL,
   },
 
   robots: {
@@ -62,23 +63,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="zh-Hant" suppressHydrationWarning>
-      <head>
-        <meta
-          name="google-site-verification"
-          content="6GAJmOE_9Da5hLgAi6oa73iDM2f0BYhYInupwi7ORZU"
-        />
-      </head>
-
       <body className="bg-[#f6f2ec] text-[#2f2a25]">
         <GoogleTagManager gtmId="GTM-MFLZMWPV" />
         <Navbar />
         {children}
-        <AdminEntryButton />
         <Footer />
         <MobileCTA />
         <FloatingLine />

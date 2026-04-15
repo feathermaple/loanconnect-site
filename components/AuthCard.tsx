@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type Props = {
@@ -9,7 +9,6 @@ type Props = {
   title: string;
   desc: string;
   primaryText: string;
-  extraFields?: [string, string][];
 };
 
 export default function AuthCard({
@@ -19,6 +18,7 @@ export default function AuthCard({
   primaryText,
 }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -39,6 +39,7 @@ export default function AuthCard({
         return;
       }
 
+      // 註冊
       if (mode === "register") {
         const { error } = await supabase.auth.signUp({
           email,
@@ -66,6 +67,7 @@ export default function AuthCard({
         return;
       }
 
+      // 登入
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -77,8 +79,13 @@ export default function AuthCard({
         return;
       }
 
+      // 🔥 核心：回原頁
+      const redirectTo = searchParams.get("redirect") || "/dashboard";
+
       setLoading(false);
-      router.push("/dashboard");
+
+      router.refresh(); // 很重要，讓 server 重新抓登入狀態
+      router.push(redirectTo);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "發生未知錯誤，請稍後再試";
