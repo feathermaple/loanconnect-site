@@ -148,7 +148,7 @@ export default function LoanInfoPage() {
 
             <div className="mt-6">
               <Link
-                href="/borrow"
+                href="/apply-loan"
                 className="inline-flex rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#3e3a34]"
               >
                 前往貸款申請

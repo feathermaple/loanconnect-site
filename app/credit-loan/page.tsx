@@ -217,7 +217,7 @@ export default function CreditLoanPage() {
 
         <div className="mt-6">
           <Link
-            href="/borrow"
+            href="/apply-loan"
             className="inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#2f2a25] transition hover:opacity-95"
           >
             前往免費評估
@@ -231,7 +231,7 @@ export default function CreditLoanPage() {
           <Link href="/articles" className="text-[#5c534c] hover:underline">
             查看所有貸款知識文章
           </Link>
-          <Link href="/borrow" className="text-[#5c534c] hover:underline">
+          <Link href="/apply-loan" className="text-[#5c534c] hover:underline">
             免費貸款需求評估
           </Link>
         </div>

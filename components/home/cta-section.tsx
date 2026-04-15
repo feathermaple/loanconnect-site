@@ -52,7 +52,7 @@ export default function CtaSection() {
 
               <div className="mt-6 space-y-3">
                 <Link
-                  href="/borrow"
+                  href="/apply-loan"
                   className="block rounded-full bg-[#3e3a34] px-6 py-3 text-center text-sm font-semibold text-white shadow-md hover:opacity-95"
                 >
                   立即免費評估

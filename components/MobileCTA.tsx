@@ -21,7 +21,7 @@ export default function MobileCTA() {
 
         {/* 免費評估 */}
         <Link
-          href="/borrow"
+          href="/apply-loan"
           className="flex flex-col items-center justify-center bg-[#3e3a34] py-3 text-xs font-semibold text-white transition active:opacity-90"
         >
           <span className="text-base">📝</span>

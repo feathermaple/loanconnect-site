@@ -96,7 +96,7 @@ export default async function LoanSeoPage({
 
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
-              href="/borrow"
+              href="/apply-loan"
               className="rounded-full bg-[#3e3a34] px-7 py-3 text-sm font-semibold text-white shadow-lg hover:opacity-95"
             >
               立即免費評估
@@ -205,7 +205,7 @@ export default async function LoanSeoPage({
 
             <div className="mt-8">
               <Link
-                href="/borrow"
+                href="/apply-loan"
                 className="inline-flex rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#3e3a34]"
               >
                 前往免費評估

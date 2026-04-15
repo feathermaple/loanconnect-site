@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const nav = [
   ["/", "首頁"],
-  ["/borrow", "立即申請"],
+  ["/apply-loan", "我要借錢"],
   ["/lenders", "服務據點"],
   ["/articles", "知識專區"],
   ["/register", "會員註冊"],
@@ -38,7 +38,7 @@ export default function Header() {
             登入
           </Link>
           <Link
-            href="/borrow"
+            href="/apply-loan"
             className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5"
           >
             免費諮詢

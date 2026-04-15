@@ -57,8 +57,8 @@ export default function Footer() {
           <div className="font-semibold text-ink">快速入口</div>
           <ul className="mt-4 space-y-3 text-sm text-muted">
             <li>
-              <Link href="/borrow" className="transition hover:text-ink">
-                立即申請
+              <Link href="/apply-loan" className="transition hover:text-ink">
+                我要借錢
               </Link>
             </li>
             <li>

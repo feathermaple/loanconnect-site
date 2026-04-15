@@ -69,7 +69,7 @@ export default function BorrowPage() {
         window.dataLayer.push({
           event: "lead_submit",
           form_name: "borrow_form",
-          page_path: "/borrow",
+          page_path: "/apply-loan",
         });
 
         console.log("lead_submit pushed", window.dataLayer);
@@ -99,7 +99,7 @@ export default function BorrowPage() {
     <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
       <SectionTitle
         badge="Borrow Page"
-        title="立即申請"
+        title="我要借錢"
         desc="填寫基本資料後，將由專人協助初步評估適合的貸款方向與方案。"
       />
 

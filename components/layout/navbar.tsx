@@ -7,7 +7,7 @@ const navItems = [
   { label: "首頁", href: "/" },
   { label: "貸款資訊", href: "/loan-info" },
   { label: "常見問題", href: "/faq" },
-  { label: "立即申請", href: "/borrow" },
+  { label: "我要借錢", href: "/apply-loan" },
 ];
 
 export default function Navbar() {
@@ -42,7 +42,7 @@ export default function Navbar() {
           ))}
 
           <Link
-            href="/borrow"
+            href="/apply-loan"
             className="ml-2 rounded-full bg-[#3e3a34] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
           >
             立即免費評估

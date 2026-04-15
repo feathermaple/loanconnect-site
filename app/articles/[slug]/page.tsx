@@ -517,7 +517,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
 
             <div className="mt-6">
               <Link
-                href="/borrow"
+                href="/apply-loan"
                 className="inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#3e3a34] transition hover:opacity-95"
               >
                 前往免費評估
