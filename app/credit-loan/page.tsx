@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     "資金週轉",
   ],
   alternates: {
-    canonical: "https://loanconnect-site.vercel.app/credit-loan",
+    canonical: "https://miaodaitong.com/credit-loan",
   },
   openGraph: {
     title: "信用貸款是什麼？條件、利率、流程一次看懂",
     description:
       "整理信用貸款申請條件、利率比較、申請流程與常見問題，幫助你快速了解並進行貸款評估。",
-    url: "https://loanconnect-site.vercel.app/credit-loan",
+    url: "https://miaodaitong.com/credit-loan",
     siteName: "LoanConnect",
     locale: "zh_TW",
     type: "article",
@@ -56,7 +56,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     "@type": "WebPage",
-    "@id": "https://loanconnect-site.vercel.app/credit-loan",
+    "@id": "https://miaodaitong.com/credit-loan",
   },
 };
 

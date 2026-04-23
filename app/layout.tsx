@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { GoogleTagManager } from "@next/third-parties/google";
 import FloatingLine from "@/components/FloatingLine";
 
-const SITE_URL = "https://loanconnect-site.vercel.app";
+const SITE_URL = "https://miaodaitong.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

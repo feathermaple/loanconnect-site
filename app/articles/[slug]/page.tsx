@@ -217,7 +217,7 @@ export async function generateMetadata({
     article.seo_description?.trim() ||
     article.excerpt?.trim() ||
     "LoanConnect 貸款知識文章";
-  const url = `https://loanconnect-site.vercel.app/articles/${encodeURIComponent(
+  const url = `https://miaodaitong.com/articles/${encodeURIComponent(
     article.slug
   )}`;
 
@@ -298,7 +298,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
     article.seo_description?.trim() ||
     article.excerpt?.trim() ||
     "LoanConnect 貸款知識文章";
-  const url = `https://loanconnect-site.vercel.app/articles/${encodeURIComponent(
+  const url = `https://miaodaitong.com/articles/${encodeURIComponent(
     article.slug
   )}`;
 
@@ -348,13 +348,13 @@ export default async function ArticleDetailPage({ params }: PageProps) {
         "@type": "ListItem",
         position: 1,
         name: "首頁",
-        item: "https://loanconnect-site.vercel.app",
+        item: "https://miaodaitong.com",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "知識專區",
-        item: "https://loanconnect-site.vercel.app/articles",
+        item: "https://miaodaitong.com/articles",
       },
       {
         "@type": "ListItem",

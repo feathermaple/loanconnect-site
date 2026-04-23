@@ -23,13 +23,13 @@ export const metadata: Metadata = {
     "秒貸通",
   ],
   alternates: {
-    canonical: "https://loanconnect-site.vercel.app/",
+    canonical: "https://miaodaitong.com/",
   },
   openGraph: {
     title: "秒貸通｜借款需求與放款廣告媒合平台",
     description:
       "借款方可免費刊登需求，放款方可免費刊登資訊，快速建立雙邊媒合平台。",
-    url: "https://loanconnect-site.vercel.app",
+    url: "https://miaodaitong.com",
     siteName: "秒貸通",
     locale: "zh_TW",
     type: "website",

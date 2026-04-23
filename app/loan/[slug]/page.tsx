@@ -61,7 +61,7 @@ export async function generateMetadata({
     title: `${page.title}申請與條件說明`,
     description: page.description,
     alternates: {
-      canonical: `https://loanconnect-site.vercel.app/loan/${slug}`,
+      canonical: `https://miaodaitong.com/loan/${slug}`,
     },
   };
 }

@@ -7,7 +7,7 @@ const supabase = createClient(
 );
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://loanconnect-site.vercel.app";
+  const baseUrl = "https://miaodaitong.com";
   const now = new Date();
 
   let articleRoutes: MetadataRoute.Sitemap = [];

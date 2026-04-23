@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: "我要借錢｜免費刊登借款需求｜秒貸通 MIAO DAI TONG",
     description:
       "免費刊登借款需求，讓資金更快找到你。流程簡單、操作方便、快速開始評估。",
-    url: "https://loanconnect-site.vercel.app/apply-loan",
+    url: "https://miaodaitong.com/apply-loan",
     siteName: "秒貸通 MIAO DAI TONG",
     locale: "zh_TW",
     type: "website",

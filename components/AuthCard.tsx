@@ -46,7 +46,7 @@ export default function AuthCard({
           password,
           options: {
             emailRedirectTo:
-              "https://loanconnect-site.vercel.app/auth/callback",
+              "https://miaodaitong.com/auth/callback",
             data: {
               phone,
               line_id: lineId,
