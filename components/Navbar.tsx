@@ -28,6 +28,16 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [authReady, setAuthReady] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -144,71 +154,100 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1700px] items-center justify-between px-4 py-3 md:px-8 md:py-4">
-          <Link href="/" className="flex shrink-0 items-center">
-  <div className="relative h-[88px] w-[360px] sm:h-[96px] sm:w-[400px] md:h-[110px] md:w-[460px] lg:h-[120px] lg:w-[500px] xl:h-[130px] xl:w-[540px]">
-    <Image
-      src="/logo.png"
-      alt="秒貸通"
-      fill
-      sizes="(max-width: 640px) 360px, (max-width: 768px) 400px, (max-width: 1024px) 460px, (max-width: 1280px) 500px, 540px"
-      className="object-contain"
-      priority
-    />
-  </div>
-</Link>
-
-          <nav className="hidden items-center gap-5 lg:flex xl:gap-6">
-            {navLinks.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="whitespace-nowrap text-[15px] font-medium text-[#5f5750] hover:text-black"
-              >
-                {item.label}
-              </Link>
-            ))}
-
-            <Link
-              href="/apply-loan"
-              className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white"
+      <header
+        className={[
+          "sticky top-0 z-50 border-b border-[#eadfce] bg-[#fbf8f3]/95 backdrop-blur-xl transition-all duration-300",
+          scrolled ? "shadow-[0_10px_30px_rgba(95,69,36,0.08)]" : "shadow-none",
+        ].join(" ")}
+      >
+        <div
+          className={[
+            "mx-auto flex max-w-[1800px] items-center px-4 md:px-8 transition-all duration-300",
+            scrolled ? "py-2 md:py-2.5" : "py-3 md:py-4",
+          ].join(" ")}
+        >
+          {/* LOGO：左半邊品牌區 */}
+          <Link
+            href="/"
+            className="flex w-[42%] min-w-[240px] shrink-0 items-center lg:w-[34%] xl:w-[36%]"
+            aria-label="回到首頁"
+          >
+            <div
+              className={[
+                "relative w-full transition-all duration-300",
+                scrolled
+                  ? "h-[58px] sm:h-[64px] md:h-[72px] lg:h-[78px]"
+                  : "h-[76px] sm:h-[86px] md:h-[98px] lg:h-[108px]",
+              ].join(" ")}
             >
-              我要借錢
-            </Link>
+              <Image
+                src="/logo.png"
+                alt="秒貸通"
+                fill
+                sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, 560px"
+                className="object-contain object-left drop-shadow-[0_3px_8px_rgba(160,116,34,0.16)]"
+                priority
+              />
+            </div>
+          </Link>
 
-            <Link
-              href="/post-lender"
-              className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white"
-            >
-              我要放款
-            </Link>
+          {/* 桌機選單 */}
+          <div className="ml-auto hidden items-center gap-4 lg:flex xl:gap-5">
+            <nav className="flex items-center gap-4 rounded-full border border-[#eadfce]/70 bg-white/45 px-5 py-3 shadow-sm xl:gap-5">
+              {navLinks.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="whitespace-nowrap text-[14px] font-medium tracking-wide text-[#5f5750] transition hover:-translate-y-0.5 hover:text-[#b8872b]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
 
-            {!authReady ? (
-              <div className="rounded-full border px-4 py-2.5 text-sm text-gray-400">
-                載入中...
-              </div>
-            ) : isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="rounded-full border px-4 py-2.5 text-sm disabled:opacity-60"
-              >
-                {loggingOut ? "登出中..." : "登出"}
-              </button>
-            ) : (
+            <div className="flex items-center gap-3">
               <Link
-                href="/login"
-                className="rounded-full border px-4 py-2.5 text-sm"
+                href="/apply-loan"
+                className="flex h-[86px] w-[54px] items-center justify-center rounded-full bg-gradient-to-b from-red-500 to-red-700 px-3 text-center text-[15px] font-bold leading-[1.35] text-white shadow-[0_10px_22px_rgba(220,38,38,0.28)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(220,38,38,0.34)]"
               >
-                登入
+                我要借錢
               </Link>
-            )}
-          </nav>
 
+              <Link
+                href="/post-lender"
+                className="flex h-[86px] w-[54px] items-center justify-center rounded-full bg-gradient-to-b from-blue-500 to-blue-700 px-3 text-center text-[15px] font-bold leading-[1.35] text-white shadow-[0_10px_22px_rgba(37,99,235,0.28)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(37,99,235,0.34)]"
+              >
+                我要放款
+              </Link>
+
+              {!authReady ? (
+                <div className="flex h-[72px] w-[52px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/70 text-center text-xs text-gray-400">
+                  載入中
+                </div>
+              ) : isLoggedIn ? (
+                <button
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="flex h-[72px] w-[52px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/70 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white disabled:opacity-60"
+                  type="button"
+                >
+                  {loggingOut ? "登出中" : "登出"}
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex h-[72px] w-[52px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/70 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white"
+                >
+                  登入
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* 手機選單按鈕 */}
           <button
             onClick={() => setMenuOpen(true)}
-            className="text-2xl lg:hidden"
+            className="ml-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#eadfce] bg-white text-2xl text-[#5f5750] shadow-sm lg:hidden"
             aria-label="開啟選單"
             type="button"
           >
@@ -222,17 +261,28 @@ export default function Navbar() {
           <button
             type="button"
             aria-label="關閉選單背景"
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/45"
             onClick={() => setMenuOpen(false)}
           />
 
-          <div className="absolute right-0 top-0 h-dvh w-[80%] max-w-[360px] bg-white shadow-xl">
+          <div className="absolute right-0 top-0 h-dvh w-[86%] max-w-[390px] bg-[#fbf8f3] shadow-2xl">
             <div className="flex h-full flex-col">
-              <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-5 py-4">
-                <div className="text-lg font-semibold">選單</div>
+              <div className="flex shrink-0 items-center justify-between border-b border-[#eadfce] px-5 py-4">
+                <div className="relative h-[58px] w-[210px]">
+                  <Image
+                    src="/logo.png"
+                    alt="秒貸通"
+                    fill
+                    sizes="210px"
+                    className="object-contain object-left"
+                    priority
+                  />
+                </div>
+
                 <button
                   onClick={() => setMenuOpen(false)}
                   aria-label="關閉選單"
+                  className="rounded-full border border-[#eadfce] bg-white px-4 py-2 text-sm text-[#5f5750]"
                   type="button"
                 >
                   關閉
@@ -246,13 +296,13 @@ export default function Navbar() {
                   touchAction: "pan-y",
                 }}
               >
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   {navLinks.map((item) => (
                     <Link
                       key={item.label}
                       href={item.href}
                       onClick={() => setMenuOpen(false)}
-                      className="border-b border-gray-100 pb-3 text-base text-[#5f5750]"
+                      className="rounded-2xl border border-[#eadfce] bg-white px-4 py-3 text-base font-medium text-[#5f5750] shadow-sm"
                     >
                       {item.label}
                     </Link>
@@ -261,7 +311,7 @@ export default function Navbar() {
                   <Link
                     href="/apply-loan"
                     onClick={() => setMenuOpen(false)}
-                    className="mt-2 rounded-full bg-red-600 px-5 py-3 text-center text-sm font-semibold text-white"
+                    className="mt-2 rounded-2xl bg-red-600 px-5 py-3 text-center text-sm font-bold text-white shadow-lg"
                   >
                     我要借錢
                   </Link>
@@ -269,20 +319,20 @@ export default function Navbar() {
                   <Link
                     href="/post-lender"
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-full bg-blue-600 px-5 py-3 text-center text-sm font-semibold text-white"
+                    className="rounded-2xl bg-blue-600 px-5 py-3 text-center text-sm font-bold text-white shadow-lg"
                   >
                     我要放款
                   </Link>
 
                   {!authReady ? (
-                    <div className="rounded-full border px-5 py-3 text-center text-sm text-gray-400">
+                    <div className="rounded-2xl border border-[#eadfce] bg-white px-5 py-3 text-center text-sm text-gray-400">
                       載入中...
                     </div>
                   ) : isLoggedIn ? (
                     <button
                       onClick={handleLogout}
                       disabled={loggingOut}
-                      className="rounded-full border px-5 py-3 text-sm disabled:opacity-60"
+                      className="rounded-2xl border border-[#eadfce] bg-white px-5 py-3 text-sm font-medium text-[#5f5750] disabled:opacity-60"
                       type="button"
                     >
                       {loggingOut ? "登出中..." : "登出"}
@@ -291,7 +341,7 @@ export default function Navbar() {
                     <Link
                       href="/login"
                       onClick={() => setMenuOpen(false)}
-                      className="rounded-full border px-5 py-3 text-center text-sm"
+                      className="rounded-2xl border border-[#eadfce] bg-white px-5 py-3 text-center text-sm font-medium text-[#5f5750]"
                     >
                       登入
                     </Link>
