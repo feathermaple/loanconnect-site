@@ -145,17 +145,14 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-4 md:px-8 md:py-5">
-          <Link
-  href="/"
-  className="flex shrink-0 items-center"
->
-  <div className="relative h-[64px] w-[220px] sm:h-[72px] sm:w-[250px] md:h-[88px] md:w-[305px] lg:h-[96px] lg:w-[335px] xl:h-[120px] xl:w-[420px]">
+        <div className="mx-auto flex max-w-[1700px] items-center justify-between px-4 py-3 md:px-8 md:py-4">
+          <Link href="/" className="flex shrink-0 items-center">
+  <div className="relative h-[88px] w-[360px] sm:h-[96px] sm:w-[400px] md:h-[110px] md:w-[460px] lg:h-[120px] lg:w-[500px] xl:h-[130px] xl:w-[540px]">
     <Image
-      src="/logo.png"
+      src="/logo.PNG"
       alt="秒貸通"
       fill
-      sizes="(max-width: 640px) 220px, (max-width: 768px) 250px, (max-width: 1024px) 305px, (max-width: 1280px) 335px, 365px"
+      sizes="(max-width: 640px) 360px, (max-width: 768px) 400px, (max-width: 1024px) 460px, (max-width: 1280px) 500px, 540px"
       className="object-contain"
       priority
     />
