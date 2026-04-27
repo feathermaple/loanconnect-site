@@ -169,7 +169,7 @@ export default function Navbar() {
           {/* LOGO：左半邊品牌區 */}
           <Link
             href="/"
-            className="flex w-[42%] min-w-[240px] shrink-0 items-center lg:w-[34%] xl:w-[36%]"
+            className="flex w-[60%] min-w-[320px] shrink-0 items-center lg:w-[50%] xl:w-[52%]"
             aria-label="回到首頁"
           >
             <div
