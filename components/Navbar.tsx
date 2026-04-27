@@ -148,10 +148,10 @@ export default function Navbar() {
         <div className="mx-auto flex max-w-[1920px] items-center px-3 py-4 sm:px-4 md:px-10 md:py-5 xl:px-16">
           <Link
             href="/"
-            className="flex w-[180px] shrink-0 items-center sm:w-[230px] md:w-[360px] lg:w-[48vw] lg:max-w-[820px] lg:min-w-[420px]"
+            className="flex w-[245px] shrink-0 items-center sm:w-[310px] md:w-[430px] lg:w-[48vw] lg:max-w-[820px] lg:min-w-[420px]"
             aria-label="回到首頁"
           >
-            <div className="relative h-[110px] w-full sm:h-[130px] md:h-[150px] xl:h-[170px]">
+            <div className="relative h-[135px] w-full sm:h-[155px] md:h-[170px] xl:h-[180px]">
               <Image
                 src="/logo.png"
                 alt="秒貸通"
