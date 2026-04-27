@@ -31,11 +31,10 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => setScrolled(window.scrollY > 10);
     onScroll();
 
     window.addEventListener("scroll", onScroll, { passive: true });
-
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -156,95 +155,90 @@ export default function Navbar() {
     <>
       <header
         className={[
-          "sticky top-0 z-50 border-b border-[#eadfce] bg-[#fbf8f3]/95 backdrop-blur-xl transition-all duration-300",
-          scrolled ? "shadow-[0_10px_30px_rgba(95,69,36,0.08)]" : "shadow-none",
+          "sticky top-0 z-50 border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl transition-all duration-300",
+          scrolled ? "shadow-[0_12px_35px_rgba(94,70,36,0.12)]" : "shadow-none",
         ].join(" ")}
       >
         <div
           className={[
-            "mx-auto flex max-w-[1800px] items-center px-4 md:px-8 transition-all duration-300",
-            scrolled ? "py-2 md:py-2.5" : "py-3 md:py-4",
+            "mx-auto flex max-w-[1920px] items-center px-6 md:px-10 xl:px-16 transition-all duration-300",
+            scrolled ? "py-2 md:py-3" : "py-4 md:py-5",
           ].join(" ")}
         >
-          {/* LOGO：左半邊品牌區 */}
           <Link
             href="/"
-            className="flex w-[60%] min-w-[320px] shrink-0 items-center lg:w-[50%] xl:w-[52%]"
+            className="flex w-[48vw] max-w-[820px] min-w-[420px] shrink-0 items-center"
             aria-label="回到首頁"
           >
             <div
               className={[
                 "relative w-full transition-all duration-300",
                 scrolled
-                  ? "h-[58px] sm:h-[64px] md:h-[72px] lg:h-[78px]"
-                  : "h-[76px] sm:h-[86px] md:h-[98px] lg:h-[108px]",
+                  ? "h-[92px] md:h-[105px] xl:h-[118px]"
+                  : "h-[130px] md:h-[150px] xl:h-[170px]",
               ].join(" ")}
             >
               <Image
                 src="/logo.png"
                 alt="秒貸通"
                 fill
-                sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, 560px"
-                className="object-contain object-left drop-shadow-[0_3px_8px_rgba(160,116,34,0.16)]"
+                sizes="(max-width: 1024px) 420px, 820px"
+                className="object-contain object-left drop-shadow-[0_6px_14px_rgba(178,132,38,0.22)]"
                 priority
               />
             </div>
           </Link>
 
-          {/* 桌機選單 */}
-          <div className="ml-auto hidden items-center gap-4 lg:flex xl:gap-5">
-            <nav className="flex items-center gap-4 rounded-full border border-[#eadfce]/70 bg-white/45 px-5 py-3 shadow-sm xl:gap-5">
+          <div className="ml-auto hidden items-center gap-4 lg:flex">
+            <nav className="flex items-center gap-4 rounded-full border border-[#eadfce] bg-white/70 px-5 py-3 shadow-[0_8px_24px_rgba(94,70,36,0.06)] xl:gap-5">
               {navLinks.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="whitespace-nowrap text-[14px] font-medium tracking-wide text-[#5f5750] transition hover:-translate-y-0.5 hover:text-[#b8872b]"
+                  className="whitespace-nowrap text-[14px] font-medium text-[#5f5750] transition hover:-translate-y-0.5 hover:text-[#b8872b]"
                 >
                   {item.label}
                 </Link>
               ))}
             </nav>
 
-            <div className="flex items-center gap-3">
-              <Link
-                href="/apply-loan"
-                className="flex h-[86px] w-[54px] items-center justify-center rounded-full bg-gradient-to-b from-red-500 to-red-700 px-3 text-center text-[15px] font-bold leading-[1.35] text-white shadow-[0_10px_22px_rgba(220,38,38,0.28)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(220,38,38,0.34)]"
-              >
-                我要借錢
-              </Link>
+            <Link
+              href="/apply-loan"
+              className="flex h-[92px] w-[58px] items-center justify-center rounded-full bg-gradient-to-b from-red-500 to-red-700 px-3 text-center text-[15px] font-bold leading-[1.35] text-white shadow-[0_12px_25px_rgba(220,38,38,0.28)] transition hover:-translate-y-1"
+            >
+              我要借錢
+            </Link>
 
-              <Link
-                href="/post-lender"
-                className="flex h-[86px] w-[54px] items-center justify-center rounded-full bg-gradient-to-b from-blue-500 to-blue-700 px-3 text-center text-[15px] font-bold leading-[1.35] text-white shadow-[0_10px_22px_rgba(37,99,235,0.28)] transition hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(37,99,235,0.34)]"
-              >
-                我要放款
-              </Link>
+            <Link
+              href="/post-lender"
+              className="flex h-[92px] w-[58px] items-center justify-center rounded-full bg-gradient-to-b from-blue-500 to-blue-700 px-3 text-center text-[15px] font-bold leading-[1.35] text-white shadow-[0_12px_25px_rgba(37,99,235,0.28)] transition hover:-translate-y-1"
+            >
+              我要放款
+            </Link>
 
-              {!authReady ? (
-                <div className="flex h-[72px] w-[52px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/70 text-center text-xs text-gray-400">
-                  載入中
-                </div>
-              ) : isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  disabled={loggingOut}
-                  className="flex h-[72px] w-[52px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/70 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white disabled:opacity-60"
-                  type="button"
-                >
-                  {loggingOut ? "登出中" : "登出"}
-                </button>
-              ) : (
-                <Link
-                  href="/login"
-                  className="flex h-[72px] w-[52px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/70 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white"
-                >
-                  登入
-                </Link>
-              )}
-            </div>
+            {!authReady ? (
+              <div className="flex h-[74px] w-[56px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-xs text-gray-400">
+                載入中
+              </div>
+            ) : isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="flex h-[74px] w-[56px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white disabled:opacity-60"
+                type="button"
+              >
+                {loggingOut ? "登出中" : "登出"}
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="flex h-[74px] w-[56px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white"
+              >
+                登入
+              </Link>
+            )}
           </div>
 
-          {/* 手機選單按鈕 */}
           <button
             onClick={() => setMenuOpen(true)}
             className="ml-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#eadfce] bg-white text-2xl text-[#5f5750] shadow-sm lg:hidden"
@@ -268,12 +262,12 @@ export default function Navbar() {
           <div className="absolute right-0 top-0 h-dvh w-[86%] max-w-[390px] bg-[#fbf8f3] shadow-2xl">
             <div className="flex h-full flex-col">
               <div className="flex shrink-0 items-center justify-between border-b border-[#eadfce] px-5 py-4">
-                <div className="relative h-[58px] w-[210px]">
+                <div className="relative h-[72px] w-[250px]">
                   <Image
                     src="/logo.png"
                     alt="秒貸通"
                     fill
-                    sizes="210px"
+                    sizes="250px"
                     className="object-contain object-left"
                     priority
                   />
