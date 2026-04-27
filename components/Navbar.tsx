@@ -28,7 +28,6 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [authReady, setAuthReady] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
 
   
   useEffect(() => {
@@ -146,31 +145,14 @@ export default function Navbar() {
 
   return (
     <>
-      <header
-        className={[
-          "sticky top-0 z-50 border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl transition-all duration-300",
-          scrolled ? "shadow-[0_12px_35px_rgba(94,70,36,0.12)]" : "shadow-none",
-        ].join(" ")}
-      >
-        <div
-          className={[
-            "mx-auto flex max-w-[1920px] items-center px-6 md:px-10 xl:px-16 transition-all duration-300",
-            scrolled ? "py-2 md:py-3" : "py-4 md:py-5",
-          ].join(" ")}
-        >
+      <header className="sticky top-0 z-50 border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(94,70,36,0.08)]">
+       <div className="mx-auto flex max-w-[1920px] items-center px-6 py-4 md:px-10 md:py-5 xl:px-16">
           <Link
             href="/"
             className="flex w-[48vw] max-w-[820px] min-w-[420px] shrink-0 items-center"
             aria-label="回到首頁"
           >
-            <div
-              className={[
-                "relative w-full transition-all duration-300",
-                scrolled
-                  ? "h-[92px] md:h-[105px] xl:h-[118px]"
-                  : "h-[130px] md:h-[150px] xl:h-[170px]",
-              ].join(" ")}
-            >
+            <div className="relative h-[130px] w-full md:h-[150px] xl:h-[170px]">
               <Image
                 src="/logo.png"
                 alt="秒貸通"
