@@ -150,7 +150,7 @@ export default function Navbar() {
   href="/"
   className="flex shrink-0 items-center"
 >
-  <div className="relative h-[64px] w-[220px] sm:h-[72px] sm:w-[250px] md:h-[88px] md:w-[305px] lg:h-[96px] lg:w-[335px] xl:h-[104px] xl:w-[365px]">
+  <div className="relative h-[64px] w-[220px] sm:h-[72px] sm:w-[250px] md:h-[88px] md:w-[305px] lg:h-[96px] lg:w-[335px] xl:h-[120px] xl:w-[420px]">
     <Image
       src="/logo.png"
       alt="秒貸通"
