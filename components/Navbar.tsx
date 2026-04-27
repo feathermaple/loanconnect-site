@@ -149,7 +149,7 @@ export default function Navbar() {
           <Link href="/" className="flex shrink-0 items-center">
   <div className="relative h-[88px] w-[360px] sm:h-[96px] sm:w-[400px] md:h-[110px] md:w-[460px] lg:h-[120px] lg:w-[500px] xl:h-[130px] xl:w-[540px]">
     <Image
-      src="/logo.PNG"
+      src="/logo.png"
       alt="秒貸通"
       fill
       sizes="(max-width: 640px) 360px, (max-width: 768px) 400px, (max-width: 1024px) 460px, (max-width: 1280px) 500px, 540px"
