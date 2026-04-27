@@ -145,11 +145,11 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(94,70,36,0.08)]">
+      <header className="sticky top-0 z-[999] w-full overflow-hidden border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(94,70,36,0.08)]">
        <div className="mx-auto flex max-w-[1920px] items-center px-6 py-4 md:px-10 md:py-5 xl:px-16">
           <Link
             href="/"
-            className="flex w-[48vw] max-w-[820px] min-w-[420px] shrink-0 items-center"
+            className="flex w-[210px] shrink-0 items-center sm:w-[260px] md:w-[360px] lg:w-[48vw] lg:max-w-[820px] lg:min-w-[420px]"
             aria-label="回到首頁"
           >
             <div className="relative h-[130px] w-full md:h-[150px] xl:h-[170px]">
@@ -216,7 +216,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setMenuOpen(true)}
-            className="ml-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#eadfce] bg-white text-2xl text-[#5f5750] shadow-sm lg:hidden"
+            className="relative z-[1000] ml-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#eadfce] bg-white text-2xl text-[#5f5750] shadow-sm lg:hidden"
             aria-label="開啟選單"
             type="button"
           >
@@ -226,7 +226,7 @@ export default function Navbar() {
       </header>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-[60] lg:hidden">
+        <div className="fixed inset-0 z-[1001] lg:hidden">
           <button
             type="button"
             aria-label="關閉選單背景"

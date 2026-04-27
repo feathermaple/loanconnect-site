@@ -1,50 +1,63 @@
-import Link from "next/link";
+"use client";
 
-const nav = [
-  ["/", "首頁"],
-  ["/apply-loan", "我要借錢"],
-  ["/lenders", "服務據點"],
-  ["/articles", "知識專區"],
-  ["/register", "會員註冊"],
-  ["/dashboard", "後台預覽"],
-] as const;
+import Link from "next/link";
+import { useState } from "react";
 
 export default function Header() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-line/80 bg-paper/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-        <Link href="/" className="text-left">
-          <div className="text-xl font-black tracking-tight text-ink">LoanConnect</div>
-          <div className="text-xs text-[#8a8178]">暖白米色信任系平台網站</div>
-        </Link>
+    <>
+      <header className="sticky top-0 z-[999] w-full bg-[#f8f3ea]/95 backdrop-blur-md shadow-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
 
-        <nav className="hidden items-center gap-1 lg:flex">
-          {nav.map(([href, label]) => (
-            <Link
-              key={href}
-              href={href}
-              className="rounded-full px-4 py-2 text-sm font-medium text-muted transition hover:bg-soft hover:text-ink"
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
+          {/* LOGO */}
+          <Link href="/" className="flex items-center gap-2">
+            <img
+              src="/logo.png"
+              alt="logo"
+              className="h-10 w-auto"
+            />
+          </Link>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="hidden rounded-full border border-line px-4 py-2 text-sm font-medium text-muted hover:bg-soft md:block"
+          {/* 桌機選單 */}
+          <nav className="hidden md:flex items-center gap-6 text-sm font-semibold">
+            <Link href="/">首頁</Link>
+            <Link href="/apply-loan">我要借錢</Link>
+            <Link href="/posts">放款資訊</Link>
+            <Link href="/dashboard">會員中心</Link>
+          </nav>
+
+          {/* 漢堡 */}
+          <button
+            onClick={() => setOpen(!open)}
+            className="relative z-[1000] flex h-11 w-11 items-center justify-center rounded-full bg-white shadow md:hidden"
           >
-            登入
-          </Link>
-          <Link
-            href="/apply-loan"
-            className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5"
-          >
-            免費諮詢
-          </Link>
+            <span className="text-xl">☰</span>
+          </button>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* 手機選單 */}
+      {open && (
+        <div className="fixed inset-0 z-[998] bg-black/40">
+          <div className="absolute right-0 top-0 h-full w-[70%] bg-white p-6 shadow-xl">
+            <button
+              onClick={() => setOpen(false)}
+              className="mb-6 text-lg"
+            >
+              ✕
+            </button>
+
+            <div className="flex flex-col gap-4 text-base font-semibold">
+              <Link href="/" onClick={() => setOpen(false)}>首頁</Link>
+              <Link href="/apply-loan" onClick={() => setOpen(false)}>我要借錢</Link>
+              <Link href="/posts" onClick={() => setOpen(false)}>放款資訊</Link>
+              <Link href="/dashboard" onClick={() => setOpen(false)}>會員中心</Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
