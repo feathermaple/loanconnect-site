@@ -145,14 +145,14 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-3 md:px-8 md:py-4">
-          <Link href="/" className="flex shrink-0 items-center">
+        <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-4 md:px-8 md:py-5">
+          <Link href="/" className="flex min-w-[190px] shrink-0 items-center sm:min-w-[230px] md:min-w-[300px]">
             <Image
               src="/logo.png"
               alt="秒貸通"
               width={1024}
               height={408}
-              className="h-16 w-auto md:h-24 xl:h-28"
+              className="h-[56px] w-auto object-contain sm:h-[64px] md:h-[82px] lg:h-[92px] xl:h-[104px]"
               priority
             />
           </Link>
