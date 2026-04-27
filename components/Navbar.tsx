@@ -30,14 +30,7 @@ export default function Navbar() {
   const [authReady, setAuthReady] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    onScroll();
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
+  
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     document.documentElement.style.overflow = menuOpen ? "hidden" : "";
