@@ -29,7 +29,6 @@ export default function Navbar() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [authReady, setAuthReady] = useState(false);
 
-  
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     document.documentElement.style.overflow = menuOpen ? "hidden" : "";
@@ -146,18 +145,18 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-[999] w-full overflow-hidden border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(94,70,36,0.08)]">
-       <div className="mx-auto flex max-w-[1920px] items-center px-6 py-4 md:px-10 md:py-5 xl:px-16">
+        <div className="mx-auto flex max-w-[1920px] items-center px-3 py-4 sm:px-4 md:px-10 md:py-5 xl:px-16">
           <Link
             href="/"
-            className="flex w-[210px] shrink-0 items-center sm:w-[260px] md:w-[360px] lg:w-[48vw] lg:max-w-[820px] lg:min-w-[420px]"
+            className="flex w-[180px] shrink-0 items-center sm:w-[230px] md:w-[360px] lg:w-[48vw] lg:max-w-[820px] lg:min-w-[420px]"
             aria-label="回到首頁"
           >
-            <div className="relative h-[130px] w-full md:h-[150px] xl:h-[170px]">
+            <div className="relative h-[110px] w-full sm:h-[130px] md:h-[150px] xl:h-[170px]">
               <Image
                 src="/logo.png"
                 alt="秒貸通"
                 fill
-                sizes="(max-width: 1024px) 420px, 820px"
+                sizes="(max-width: 640px) 180px, (max-width: 1024px) 360px, 820px"
                 className="object-contain object-left drop-shadow-[0_6px_14px_rgba(178,132,38,0.22)]"
                 priority
               />
