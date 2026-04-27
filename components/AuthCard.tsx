@@ -11,12 +11,7 @@ type Props = {
   primaryText: string;
 };
 
-export default function AuthCard({
-  mode,
-  title,
-  desc,
-  primaryText,
-}: Props) {
+export default function AuthCard({ mode, title, desc, primaryText }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -24,7 +19,7 @@ export default function AuthCard({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [lineId, setLineId] = useState("");
-  const [company, setCompany] = useState("");
+  const [memberRole, setMemberRole] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -39,19 +34,22 @@ export default function AuthCard({
         return;
       }
 
-      // 註冊
+      if (mode === "register" && !memberRole) {
+        setMsg("請選擇會員身分");
+        setLoading(false);
+        return;
+      }
+
       if (mode === "register") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo:
-              "https://miaodaitong.com/auth/callback",
+            emailRedirectTo: "https://miaodaitong.com/auth/callback",
             data: {
               phone,
               line_id: lineId,
-              company,
-              role: "customer",
+              role: memberRole,
             },
           },
         });
@@ -60,6 +58,18 @@ export default function AuthCard({
           setMsg(error.message);
           setLoading(false);
           return;
+        }
+
+        // 🔥 同步寫入 profiles（重點）
+        const user = data.user;
+
+        if (user) {
+          await supabase.from("profiles").insert({
+            id: user.id,
+            phone,
+            line_id: lineId,
+            role: memberRole,
+          });
         }
 
         setMsg("註冊成功，請到信箱驗證 Email");
@@ -79,13 +89,27 @@ export default function AuthCard({
         return;
       }
 
-      // 🔥 核心：回原頁
-      const redirectTo = searchParams.get("redirect") || "/dashboard";
+      // 🔥 登入後依會員身分導向
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.role === "lender") {
+          router.push("/dashboard/lender");
+        } else {
+          router.push("/apply-loan");
+        }
+      }
 
       setLoading(false);
-
-      router.refresh(); // 很重要，讓 server 重新抓登入狀態
-      router.push(redirectTo);
+      router.refresh();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "發生未知錯誤，請稍後再試";
@@ -105,16 +129,20 @@ export default function AuthCard({
         {mode === "register" && (
           <>
             <Field label="手機號碼" value={phone} onChange={setPhone} />
-            <Field
-              label="營業名稱 / 店家名稱"
-              value={company}
-              onChange={setCompany}
+
+            {/* 🔥 會員身分 */}
+            <SelectField
+              label="會員身分"
+              value={memberRole}
+              onChange={setMemberRole}
             />
+
             <Field label="LINE ID" value={lineId} onChange={setLineId} />
           </>
         )}
 
         <Field label="Email" type="email" value={email} onChange={setEmail} />
+
         <Field
           label="密碼"
           type="password"
@@ -163,8 +191,33 @@ function Field({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-line px-4 py-3"
+        className="w-full rounded-2xl border border-line bg-white px-4 py-3 outline-none transition focus:border-[#b8872b] focus:ring-2 focus:ring-[#b8872b]/20"
       />
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div>
+      <label className="mb-2 block text-sm">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-2xl border border-line bg-white px-4 py-3 outline-none transition focus:border-[#b8872b] focus:ring-2 focus:ring-[#b8872b]/20"
+      >
+        <option value="">請選擇會員身分</option>
+        <option value="lender">金主會員</option>
+        <option value="borrower">借錢會員</option>
+      </select>
     </div>
   );
 }
