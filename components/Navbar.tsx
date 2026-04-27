@@ -145,26 +145,26 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-[999] w-full overflow-hidden border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(94,70,36,0.08)]">
-        <div className="mx-auto flex max-w-[1920px] items-center px-3 py-4 sm:px-4 md:px-10 md:py-5 xl:px-16">
+        <div className="mx-auto flex max-w-[1920px] items-center px-3 py-3 sm:px-4 md:px-8 md:py-4 xl:px-14">
           <Link
             href="/"
-            className="flex w-[245px] shrink-0 items-center sm:w-[310px] md:w-[430px] lg:w-[48vw] lg:max-w-[820px] lg:min-w-[420px]"
+            className="flex w-[265px] max-w-[calc(100vw-76px)] shrink-0 items-center sm:w-[340px] md:w-[480px] lg:w-[48vw] lg:max-w-[820px] lg:min-w-[420px]"
             aria-label="回到首頁"
           >
-            <div className="relative h-[135px] w-full sm:h-[155px] md:h-[170px] xl:h-[180px]">
+            <div className="relative h-[128px] w-full sm:h-[150px] md:h-[165px] xl:h-[180px]">
               <Image
                 src="/logo.png"
                 alt="秒貸通"
                 fill
-                sizes="(max-width: 640px) 180px, (max-width: 1024px) 360px, 820px"
-                className="object-contain object-left drop-shadow-[0_6px_14px_rgba(178,132,38,0.22)]"
+                sizes="(max-width: 640px) 265px, (max-width: 1024px) 480px, 820px"
+                className="object-contain object-left drop-shadow-[0_8px_18px_rgba(178,132,38,0.24)]"
                 priority
               />
             </div>
           </Link>
 
           <div className="ml-auto hidden items-center gap-4 lg:flex">
-            <nav className="flex items-center gap-4 rounded-full border border-[#eadfce] bg-white/70 px-5 py-3 shadow-[0_8px_24px_rgba(94,70,36,0.06)] xl:gap-5">
+            <nav className="flex items-center gap-4 rounded-full border border-[#eadfce] bg-white/75 px-5 py-3 shadow-[0_8px_24px_rgba(94,70,36,0.06)] xl:gap-5">
               {navLinks.map((item) => (
                 <Link
                   key={item.label}
