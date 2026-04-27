@@ -146,16 +146,21 @@ export default function Navbar() {
     <>
       <header className="sticky top-0 z-50 border-b border-[#e9e2d8] bg-[#fbf8f3]/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-4 md:px-8 md:py-5">
-          <Link href="/" className="flex min-w-[190px] shrink-0 items-center sm:min-w-[230px] md:min-w-[300px]">
-            <Image
-              src="/logo.png"
-              alt="秒貸通"
-              width={1024}
-              height={408}
-              className="h-[56px] w-auto object-contain sm:h-[64px] md:h-[82px] lg:h-[92px] xl:h-[104px]"
-              priority
-            />
-          </Link>
+          <Link
+  href="/"
+  className="flex shrink-0 items-center"
+>
+  <div className="relative h-[64px] w-[220px] sm:h-[72px] sm:w-[250px] md:h-[88px] md:w-[305px] lg:h-[96px] lg:w-[335px] xl:h-[104px] xl:w-[365px]">
+    <Image
+      src="/logo.png"
+      alt="秒貸通"
+      fill
+      sizes="(max-width: 640px) 220px, (max-width: 768px) 250px, (max-width: 1024px) 305px, (max-width: 1280px) 335px, 365px"
+      className="object-contain"
+      priority
+    />
+  </div>
+</Link>
 
           <nav className="hidden items-center gap-5 lg:flex xl:gap-6">
             {navLinks.map((item) => (
