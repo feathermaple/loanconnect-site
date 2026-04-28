@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import { getLoanCity, loanCities } from "@/lib/loanCities";
 
 type PageProps = {
-  params: {
-    city: string;
-  };
+  params: Promise<{
+    slug: string;
+  }>;
 };
 
 export function generateStaticParams() {
@@ -15,7 +15,7 @@ export function generateStaticParams() {
 }
 
 export function generateMetadata({ params }: PageProps) {
-  const city = getLoanCity(params.city);
+  const city = getLoanCity(slug: string);
 
   if (!city) {
     return {
@@ -40,7 +40,7 @@ export function generateMetadata({ params }: PageProps) {
 }
 
 export default function LoanCityPage({ params }: PageProps) {
-  const city = getLoanCity(params.city);
+  const city = getLoanCity(slug: string);
 
   if (!city) notFound();
 
