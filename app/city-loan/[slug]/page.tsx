@@ -10,12 +10,13 @@ type PageProps = {
 
 export function generateStaticParams() {
   return loanCities.map((city) => ({
-    city: city.slug,
+    slug: city.slug,
   }));
 }
 
-export function generateMetadata({ params }: PageProps) {
-  const city = getLoanCity(slug: string);
+export async function generateMetadata({ params }: PageProps) {
+  const { slug } = await params;
+  const city = getLoanCity(slug);
 
   if (!city) {
     return {
@@ -27,24 +28,27 @@ export function generateMetadata({ params }: PageProps) {
     title: city.title,
     description: city.description,
     alternates: {
-      canonical: `https://www.miaodaitong.com/loan/${city.slug}`,
+      canonical: `https://www.miaodaitong.com/city-loan/${city.slug}`,
     },
     openGraph: {
       title: city.title,
       description: city.description,
-      url: `https://www.miaodaitong.com/loan/${city.slug}`,
+      url: `https://www.miaodaitong.com/city-loan/${city.slug}`,
       siteName: "秒貸通",
       type: "website",
     },
   };
 }
 
-export default function LoanCityPage({ params }: PageProps) {
-  const city = getLoanCity(slug: string);
+export default async function LoanCityPage({ params }: PageProps) {
+  const { slug } = await params;
+  const city = getLoanCity(slug);
 
   if (!city) notFound();
 
-  const otherCities = loanCities.filter((item) => item.slug !== city.slug).slice(0, 8);
+  const otherCities = loanCities
+    .filter((item) => item.slug !== city.slug)
+    .slice(0, 8);
 
   return (
     <main className="min-h-screen bg-[#f6f2ec] px-4 py-10">
@@ -71,7 +75,7 @@ export default function LoanCityPage({ params }: PageProps) {
             </Link>
 
             <Link
-              href="/loan"
+              href="/city-loan"
               className="rounded-full border border-[#d8c7b2] bg-white px-6 py-4 text-center font-bold text-[#5a4030] transition hover:bg-[#f8f1e8]"
             >
               查看其他地區
@@ -160,9 +164,7 @@ export default function LoanCityPage({ params }: PageProps) {
         </section>
 
         <section className="mt-8 rounded-[28px] border border-[#eadfce] bg-[#2b2118] p-6 text-white shadow-sm md:p-8">
-          <h2 className="text-2xl font-bold">
-            有{city.name}借款需求？
-          </h2>
+          <h2 className="text-2xl font-bold">有{city.name}借款需求？</h2>
 
           <p className="mt-3 leading-7 text-white/80">
             可先填寫申請資料，平台將協助媒合可能合適的資金方。
@@ -186,7 +188,7 @@ export default function LoanCityPage({ params }: PageProps) {
             {otherCities.map((item) => (
               <Link
                 key={item.slug}
-                href={`/loan/${item.slug}`}
+                href={`/city-loan/${item.slug}`}
                 className="rounded-2xl border border-[#eadfce] bg-white px-4 py-3 text-center font-semibold text-[#5a4030] transition hover:bg-[#f8f1e8]"
               >
                 {item.name}借錢
