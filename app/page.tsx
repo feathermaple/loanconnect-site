@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { loanCities } from "@/lib/loanCities";
 import SectionTitle from "@/components/SectionTitle";
 import { faq } from "@/lib/data";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -321,6 +322,52 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 全台借錢入口 */}
+      <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-14">
+        <div className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-[#9b6b32]">
+                全台服務地區
+              </p>
+              <h2 className="mt-1 text-2xl font-black text-[#2b2118] md:text-3xl">
+                全台借錢媒合入口
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-[#6f675f]">
+                依照縣市快速找到借款媒合入口，包含台北、新北、桃園、新竹、台中、台南、高雄等地區。
+              </p>
+            </div>
+
+            <Link
+              href="/loan"
+              className="hidden rounded-full border border-[#d8c7b2] px-5 py-3 text-sm font-bold text-[#5a4030] transition hover:bg-[#f8f1e8] md:inline-flex"
+            >
+              查看全部地區
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+            {loanCities.slice(0, 10).map((city) => (
+              <Link
+                key={city.slug}
+                href={`/loan/${city.slug}`}
+                className="rounded-2xl bg-[#fbf7f1] px-4 py-3 text-center font-bold text-[#5a4030] transition hover:bg-[#f1e4d4]"
+              >
+                {city.name}借錢
+              </Link>
+            ))}
+          </div>
+
+          <Link
+            href="/loan"
+            className="mt-5 flex justify-center rounded-full bg-[#8b5a2b] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#6f4520] md:hidden"
+          >
+            查看全部地區
+          </Link>
+        </div>
+      </section>
+
 
       {/* PLATFORM FEATURES */}
       <section className="border-t border-line/70 bg-white">
