@@ -432,7 +432,7 @@ export default function AdminLeadsPage() {
 
       {showPaidAdModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">
                 新增圖文廣告
@@ -445,7 +445,8 @@ export default function AdminLeadsPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="flex-1 overflow-y-auto px-6 pb-4">
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
                 <label className="mb-1 block text-sm font-medium text-slate-700">
                   廣告標題 *
@@ -617,7 +618,7 @@ export default function AdminLeadsPage() {
               </label>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="flex shrink-0 justify-end gap-3 border-t bg-white px-6 py-4">
               <button
                 onClick={() => setShowPaidAdModal(false)}
                 className="rounded-xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
@@ -650,7 +651,8 @@ export default function AdminLeadsPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="flex-1 overflow-y-auto px-6 pb-4">
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {Object.keys(editForm)
                 .filter((key) => !HIDDEN_FIELDS.includes(key))
                 .map((key) => {
@@ -703,7 +705,7 @@ export default function AdminLeadsPage() {
                 })}
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="flex shrink-0 justify-end gap-3 border-t bg-white px-6 py-4">
               <button
                 onClick={closeEdit}
                 className="rounded-xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
