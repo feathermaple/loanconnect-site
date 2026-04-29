@@ -9,18 +9,28 @@ const supabase = createClient(
 export const dynamic = "force-dynamic";
 
 export default async function AdsPage() {
-  const { data, error } = await supabase
+  // 🔥 付費圖文廣告
+  const { data: paidAds } = await supabase
+    .from("paid_lender_ads")
+    .select("*")
+    .eq("is_active", true)
+    .order("is_top", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  // 🔥 免費文字廣告（你原本的）
+  const { data: freeAds, error } = await supabase
     .from("lender_ads")
     .select("*")
     .eq("is_active", true)
     .order("is_vip", { ascending: false })
     .order("created_at", { ascending: false });
 
-  const ads = data || [];
+  const ads = freeAds || [];
 
   return (
     <main className="min-h-screen bg-[#f8f5ef] px-4 py-10 md:px-6">
       <div className="mx-auto max-w-6xl">
+        {/* 標題 */}
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[#2f2a25] md:text-4xl">
@@ -33,20 +43,63 @@ export default async function AdsPage() {
 
           <Link
             href="/post-lender"
-            className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white transition hover:opacity-95"
+            className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white"
           >
             免費刊登放款資訊
           </Link>
         </div>
 
+        {/* 🔥 付費圖文廣告 */}
+        {paidAds && paidAds.length > 0 && (
+          <div className="mb-10">
+            <h2 className="mb-4 text-xl font-bold text-[#2f2a25]">
+              🔥 精選推薦
+            </h2>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {paidAds.map((item) => (
+                <div
+                  key={item.id}
+                  className="overflow-hidden rounded-3xl border bg-white shadow-md"
+                >
+                  {/* 圖片 */}
+                  {item.image_url && (
+                    <img
+                      src={item.image_url}
+                      alt={item.title}
+                      className="h-48 w-full object-cover"
+                    />
+                  )}
+
+                  <div className="p-5">
+                    <h3 className="mb-2 text-xl font-bold">
+                      {item.title}
+                    </h3>
+
+                    <p className="mb-2 text-sm text-gray-600">
+                      {item.company_name}
+                    </p>
+
+                    <p className="mb-3 text-sm text-gray-700">
+                      {item.ad_content}
+                    </p>
+
+                    <div className="text-sm text-gray-600 space-y-1">
+                      {item.phone && <p>📞 {item.phone}</p>}
+                      {item.line_id && <p>LINE：{item.line_id}</p>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 🔽 免費文字廣告（你原本） */}
         {error ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-700">
-            讀取資料失敗：{error.message}
-          </div>
+          <div className="text-red-500">讀取資料失敗</div>
         ) : ads.length === 0 ? (
-          <div className="rounded-3xl border border-[#e8dfd3] bg-white px-6 py-12 text-center text-[#6b6258]">
-            目前還沒有放款廣告，歡迎搶先刊登。
-          </div>
+          <div className="text-center">目前沒有資料</div>
         ) : (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {ads.map((item) => (
@@ -54,64 +107,30 @@ export default async function AdsPage() {
                 key={item.id}
                 className="rounded-3xl border border-[#e8dfd3] bg-white p-6 shadow-sm"
               >
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-[#f3ece3] px-3 py-1 text-xs font-bold text-[#5a4b3d]">
-                      {item.region}
-                    </span>
-                    {item.is_vip ? (
-                      <span className="rounded-full bg-[#ffe7a3] px-3 py-1 text-xs font-bold text-[#6b4d00]">
-                        VIP
-                      </span>
-                    ) : null}
-                  </div>
-
-                  <span className="text-xs text-[#8a8178]">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="text-xs">{item.region}</span>
+                  <span className="text-xs">
                     {new Date(item.created_at).toLocaleDateString("zh-TW")}
                   </span>
                 </div>
 
-                <h2 className="mb-2 text-xl font-bold text-[#2f2a25]">
+                <h2 className="mb-2 text-xl font-bold">
                   {item.company_name}
                 </h2>
 
-                <p className="mb-4 text-sm text-[#7b7268]">
+                <p className="mb-2 text-sm">
                   聯絡人：{item.contact_name}
                 </p>
 
-                <div className="space-y-2 text-sm text-[#5f5750]">
-                  <p>
-                    <span className="font-semibold">可承作類型：</span>
-                    {item.loan_types}
-                  </p>
+                <p className="text-sm">
+                  {item.loan_types}
+                </p>
 
-                  {(item.min_amount || item.max_amount) && (
-                    <p>
-                      <span className="font-semibold">承作金額：</span>
-                      {item.min_amount ? `NT$ ${Number(item.min_amount).toLocaleString()}` : "不限"}
-                      {" ~ "}
-                      {item.max_amount ? `NT$ ${Number(item.max_amount).toLocaleString()}` : "不限"}
-                    </p>
-                  )}
-
-                  <p>
-                    <span className="font-semibold">聯絡電話：</span>
-                    {item.phone}
-                  </p>
-
-                  {item.line_id ? (
-                    <p>
-                      <span className="font-semibold">LINE ID：</span>
-                      {item.line_id}
-                    </p>
-                  ) : null}
-                </div>
-
-                {item.ad_content ? (
-                  <div className="mt-4 rounded-2xl bg-[#f8f5ef] px-4 py-3 text-sm leading-6 text-[#5f5750]">
+                {item.ad_content && (
+                  <div className="mt-3 text-sm">
                     {item.ad_content}
                   </div>
-                ) : null}
+                )}
               </article>
             ))}
           </div>

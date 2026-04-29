@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 type TabKey = "borrower" | "ads" | "lenders";
 type RowData = Record<string, any>;
 
-const TABLE_MAP: Record<
-  TabKey,
-  { label: string; table: string; pk: string }
-> = {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+const TABLE_MAP: Record<TabKey, { label: string; table: string; pk: string }> = {
   borrower: { label: "借款需求", table: "loan_requests", pk: "id" },
   ads: { label: "放款廣告", table: "lender_ads", pk: "id" },
   lenders: { label: "各區放款資訊", table: "profiles", pk: "id" },
@@ -39,6 +43,25 @@ export default function AdminLeadsPage() {
   const [editForm, setEditForm] = useState<RowData>({});
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
+
+  const [showPaidAdModal, setShowPaidAdModal] = useState(false);
+  const [paidAdLoading, setPaidAdLoading] = useState(false);
+  const [paidAdImage, setPaidAdImage] = useState<File | null>(null);
+
+  const [paidAdForm, setPaidAdForm] = useState({
+    title: "",
+    company_name: "",
+    contact_name: "",
+    region: "",
+    loan_types: "",
+    min_amount: "",
+    max_amount: "",
+    phone: "",
+    line_id: "",
+    ad_content: "",
+    is_active: true,
+    is_top: false,
+  });
 
   const currentConfig = TABLE_MAP[activeTab];
 
@@ -103,6 +126,101 @@ export default function AdminLeadsPage() {
       ...prev,
       [key]: parsed,
     }));
+  }
+
+  function handlePaidAdChange(key: string, value: string | boolean) {
+    setPaidAdForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  }
+
+  async function handleCreatePaidAd() {
+    if (!paidAdForm.title.trim()) {
+      alert("請填寫廣告標題");
+      return;
+    }
+
+    setPaidAdLoading(true);
+
+    try {
+      let imageUrl = "";
+
+      if (paidAdImage) {
+        const fileExt = paidAdImage.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2)}.${fileExt}`;
+        const filePath = `paid-ads/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("paid-ads")
+          .upload(filePath, paidAdImage, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          alert(`圖片上傳失敗：${uploadError.message}`);
+          setPaidAdLoading(false);
+          return;
+        }
+
+        const { data } = supabase.storage
+          .from("paid-ads")
+          .getPublicUrl(filePath);
+
+        imageUrl = data.publicUrl;
+      }
+
+      const { error } = await supabase.from("paid_lender_ads").insert({
+        title: paidAdForm.title,
+        company_name: paidAdForm.company_name || null,
+        contact_name: paidAdForm.contact_name || null,
+        region: paidAdForm.region || null,
+        loan_types: paidAdForm.loan_types || null,
+        min_amount: paidAdForm.min_amount
+          ? Number(paidAdForm.min_amount)
+          : null,
+        max_amount: paidAdForm.max_amount
+          ? Number(paidAdForm.max_amount)
+          : null,
+        phone: paidAdForm.phone || null,
+        line_id: paidAdForm.line_id || null,
+        ad_content: paidAdForm.ad_content || null,
+        image_url: imageUrl || null,
+        is_active: paidAdForm.is_active,
+        is_top: paidAdForm.is_top,
+      });
+
+      if (error) {
+        alert(`新增圖文廣告失敗：${error.message}`);
+        setPaidAdLoading(false);
+        return;
+      }
+
+      alert("圖文廣告新增成功");
+      setShowPaidAdModal(false);
+      setPaidAdImage(null);
+      setPaidAdForm({
+        title: "",
+        company_name: "",
+        contact_name: "",
+        region: "",
+        loan_types: "",
+        min_amount: "",
+        max_amount: "",
+        phone: "",
+        line_id: "",
+        ad_content: "",
+        is_active: true,
+        is_top: false,
+      });
+    } catch (err: any) {
+      alert(err?.message || "新增圖文廣告失敗");
+    } finally {
+      setPaidAdLoading(false);
+    }
   }
 
   async function handleSave() {
@@ -202,7 +320,7 @@ export default function AdminLeadsPage() {
           可查看、編輯、刪除借款需求、放款廣告、各區放款資訊資料。
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-wrap items-center gap-3">
           {(Object.keys(TABLE_MAP) as TabKey[]).map((key) => {
             const active = activeTab === key;
             return (
@@ -219,12 +337,22 @@ export default function AdminLeadsPage() {
               </button>
             );
           })}
+
+          {activeTab === "ads" && (
+            <button
+              onClick={() => setShowPaidAdModal(true)}
+              className="rounded-full border border-amber-300 bg-amber-100 px-5 py-3 text-sm font-bold text-amber-900 transition hover:bg-amber-200"
+            >
+              ＋新增圖文廣告
+            </button>
+          )}
         </div>
 
         <div className="mt-6 text-sm text-slate-500">
           目前資料表：
           <span className="font-semibold text-slate-700">
-            {" "}{currentConfig.table}
+            {" "}
+            {currentConfig.table}
           </span>
         </div>
 
@@ -286,7 +414,9 @@ export default function AdminLeadsPage() {
                               disabled={deletingId === rowPkValue}
                               className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
                             >
-                              {deletingId === rowPkValue ? "刪除中..." : "刪除"}
+                              {deletingId === rowPkValue
+                                ? "刪除中..."
+                                : "刪除"}
                             </button>
                           </div>
                         </td>
@@ -299,6 +429,213 @@ export default function AdminLeadsPage() {
           )}
         </div>
       </div>
+
+      {showPaidAdModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-900">
+                新增圖文廣告
+              </h2>
+              <button
+                onClick={() => setShowPaidAdModal(false)}
+                className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+              >
+                關閉
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  廣告標題 *
+                </label>
+                <input
+                  value={paidAdForm.title}
+                  onChange={(e) => handlePaidAdChange("title", e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  placeholder="例如：台北快速週轉、彈性放款"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  公司 / 品牌名稱
+                </label>
+                <input
+                  value={paidAdForm.company_name}
+                  onChange={(e) =>
+                    handlePaidAdChange("company_name", e.target.value)
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  聯絡人
+                </label>
+                <input
+                  value={paidAdForm.contact_name}
+                  onChange={(e) =>
+                    handlePaidAdChange("contact_name", e.target.value)
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  地區
+                </label>
+                <input
+                  value={paidAdForm.region}
+                  onChange={(e) => handlePaidAdChange("region", e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  placeholder="例如：台北、新北、桃園"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  可承作類型
+                </label>
+                <input
+                  value={paidAdForm.loan_types}
+                  onChange={(e) =>
+                    handlePaidAdChange("loan_types", e.target.value)
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  placeholder="例如：汽機車、房屋、信用、民間"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  最低金額
+                </label>
+                <input
+                  type="number"
+                  value={paidAdForm.min_amount}
+                  onChange={(e) =>
+                    handlePaidAdChange("min_amount", e.target.value)
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  最高金額
+                </label>
+                <input
+                  type="number"
+                  value={paidAdForm.max_amount}
+                  onChange={(e) =>
+                    handlePaidAdChange("max_amount", e.target.value)
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  電話
+                </label>
+                <input
+                  value={paidAdForm.phone}
+                  onChange={(e) => handlePaidAdChange("phone", e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  LINE ID
+                </label>
+                <input
+                  value={paidAdForm.line_id}
+                  onChange={(e) =>
+                    handlePaidAdChange("line_id", e.target.value)
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  廣告內容
+                </label>
+                <textarea
+                  value={paidAdForm.ad_content}
+                  onChange={(e) =>
+                    handlePaidAdChange("ad_content", e.target.value)
+                  }
+                  rows={5}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  placeholder="輸入要顯示在前台的廣告文案"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  廣告圖片
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setPaidAdImage(e.target.files?.[0] || null)}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+                />
+                {paidAdImage && (
+                  <p className="mt-2 text-xs text-slate-500">
+                    已選擇：{paidAdImage.name}
+                  </p>
+                )}
+              </div>
+
+              <label className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={paidAdForm.is_active}
+                  onChange={(e) =>
+                    handlePaidAdChange("is_active", e.target.checked)
+                  }
+                />
+                上架顯示
+              </label>
+
+              <label className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={paidAdForm.is_top}
+                  onChange={(e) =>
+                    handlePaidAdChange("is_top", e.target.checked)
+                  }
+                />
+                置頂推薦
+              </label>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowPaidAdModal(false)}
+                className="rounded-xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+              >
+                取消
+              </button>
+
+              <button
+                onClick={handleCreatePaidAd}
+                disabled={paidAdLoading}
+                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {paidAdLoading ? "新增中..." : "新增圖文廣告"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editingRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -335,7 +672,9 @@ export default function AdminLeadsPage() {
                       ) : isBoolean ? (
                         <select
                           value={String(value)}
-                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange(key, e.target.value)
+                          }
                           className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
                         >
                           <option value="true">true</option>
@@ -344,14 +683,18 @@ export default function AdminLeadsPage() {
                       ) : String(value ?? "").length > 80 ? (
                         <textarea
                           value={value ?? ""}
-                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange(key, e.target.value)
+                          }
                           rows={4}
                           className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
                         />
                       ) : (
                         <input
                           value={value ?? ""}
-                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange(key, e.target.value)
+                          }
                           className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
                         />
                       )}
