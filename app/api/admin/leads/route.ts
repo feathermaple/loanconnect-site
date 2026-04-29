@@ -28,8 +28,8 @@ export async function GET(request: NextRequest) {
     let query = admin.from(TABLE_MAP[type]).select("*");
 
     if (type === "lenders") {
-      query = query.eq("role", "lender");
-    }
+  query = query.not("region", "is", null);
+}
 
     const { data, error } = await query.order("created_at", {
       ascending: false,
