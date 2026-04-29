@@ -340,7 +340,7 @@ export default async function HomePage() {
             </div>
 
             <Link
-              href="/loan"
+              href="/lenders"
               className="hidden rounded-full border border-[#d8c7b2] px-5 py-3 text-sm font-bold text-[#5a4030] transition hover:bg-[#f8f1e8] md:inline-flex"
             >
               查看全部地區
@@ -351,7 +351,7 @@ export default async function HomePage() {
             {loanCities.slice(0, 10).map((city) => (
               <Link
                 key={city.slug}
-                href={`/loan/${city.slug}`}
+                href="/lenders"
                 className="rounded-2xl bg-[#fbf7f1] px-4 py-3 text-center font-bold text-[#5a4030] transition hover:bg-[#f1e4d4]"
               >
                 {city.name}借錢
@@ -360,7 +360,7 @@ export default async function HomePage() {
           </div>
 
           <Link
-            href="/loan"
+            href="/lenders"
             className="mt-5 flex justify-center rounded-full bg-[#8b5a2b] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#6f4520] md:hidden"
           >
             查看全部地區
