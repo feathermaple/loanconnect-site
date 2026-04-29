@@ -67,12 +67,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-Hant" suppressHydrationWarning>
-      <body className="bg-[#f6f2ec] text-[#2f2a25]">
+      <body className="overflow-x-hidden bg-[#f6f2ec] text-[#2f2a25]">
         <GoogleTagManager gtmId="GTM-MFLZMWPV" />
+
         <Navbar />
+
         {children}
+
         <Footer />
-        
+
         <FloatingLine />
       </body>
     </html>
