@@ -144,32 +144,32 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-[999] w-full overflow-hidden border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(94,70,36,0.08)]">
-        <div className="mx-auto flex max-w-[1920px] items-center px-3 py-3 sm:px-4 md:px-8 md:py-4 xl:px-14">
+      <header className="sticky top-0 z-[999] w-full border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(94,70,36,0.08)]">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center gap-3 px-3 py-2 sm:px-4 md:px-6 lg:px-8">
           <Link
             href="/"
-            className="flex w-[265px] max-w-[calc(100vw-76px)] shrink-0 items-center sm:w-[340px] md:w-[480px] lg:w-[48vw] lg:max-w-[820px] lg:min-w-[420px]"
+            className="flex w-[210px] shrink-0 items-center sm:w-[250px] md:w-[280px] lg:w-[300px] xl:w-[330px]"
             aria-label="回到首頁"
           >
-            <div className="relative h-[128px] w-full sm:h-[150px] md:h-[165px] xl:h-[180px]">
+            <div className="relative h-[82px] w-full sm:h-[92px] md:h-[100px] lg:h-[108px] xl:h-[116px]">
               <Image
                 src="/logo.png"
                 alt="秒貸通"
                 fill
-                sizes="(max-width: 640px) 265px, (max-width: 1024px) 480px, 820px"
-                className="object-contain object-left drop-shadow-[0_8px_18px_rgba(178,132,38,0.24)]"
+                sizes="(max-width: 640px) 210px, (max-width: 1024px) 280px, 330px"
+                className="object-contain object-left drop-shadow-[0_8px_18px_rgba(178,132,38,0.2)]"
                 priority
               />
             </div>
           </Link>
 
-          <div className="ml-auto hidden items-center gap-4 lg:flex">
-            <nav className="flex items-center gap-4 rounded-full border border-[#eadfce] bg-white/75 px-5 py-3 shadow-[0_8px_24px_rgba(94,70,36,0.06)] xl:gap-5">
+          <div className="ml-auto hidden min-w-0 items-center gap-2 lg:flex">
+            <nav className="flex min-w-0 items-center gap-2 rounded-full border border-[#eadfce] bg-white/75 px-3 py-2 shadow-[0_8px_24px_rgba(94,70,36,0.06)] xl:gap-3 xl:px-4">
               {navLinks.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="whitespace-nowrap text-[14px] font-medium text-[#5f5750] transition hover:-translate-y-0.5 hover:text-[#b8872b]"
+                  className="whitespace-nowrap text-[13px] font-medium text-[#5f5750] transition hover:-translate-y-0.5 hover:text-[#b8872b] xl:text-[14px]"
                 >
                   {item.label}
                 </Link>
@@ -178,27 +178,27 @@ export default function Navbar() {
 
             <Link
               href="/apply-loan"
-              className="flex h-[92px] w-[58px] items-center justify-center rounded-full bg-gradient-to-b from-red-500 to-red-700 px-3 text-center text-[15px] font-bold leading-[1.35] text-white shadow-[0_12px_25px_rgba(220,38,38,0.28)] transition hover:-translate-y-1"
+              className="flex h-[68px] w-[48px] shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-red-500 to-red-700 px-2 text-center text-[13px] font-bold leading-[1.25] text-white shadow-[0_12px_25px_rgba(220,38,38,0.28)] transition hover:-translate-y-1 xl:h-[76px] xl:w-[52px] xl:text-[14px]"
             >
               我要借錢
             </Link>
 
             <Link
               href="/post-lender"
-              className="flex h-[92px] w-[58px] items-center justify-center rounded-full bg-gradient-to-b from-blue-500 to-blue-700 px-3 text-center text-[15px] font-bold leading-[1.35] text-white shadow-[0_12px_25px_rgba(37,99,235,0.28)] transition hover:-translate-y-1"
+              className="flex h-[68px] w-[48px] shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-blue-500 to-blue-700 px-2 text-center text-[13px] font-bold leading-[1.25] text-white shadow-[0_12px_25px_rgba(37,99,235,0.28)] transition hover:-translate-y-1 xl:h-[76px] xl:w-[52px] xl:text-[14px]"
             >
               我要放款
             </Link>
 
             {!authReady ? (
-              <div className="flex h-[74px] w-[56px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-xs text-gray-400">
+              <div className="flex h-[58px] w-[48px] shrink-0 items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-xs text-gray-400">
                 載入中
               </div>
             ) : isLoggedIn ? (
               <button
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="flex h-[74px] w-[56px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white disabled:opacity-60"
+                className="flex h-[58px] w-[48px] shrink-0 items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white disabled:opacity-60"
                 type="button"
               >
                 {loggingOut ? "登出中" : "登出"}
@@ -206,7 +206,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="flex h-[74px] w-[56px] items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white"
+                className="flex h-[58px] w-[48px] shrink-0 items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white"
               >
                 登入
               </Link>
@@ -236,12 +236,12 @@ export default function Navbar() {
           <div className="absolute right-0 top-0 h-dvh w-[86%] max-w-[390px] bg-[#fbf8f3] shadow-2xl">
             <div className="flex h-full flex-col">
               <div className="flex shrink-0 items-center justify-between border-b border-[#eadfce] px-5 py-4">
-                <div className="relative h-[72px] w-[250px]">
+                <div className="relative h-[72px] w-[220px]">
                   <Image
                     src="/logo.png"
                     alt="秒貸通"
                     fill
-                    sizes="250px"
+                    sizes="220px"
                     className="object-contain object-left"
                     priority
                   />
