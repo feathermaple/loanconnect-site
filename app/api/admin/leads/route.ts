@@ -7,7 +7,7 @@ type LeadType = "borrower" | "ads" | "lenders";
 const TABLE_MAP: Record<LeadType, string> = {
   borrower: "loan_requests",
   ads: "lender_ads",
-  lenders: "profiles",
+  lenders: "lender_ads",
 };
 
 function getType(request: NextRequest): LeadType {

@@ -15,7 +15,7 @@ const supabase = createClient(
 const TABLE_MAP: Record<TabKey, { label: string; table: string; pk: string }> = {
   borrower: { label: "借款需求", table: "loan_requests", pk: "id" },
   ads: { label: "放款廣告", table: "lender_ads", pk: "id" },
-  lenders: { label: "各區放款資訊", table: "profiles", pk: "id" },
+  lenders: { label: "各區放款資訊", table: "lender_ads", pk: "id" },
 };
 
 const HIDDEN_FIELDS = ["password", "hashed_password"];
