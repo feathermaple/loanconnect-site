@@ -41,12 +41,6 @@ export default async function AdsPage() {
             </p>
           </div>
 
-          <Link
-            href="/post-lender"
-            className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white"
-          >
-            免費刊登放款資訊
-          </Link>
         </div>
 
         {/* 🔥 付費圖文廣告 */}

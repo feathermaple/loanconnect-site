@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -9,6 +10,7 @@ const supabase = createClient(
 );
 
 export default function ApplyLoanPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -41,8 +43,34 @@ export default function ApplyLoanPage() {
 
     setLoading(true);
 
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      setLoading(false);
+      alert("請先登入會員後再刊登借款需求");
+      router.push("/login");
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profile?.role && profile.role !== "borrower") {
+      setLoading(false);
+      alert("此功能限借款會員使用");
+      router.push("/member");
+      return;
+    }
+
     const { error } = await supabase.from("loan_requests").insert([
       {
+        user_id: user.id,
         nickname: form.nickname,
         region: form.region,
         amount: Number(form.amount),
@@ -51,6 +79,7 @@ export default function ApplyLoanPage() {
         line_id: form.line_id,
         description: form.description,
         is_agreed: form.is_agreed,
+        status: "open",
       },
     ]);
 
@@ -62,24 +91,14 @@ export default function ApplyLoanPage() {
     }
 
     alert("送出成功！已幫你刊登借款需求");
-
-    setForm({
-      nickname: "",
-      region: "",
-      amount: "",
-      purpose: "",
-      phone: "",
-      line_id: "",
-      description: "",
-      is_agreed: false,
-    });
+    router.push("/borrower/dashboard");
   };
 
   return (
     <main className="min-h-screen bg-[#f6f2ec] text-[#2b2b2b]">
       {/* 🔥 上方轉換區 */}
       <section className="bg-[#f3ede4] px-4 py-12 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold">
+        <h1 className="text-3xl font-bold md:text-4xl">
           快速刊登借款需求
         </h1>
         <p className="mt-3 text-[#6b6257]">
@@ -87,38 +106,44 @@ export default function ApplyLoanPage() {
         </p>
 
         <div className="mt-5 flex flex-wrap justify-center gap-3 text-sm">
-          <span className="bg-[#fff4dd] px-3 py-1 rounded-full">不用跑銀行</span>
-          <span className="bg-[#fff4dd] px-3 py-1 rounded-full">不限條件評估</span>
-          <span className="bg-[#fff4dd] px-3 py-1 rounded-full">快速媒合</span>
+          <span className="rounded-full bg-[#fff4dd] px-3 py-1">
+            不用跑銀行
+          </span>
+          <span className="rounded-full bg-[#fff4dd] px-3 py-1">
+            不限條件評估
+          </span>
+          <span className="rounded-full bg-[#fff4dd] px-3 py-1">
+            快速媒合
+          </span>
         </div>
       </section>
 
       {/* 🔒 信任區 */}
-      <section className="px-4 mt-6">
-        <div className="max-w-3xl mx-auto bg-white p-4 rounded-xl text-sm text-[#6b6257]">
-          🔒 本平台僅提供資訊媒合服務  
+      <section className="mt-6 px-4">
+        <div className="mx-auto max-w-3xl rounded-xl bg-white p-4 text-sm text-[#6b6257]">
+          🔒 本平台僅提供資訊媒合服務
           <br />
-          ✔ 不收前期費用  
+          ✔ 不收前期費用
           <br />
-          ✔ 不會要求提供證件正本  
+          ✔ 不會要求提供證件正本
         </div>
       </section>
 
       {/* 🧾 表單 */}
       <section className="px-4 py-10">
-        <div className="max-w-3xl mx-auto bg-white p-6 rounded-2xl space-y-4 shadow-sm">
+        <div className="mx-auto max-w-3xl space-y-4 rounded-2xl bg-white p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               placeholder="稱呼（怎麼稱呼您）"
               value={form.nickname}
               onChange={(e) => handleChange("nickname", e.target.value)}
-              className="w-full border p-4 rounded-xl"
+              className="w-full rounded-xl border p-4"
             />
 
             <select
               value={form.region}
               onChange={(e) => handleChange("region", e.target.value)}
-              className="w-full border p-4 rounded-xl"
+              className="w-full rounded-xl border p-4"
             >
               <option value="">選擇地區</option>
               <option>台北基隆</option>
@@ -135,44 +160,42 @@ export default function ApplyLoanPage() {
               placeholder="借款金額（例如：5萬、10萬）"
               value={form.amount}
               onChange={(e) => handleChange("amount", e.target.value)}
-              className="w-full border p-4 rounded-xl"
+              className="w-full rounded-xl border p-4"
             />
 
             <input
               placeholder="借款用途（例如：週轉、整合債務）"
               value={form.purpose}
               onChange={(e) => handleChange("purpose", e.target.value)}
-              className="w-full border p-4 rounded-xl"
+              className="w-full rounded-xl border p-4"
             />
 
             <input
               placeholder="聯絡電話（方便資金方聯繫）"
               value={form.phone}
               onChange={(e) => handleChange("phone", e.target.value)}
-              className="w-full border p-4 rounded-xl"
+              className="w-full rounded-xl border p-4"
             />
 
             <input
               placeholder="LINE ID（建議填寫）"
               value={form.line_id}
               onChange={(e) => handleChange("line_id", e.target.value)}
-              className="w-full border p-4 rounded-xl"
+              className="w-full rounded-xl border p-4"
             />
 
             <textarea
               placeholder="需求說明（越詳細越容易媒合）"
               value={form.description}
               onChange={(e) => handleChange("description", e.target.value)}
-              className="w-full border p-4 rounded-xl"
+              className="w-full rounded-xl border p-4"
             />
 
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
                 checked={form.is_agreed}
-                onChange={(e) =>
-                  handleChange("is_agreed", e.target.checked)
-                }
+                onChange={(e) => handleChange("is_agreed", e.target.checked)}
               />
               我同意平台媒合條款
             </label>
@@ -180,14 +203,13 @@ export default function ApplyLoanPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#c89b45] text-white py-4 rounded-xl font-bold"
+              className="w-full rounded-xl bg-[#c89b45] py-4 font-bold text-white disabled:opacity-60"
             >
               {loading ? "送出中..." : "立即免費刊登需求"}
             </button>
           </form>
 
-          {/* 🔐 安全補強 */}
-          <div className="text-xs text-center text-[#8a8175] mt-4">
+          <div className="mt-4 text-center text-xs text-[#8a8175]">
             資料僅用於媒合用途，不會公開個人資訊
           </div>
         </div>

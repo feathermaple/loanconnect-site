@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getMembershipInfo } from "@/lib/membership";
@@ -29,13 +30,6 @@ export default async function NeedsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data, error } = await adminSupabase
-    .from("loan_requests")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  const requests = data || [];
-
   let role: string | null = null;
   let isPaidMember = false;
   let isExpiredMember = false;
@@ -61,6 +55,10 @@ export default async function NeedsPage() {
 
     role = profile?.role || null;
 
+    if (role === "borrower") {
+      redirect("/borrower/dashboard");
+    }
+
     const membership = getMembershipInfo(profile);
     isPaidMember = membership.canViewFull;
     isExpiredMember = membership.isExpired;
@@ -71,9 +69,18 @@ export default async function NeedsPage() {
     unlockedCount = unlockedNeedIds.size;
   }
 
+  const { data, error } = await adminSupabase
+    .from("loan_requests")
+    .select("*")
+    .eq("status", "open")
+    .order("created_at", { ascending: false });
+
+  const requests = data || [];
+
   function canViewFullInList(needId: string) {
     if (!user) return false;
     if (role !== "lender" && role !== "admin") return false;
+    if (role === "admin") return true;
     if (isPaidMember) return true;
     if (unlockedNeedIds.has(needId)) return true;
     return false;
@@ -87,17 +94,17 @@ export default async function NeedsPage() {
       };
     }
 
-    if (role !== "lender" && role !== "admin") {
+    if (role === "admin") {
       return {
-        text: "非金主帳號",
-        className: "bg-gray-100 text-gray-600 border border-gray-200",
+        text: "管理員可看",
+        className: "bg-emerald-100 text-emerald-700 border border-emerald-200",
       };
     }
 
-    if (isPaidMember) {
+    if (role !== "lender") {
       return {
-        text: "VIP 可看",
-        className: "bg-amber-100 text-amber-700 border border-amber-200",
+        text: "金主可看",
+        className: "bg-gray-100 text-gray-600 border border-gray-200",
       };
     }
 
@@ -105,6 +112,13 @@ export default async function NeedsPage() {
       return {
         text: "已解鎖",
         className: "bg-emerald-100 text-emerald-700 border border-emerald-200",
+      };
+    }
+
+    if (isPaidMember) {
+      return {
+        text: "VIP 可看",
+        className: "bg-amber-100 text-amber-700 border border-amber-200",
       };
     }
 
@@ -123,7 +137,7 @@ export default async function NeedsPage() {
     }
 
     return {
-      text: isExpiredMember ? "會員已到期" : "需升級會員",
+      text: isExpiredMember ? "會員已到期" : "需購買解鎖",
       className: "bg-rose-100 text-rose-700 border border-rose-200",
     };
   }
@@ -136,6 +150,7 @@ export default async function NeedsPage() {
             <h1 className="text-3xl font-bold text-[#2f2a25] md:text-4xl">
               借款需求
             </h1>
+
             <p className="mt-2 text-[#6b6258]">
               最新借款需求公開列表。登入後系統會依你的會員身份，自動顯示可查看的內容。
             </p>
@@ -150,7 +165,6 @@ export default async function NeedsPage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-           
             <Link
               href="/apply-loan"
               className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white transition hover:opacity-95"
@@ -166,13 +180,14 @@ export default async function NeedsPage() {
           </div>
         ) : requests.length === 0 ? (
           <div className="rounded-3xl border border-[#e8dfd3] bg-white px-6 py-12 text-center text-[#6b6258]">
-            目前還沒有借款需求，歡迎搶先刊登。
+            目前還沒有開啟中的借款需求。
           </div>
         ) : (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {requests.map((item) => {
               const canView = canViewFullInList(item.id);
               const badge = getBadge(item.id);
+              const alreadyUnlocked = unlockedNeedIds.has(item.id);
 
               return (
                 <article
@@ -204,7 +219,9 @@ export default async function NeedsPage() {
                   <div className="space-y-2 text-sm text-[#5f5750]">
                     <p>
                       <span className="font-semibold">稱呼：</span>
-                      {canView ? item.nickname || "未提供" : maskNickname(item.nickname)}
+                      {canView
+                        ? item.nickname || "未提供"
+                        : maskNickname(item.nickname)}
                     </p>
 
                     <p>
@@ -228,19 +245,19 @@ export default async function NeedsPage() {
                       <p>
                         <span className="font-semibold">聯絡方式：</span>
                         <span className="text-[#b36b00]">
-                          {user
-                            ? role === "lender" || role === "admin"
-                              ? isExpiredMember
-                                ? unlockCredits > 0
-                                  ? `VIP 已到期，但你還有 ${unlockCredits} 點可扣點查看`
-                                  : "VIP 已到期，請續費或購買單筆解鎖"
-                                : unlockedCount < 2
-                                  ? "進入詳情頁可免費解鎖查看"
-                                  : unlockCredits > 0
-                                    ? `進入詳情頁可扣點解鎖（剩餘 ${unlockCredits} 點）`
-                                    : "免費額度已用完，請升級會員或購買單筆解鎖"
-                              : "金主會員可查看"
-                            : "登入後可依會員資格查看"}
+                          {!user
+                            ? "登入後可依會員資格查看"
+                            : role === "lender" || role === "admin"
+                            ? isExpiredMember
+                              ? unlockCredits > 0
+                                ? `VIP 已到期，但你還有 ${unlockCredits} 點可扣點查看`
+                                : "VIP 已到期，請續費或購買單筆解鎖"
+                              : unlockedCount < 2
+                              ? "進入詳情頁可免費解鎖查看"
+                              : unlockCredits > 0
+                              ? `進入詳情頁可扣點解鎖（剩餘 ${unlockCredits} 點）`
+                              : "免費額度已用完，請升級會員或購買單筆解鎖"
+                            : "金主會員可查看"}
                         </span>
                       </p>
                     )}
@@ -254,19 +271,25 @@ export default async function NeedsPage() {
 
                   {!canView && (
                     <div className="mt-4 rounded-2xl border border-[#eadfce] bg-[#fffaf4] px-4 py-3 text-sm text-[#6b6258]">
-                      {user
-                        ? role === "lender" || role === "admin"
-                          ? isExpiredMember
-                            ? unlockCredits > 0
-                              ? `${membershipReason}，但你仍可使用剩餘 ${unlockCredits} 點解鎖點數。`
-                              : `${membershipReason}，目前沒有可用點數，請續費或購買單筆解鎖。`
-                            : unlockedCount < 2
-                              ? `你目前還可免費解鎖 ${2 - unlockedCount} 筆完整需求。`
-                              : unlockCredits > 0
-                                ? `你的免費解鎖額度已用完，但仍有 ${unlockCredits} 點可使用。`
-                                : "你的免費解鎖額度已用完，升級 VIP 或購買單筆解鎖即可繼續查看。"
-                          : "目前你的帳號不是金主會員身份，無法查看完整聯絡方式。"
-                        : "登入後可依會員身份查看完整聯絡方式。"}
+                      {!user
+                        ? "登入後可依會員身份查看完整聯絡方式。"
+                        : role === "lender" || role === "admin"
+                        ? isExpiredMember
+                          ? unlockCredits > 0
+                            ? `${membershipReason}，但你仍可使用剩餘 ${unlockCredits} 點解鎖點數。`
+                            : `${membershipReason}，目前沒有可用點數，請續費或購買單筆解鎖。`
+                          : unlockedCount < 2
+                          ? `你目前還可免費解鎖 ${2 - unlockedCount} 筆完整需求。`
+                          : unlockCredits > 0
+                          ? `你的免費解鎖額度已用完，但仍有 ${unlockCredits} 點可使用。`
+                          : "你的免費解鎖額度已用完，升級 VIP 或購買單筆解鎖即可繼續查看。"
+                        : "金主會員可查看完整聯絡方式。"}
+                    </div>
+                  )}
+
+                  {alreadyUnlocked && (
+                    <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                      這筆你已解鎖過，進入詳情頁不會再次扣點。
                     </div>
                   )}
 
@@ -275,18 +298,20 @@ export default async function NeedsPage() {
                     className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#3e3a34] px-5 py-3 text-sm font-bold text-white transition hover:opacity-95"
                   >
                     {canView
-                      ? "查看詳情"
+                      ? alreadyUnlocked
+                        ? "查看已解鎖詳情"
+                        : "查看詳情"
                       : user
-                        ? role === "lender" || role === "admin"
-                          ? unlockedCount < 2
-                            ? "前往解鎖查看"
-                            : unlockCredits > 0
-                              ? "前往扣點解鎖"
-                              : isExpiredMember
-                                ? "續費或購買解鎖"
-                                : "升級會員或購買解鎖"
-                          : "查看詳情"
-                        : "登入後查看"}
+                      ? role === "lender" || role === "admin"
+                        ? unlockedCount < 2
+                          ? "前往免費解鎖"
+                          : unlockCredits > 0
+                          ? "前往扣點解鎖"
+                          : isExpiredMember
+                          ? "續費或購買解鎖"
+                          : "升級會員或購買解鎖"
+                        : "查看詳情"
+                      : "登入後查看"}
                   </Link>
                 </article>
               );

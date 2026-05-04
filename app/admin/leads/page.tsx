@@ -143,56 +143,34 @@ export default function AdminLeadsPage() {
     setPaidAdLoading(true);
 
     try {
-      let imageUrl = "";
+      const formData = new FormData();
+
+      formData.append("title", paidAdForm.title);
+      formData.append("company_name", paidAdForm.company_name);
+      formData.append("contact_name", paidAdForm.contact_name);
+      formData.append("region", paidAdForm.region);
+      formData.append("loan_types", paidAdForm.loan_types);
+      formData.append("min_amount", paidAdForm.min_amount);
+      formData.append("max_amount", paidAdForm.max_amount);
+      formData.append("phone", paidAdForm.phone);
+      formData.append("line_id", paidAdForm.line_id);
+      formData.append("ad_content", paidAdForm.ad_content);
+      formData.append("is_active", String(paidAdForm.is_active));
+      formData.append("is_top", String(paidAdForm.is_top));
 
       if (paidAdImage) {
-        const fileExt = paidAdImage.name.split(".").pop();
-        const fileName = `${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2)}.${fileExt}`;
-        const filePath = `paid-ads/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("paid-ads")
-          .upload(filePath, paidAdImage, {
-            cacheControl: "3600",
-            upsert: false,
-          });
-
-        if (uploadError) {
-          alert(`圖片上傳失敗：${uploadError.message}`);
-          return;
-        }
-
-        const { data } = supabase.storage
-          .from("paid-ads")
-          .getPublicUrl(filePath);
-
-        imageUrl = data.publicUrl;
+        formData.append("image", paidAdImage);
       }
 
-      const { error } = await supabase.from("paid_lender_ads").insert({
-        title: paidAdForm.title,
-        company_name: paidAdForm.company_name || null,
-        contact_name: paidAdForm.contact_name || null,
-        region: paidAdForm.region || null,
-        loan_types: paidAdForm.loan_types || null,
-        min_amount: paidAdForm.min_amount
-          ? Number(paidAdForm.min_amount)
-          : null,
-        max_amount: paidAdForm.max_amount
-          ? Number(paidAdForm.max_amount)
-          : null,
-        phone: paidAdForm.phone || null,
-        line_id: paidAdForm.line_id || null,
-        ad_content: paidAdForm.ad_content || null,
-        image_url: imageUrl || null,
-        is_active: paidAdForm.is_active,
-        is_top: paidAdForm.is_top,
+      const res = await fetch("/api/admin/paid-lender-ads", {
+        method: "POST",
+        body: formData,
       });
 
-      if (error) {
-        alert(`新增圖文廣告失敗：${error.message}`);
+      const json = await res.json();
+
+      if (!res.ok) {
+        alert(json?.error || "新增圖文廣告失敗");
         return;
       }
 
@@ -213,6 +191,8 @@ export default function AdminLeadsPage() {
         is_active: true,
         is_top: false,
       });
+
+      await fetchRows(activeTab);
     } catch (err: any) {
       alert(err?.message || "新增圖文廣告失敗");
     } finally {

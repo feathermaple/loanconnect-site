@@ -51,6 +51,10 @@ export default async function NeedDetailPage({
     notFound();
   }
 
+  if (!user) {
+    redirect("/login");
+  }
+
   let role: string | null = null;
   let canViewFull = false;
   let statusText = "未解鎖";
@@ -64,75 +68,55 @@ export default async function NeedDetailPage({
   let isExpired = false;
   let unlockCredits = 0;
 
-  if (user) {
-    const headerStore = await headers();
-    const forwardedFor = headerStore.get("x-forwarded-for") || "";
-    const realIp = headerStore.get("x-real-ip") || "";
-    const ip = forwardedFor.split(",")[0]?.trim() || realIp.trim() || "unknown";
+  const headerStore = await headers();
+  const forwardedFor = headerStore.get("x-forwarded-for") || "";
+  const realIp = headerStore.get("x-real-ip") || "";
+  const ip = forwardedFor.split(",")[0]?.trim() || realIp.trim() || "unknown";
 
-    const [{ data: profile }, { data: unlockLogs }] = await Promise.all([
-      adminSupabase
-        .from("profiles")
-        .select(
-          "role, membership_plan, membership_status, membership_expires_at, unlock_credits"
-        )
-        .eq("id", user.id)
-        .maybeSingle(),
-      adminSupabase
-        .from("need_unlock_logs")
-        .select("need_id")
-        .eq("user_id", user.id),
-    ]);
+  const [{ data: profile }, { data: unlockLogs }] = await Promise.all([
+    adminSupabase
+      .from("profiles")
+      .select(
+        "role, membership_plan, membership_status, membership_expires_at, unlock_credits"
+      )
+      .eq("id", user.id)
+      .maybeSingle(),
+    adminSupabase
+      .from("need_unlock_logs")
+      .select("need_id")
+      .eq("user_id", user.id),
+  ]);
 
-    role = profile?.role || null;
-    membershipPlan = profile?.membership_plan || null;
-    membershipStatus = profile?.membership_status || null;
-    membershipExpiresAt = profile?.membership_expires_at || null;
-    unlockCredits = profile?.unlock_credits || 0;
+  role = profile?.role || null;
+  membershipPlan = profile?.membership_plan || null;
+  membershipStatus = profile?.membership_status || null;
+  membershipExpiresAt = profile?.membership_expires_at || null;
+  unlockCredits = profile?.unlock_credits || 0;
 
-    const membership = getMembershipInfo(profile);
-    isPaidMember = membership.canViewFull;
-    isExpired = membership.isExpired;
-    membershipReason = membership.reason;
+  if (role !== "lender" && role !== "admin") {
+    redirect("/borrower/dashboard");
+  }
 
-    const unlockedNeedIds = new Set((unlockLogs || []).map((log) => log.need_id));
-    const alreadyUnlocked = unlockedNeedIds.has(id);
+  const membership = getMembershipInfo(profile);
+  isPaidMember = membership.canViewFull;
+  isExpired = membership.isExpired;
+  membershipReason = membership.reason;
 
-    remainingFreeUnlocks = Math.max(0, 2 - unlockedNeedIds.size);
+  const unlockedNeedIds = new Set((unlockLogs || []).map((log) => log.need_id));
+  const alreadyUnlocked = unlockedNeedIds.has(id);
 
-    if (role === "lender" || role === "admin") {
-      // 1. VIP 會員：直接可看，但若還沒解鎖過就補一筆紀錄
-      if (isPaidMember) {
-        canViewFull = true;
-        statusText = alreadyUnlocked ? "已解鎖" : "VIP 可看";
+  remainingFreeUnlocks = Math.max(0, 2 - unlockedNeedIds.size);
 
-        if (!alreadyUnlocked) {
-          const { error: insertError } = await adminSupabase
-            .from("need_unlock_logs")
-            .insert({
-              user_id: user.id,
-              need_id: id,
-              ip,
-            });
+  if (role === "admin") {
+    canViewFull = true;
+    statusText = "管理員可看";
+    membershipReason = "目前為管理員帳號";
+  } else if (role === "lender") {
+    if (isPaidMember) {
+      canViewFull = true;
+      statusText = alreadyUnlocked ? "已解鎖" : "VIP 可看";
 
-          if (!insertError) {
-            await adminSupabase.from("unlock_logs").insert({
-              user_id: user.id,
-              need_id: id,
-              credit_cost: 0,
-              unlock_type: "vip",
-              note: "VIP 查看借款需求",
-            });
-          }
-        }
-      }
-      // 2. 已經解鎖過：直接可看，不重複扣點、不重複寫紀錄
-      else if (alreadyUnlocked) {
-        canViewFull = true;
-        statusText = "已解鎖";
-      }
-      // 3. 還有免費額度：免費解鎖一次，並寫入紀錄
-      else if (remainingFreeUnlocks > 0) {
+      if (!alreadyUnlocked) {
         const { error: insertError } = await adminSupabase
           .from("need_unlock_logs")
           .insert({
@@ -146,58 +130,76 @@ export default async function NeedDetailPage({
             user_id: user.id,
             need_id: id,
             credit_cost: 0,
-            unlock_type: "free",
-            note: "使用免費額度查看借款需求",
+            unlock_type: "vip",
+            note: "VIP 查看借款需求",
+          });
+        }
+      }
+    } else if (alreadyUnlocked) {
+      canViewFull = true;
+      statusText = "已解鎖";
+    } else if (remainingFreeUnlocks > 0) {
+      const { error: insertError } = await adminSupabase
+        .from("need_unlock_logs")
+        .insert({
+          user_id: user.id,
+          need_id: id,
+          ip,
+        });
+
+      if (!insertError) {
+        await adminSupabase.from("unlock_logs").insert({
+          user_id: user.id,
+          need_id: id,
+          credit_cost: 0,
+          unlock_type: "free",
+          note: "使用免費額度查看借款需求",
+        });
+
+        canViewFull = true;
+        statusText = "已解鎖";
+        remainingFreeUnlocks = Math.max(0, remainingFreeUnlocks - 1);
+      }
+    } else if (unlockCredits > 0) {
+      const { error: insertError } = await adminSupabase
+        .from("need_unlock_logs")
+        .insert({
+          user_id: user.id,
+          need_id: id,
+          ip,
+        });
+
+      if (!insertError) {
+        const nextCredits = Math.max(0, unlockCredits - 1);
+
+        const { error: creditUpdateError } = await adminSupabase
+          .from("profiles")
+          .update({
+            unlock_credits: nextCredits,
+          })
+          .eq("id", user.id);
+
+        if (!creditUpdateError) {
+          await adminSupabase.from("unlock_logs").insert({
+            user_id: user.id,
+            need_id: id,
+            credit_cost: 1,
+            unlock_type: "credit",
+            note: "使用點數解鎖借款需求",
           });
 
           canViewFull = true;
-          statusText = "已解鎖";
-          remainingFreeUnlocks = Math.max(0, remainingFreeUnlocks - 1);
+          statusText = "點數解鎖";
+          unlockCredits = nextCredits;
         }
       }
-      // 4. 免費額度沒了，但還有點數：扣 1 點，並寫入紀錄
-      else if (unlockCredits > 0) {
-        const { error: insertError } = await adminSupabase
-          .from("need_unlock_logs")
-          .insert({
-            user_id: user.id,
-            need_id: id,
-            ip,
-          });
-
-        if (!insertError) {
-          const nextCredits = Math.max(0, unlockCredits - 1);
-
-          const { error: creditUpdateError } = await adminSupabase
-            .from("profiles")
-            .update({
-              unlock_credits: nextCredits,
-            })
-            .eq("id", user.id);
-
-          if (!creditUpdateError) {
-            await adminSupabase.from("unlock_logs").insert({
-              user_id: user.id,
-              need_id: id,
-              credit_cost: 1,
-              unlock_type: "credit",
-              note: "使用點數解鎖借款需求",
-            });
-
-            canViewFull = true;
-            statusText = "點數解鎖";
-            unlockCredits = nextCredits;
-          }
-        }
-      }
-      // 5. 沒免費額度也沒點數：導去購買頁
-      else {
-        redirect("/unlock-pack");
-      }
+    } else {
+      redirect("/unlock-pack");
     }
   }
 
   const maskedName = maskNickname(item.nickname);
+  const isLenderOrAdmin = role === "lender" || role === "admin";
 
   return (
     <main className="min-h-screen bg-[#f8f5ef] px-4 py-10 md:px-6">
@@ -210,19 +212,23 @@ export default async function NeedDetailPage({
             返回需求列表
           </Link>
 
-          <Link
-            href="/pricing"
-            className="inline-flex items-center justify-center rounded-full border border-[#ddd2c5] bg-white px-5 py-2 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
-          >
-            查看會員方案
-          </Link>
+          {isLenderOrAdmin ? (
+            <>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center justify-center rounded-full border border-[#ddd2c5] bg-white px-5 py-2 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
+              >
+                查看會員方案
+              </Link>
 
-          <Link
-            href="/unlock-pack"
-            className="inline-flex items-center justify-center rounded-full border border-[#ddd2c5] bg-white px-5 py-2 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
-          >
-            購買單筆解鎖
-          </Link>
+              <Link
+                href="/unlock-pack"
+                className="inline-flex items-center justify-center rounded-full border border-[#ddd2c5] bg-white px-5 py-2 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
+              >
+                購買單筆解鎖
+              </Link>
+            </>
+          ) : null}
         </div>
 
         <article className="rounded-3xl border border-[#e8dfd3] bg-white p-6 shadow-sm md:p-8">
@@ -236,7 +242,9 @@ export default async function NeedDetailPage({
                 className={`rounded-full px-3 py-1 text-xs font-bold ${
                   statusText === "VIP 可看"
                     ? "border border-amber-200 bg-amber-100 text-amber-700"
-                    : statusText === "已解鎖" || statusText === "點數解鎖"
+                    : statusText === "已解鎖" ||
+                      statusText === "點數解鎖" ||
+                      statusText === "管理員可看"
                     ? "border border-emerald-200 bg-emerald-100 text-emerald-700"
                     : "border border-gray-200 bg-gray-100 text-gray-600"
                 }`}
@@ -254,13 +262,9 @@ export default async function NeedDetailPage({
             {item.purpose || "借款需求"}
           </h1>
 
-          {!user ? (
-            <div className="mb-6 rounded-2xl border border-[#eadfce] bg-[#fffaf4] px-4 py-4 text-sm leading-7 text-[#6b6258]">
-              你目前尚未登入。登入金主會員後，可依會員資格查看完整聯絡方式。
-            </div>
-          ) : role !== "lender" && role !== "admin" ? (
-            <div className="mb-6 rounded-2xl border border-[#eadfce] bg-[#fffaf4] px-4 py-4 text-sm leading-7 text-[#6b6258]">
-              你目前不是金主會員身份，無法查看完整聯絡方式。
+          {role === "admin" ? (
+            <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-7 text-emerald-800">
+              目前為管理員帳號，可查看完整需求資料。
             </div>
           ) : isPaidMember ? (
             <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-7 text-amber-800">
@@ -268,15 +272,11 @@ export default async function NeedDetailPage({
             </div>
           ) : isExpired ? (
             <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm leading-7 text-red-700">
-              你的 VIP 會員已到期，請續費後查看完整需求。若有解鎖點數，系統也會自動扣點解鎖。
+              你的 VIP 會員已到期，系統會優先使用免費額度或解鎖點數查看完整需求。
             </div>
           ) : statusText === "點數解鎖" ? (
             <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-7 text-emerald-800">
               已使用 1 點解鎖點數查看本筆需求，目前剩餘 {unlockCredits} 點。
-            </div>
-          ) : !canViewFull ? (
-            <div className="mb-6 rounded-2xl border border-[#eadfce] bg-[#fffaf4] px-4 py-4 text-sm leading-7 text-[#6b6258]">
-              你的免費解鎖額度已用完，可升級 VIP 或購買單筆解鎖點數查看完整需求。
             </div>
           ) : (
             <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-7 text-emerald-800">
@@ -296,7 +296,9 @@ export default async function NeedDetailPage({
             </div>
 
             <div className="rounded-2xl bg-[#f8f5ef] px-5 py-4">
-              <div className="text-sm font-semibold text-[#6a6157]">借款金額</div>
+              <div className="text-sm font-semibold text-[#6a6157]">
+                借款金額
+              </div>
               <div className="mt-1 text-base text-[#2f2a25]">
                 NT$ {Number(item.amount || 0).toLocaleString()}
               </div>
@@ -310,7 +312,9 @@ export default async function NeedDetailPage({
             </div>
 
             <div className="rounded-2xl bg-[#f8f5ef] px-5 py-4">
-              <div className="text-sm font-semibold text-[#6a6157]">LINE ID</div>
+              <div className="text-sm font-semibold text-[#6a6157]">
+                LINE ID
+              </div>
               <div className="mt-1 text-base text-[#2f2a25]">
                 {canViewFull ? item.line_id || "未提供" : "解鎖後可查看"}
               </div>
@@ -332,66 +336,25 @@ export default async function NeedDetailPage({
             <div>權限說明：{membershipReason}</div>
           </div>
 
-          {!user ? (
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/login"
+          <div className="mt-6 flex flex-wrap gap-3">
+            {item.phone ? (
+              <a
+                href={`tel:${item.phone}`}
                 className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white transition hover:opacity-95"
               >
-                先登入再查看
-              </Link>
+                立即撥打電話
+              </a>
+            ) : null}
 
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center rounded-full border border-[#d8cbbd] bg-white px-6 py-3 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
-              >
-                註冊會員
-              </Link>
-            </div>
-          ) : role !== "lender" && role !== "admin" ? (
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/pricing"
-                className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white transition hover:opacity-95"
-              >
-                查看會員方案
-              </Link>
-            </div>
-          ) : !canViewFull ? (
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/pricing"
-                className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white transition hover:opacity-95"
-              >
-                升級會員查看更多
-              </Link>
-
-              <Link
-                href="/unlock-pack"
-                className="inline-flex items-center justify-center rounded-full border border-[#d8cbbd] bg-white px-6 py-3 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
-              >
-                購買單筆解鎖
-              </Link>
-            </div>
-          ) : (
-            <div className="mt-6 flex flex-wrap gap-3">
-              {item.phone ? (
-                <a
-                  href={`tel:${item.phone}`}
-                  className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white transition hover:opacity-95"
-                >
-                  立即撥打電話
-                </a>
-              ) : null}
-
+            {isLenderOrAdmin ? (
               <Link
                 href="/pricing"
                 className="inline-flex items-center justify-center rounded-full border border-[#d8cbbd] bg-white px-6 py-3 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
               >
                 查看會員方案
               </Link>
-            </div>
-          )}
+            ) : null}
+          </div>
         </article>
       </div>
     </main>

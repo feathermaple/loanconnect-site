@@ -54,17 +54,21 @@ export default function LoginClient() {
         .eq("id", user.id)
         .maybeSingle();
 
-      const isAdmin = profile?.role === "admin";
+      const role = profile?.role;
       const redirect = searchParams.get("redirect");
 
-      if (isAdmin) {
-        router.replace("/admin");
-      } else if (
+      if (
         isSafeRedirectPath(redirect) &&
         !redirect!.startsWith("/admin") &&
         !redirect!.startsWith("/dashboard")
       ) {
         router.replace(redirect!);
+      } else if (role === "admin") {
+        router.replace("/admin/dashboard");
+      } else if (role === "lender") {
+        router.replace("/needs");
+      } else if (role === "borrower") {
+        router.replace("/borrower/dashboard");
       } else {
         router.replace("/member");
       }
