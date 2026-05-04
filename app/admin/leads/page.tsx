@@ -1,20 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 
 type TabKey = "borrower" | "ads" | "lenders";
 type RowData = Record<string, any>;
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 const TABLE_MAP: Record<TabKey, { label: string; table: string; pk: string }> = {
   borrower: { label: "借款需求", table: "loan_requests", pk: "id" },
-  ads: { label: "放款廣告", table: "lender_ads", pk: "id" },
+  ads: { label: "放款廣告", table: "lender_ads + paid_lender_ads", pk: "id" },
   lenders: { label: "各區放款資訊", table: "lender_ads", pk: "id" },
 };
 
@@ -28,7 +21,10 @@ function formatValue(value: any) {
 }
 
 function isEditableField(key: string) {
-  if (["id", "created_at", "updated_at"].includes(key)) return false;
+  if (["id", "created_at", "updated_at", "source_label"].includes(key)) {
+    return false;
+  }
+  if (key.startsWith("__")) return false;
   if (HIDDEN_FIELDS.includes(key)) return false;
   return true;
 }
@@ -98,7 +94,9 @@ export default function AdminLeadsPage() {
 
   const columns = useMemo(() => {
     if (!rows.length) return [];
-    return Object.keys(rows[0]).filter((key) => !HIDDEN_FIELDS.includes(key));
+    return Object.keys(rows[0]).filter(
+      (key) => !HIDDEN_FIELDS.includes(key) && !key.startsWith("__")
+    );
   }, [rows]);
 
   function openEdit(row: RowData) {
@@ -175,6 +173,7 @@ export default function AdminLeadsPage() {
       }
 
       alert("圖文廣告新增成功");
+
       setShowPaidAdModal(false);
       setPaidAdImage(null);
       setPaidAdForm({
@@ -192,7 +191,7 @@ export default function AdminLeadsPage() {
         is_top: false,
       });
 
-      await fetchRows(activeTab);
+      await fetchRows("ads");
     } catch (err: any) {
       alert(err?.message || "新增圖文廣告失敗");
     } finally {
@@ -228,6 +227,7 @@ export default function AdminLeadsPage() {
         },
         body: JSON.stringify({
           type: activeTab,
+          source_table: editingRow?.__source_table,
           payload,
         }),
       });
@@ -264,8 +264,10 @@ export default function AdminLeadsPage() {
     setDeletingId(rowPkValue);
 
     try {
+      const sourceTable = encodeURIComponent(row.__source_table || "");
+
       const res = await fetch(
-        `/api/admin/leads/${rowPkValue}?type=${activeTab}`,
+        `/api/admin/leads/${rowPkValue}?type=${activeTab}&source_table=${sourceTable}`,
         {
           method: "DELETE",
         }
@@ -355,6 +357,7 @@ export default function AdminLeadsPage() {
                         {col}
                       </th>
                     ))}
+
                     <th className="sticky right-0 z-10 whitespace-nowrap border-b border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-700">
                       操作
                     </th>
@@ -393,9 +396,7 @@ export default function AdminLeadsPage() {
                               disabled={deletingId === rowPkValue}
                               className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
                             >
-                              {deletingId === rowPkValue
-                                ? "刪除中..."
-                                : "刪除"}
+                              {deletingId === rowPkValue ? "刪除中..." : "刪除"}
                             </button>
                           </div>
                         </td>
@@ -433,9 +434,7 @@ export default function AdminLeadsPage() {
                   </label>
                   <input
                     value={paidAdForm.title}
-                    onChange={(e) =>
-                      handlePaidAdChange("title", e.target.value)
-                    }
+                    onChange={(e) => handlePaidAdChange("title", e.target.value)}
                     className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
                     placeholder="例如：台北快速週轉、彈性放款"
                   />
@@ -473,9 +472,7 @@ export default function AdminLeadsPage() {
                   </label>
                   <input
                     value={paidAdForm.region}
-                    onChange={(e) =>
-                      handlePaidAdChange("region", e.target.value)
-                    }
+                    onChange={(e) => handlePaidAdChange("region", e.target.value)}
                     className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
                     placeholder="例如：台北、新北、桃園"
                   />
@@ -529,9 +526,7 @@ export default function AdminLeadsPage() {
                   </label>
                   <input
                     value={paidAdForm.phone}
-                    onChange={(e) =>
-                      handlePaidAdChange("phone", e.target.value)
-                    }
+                    onChange={(e) => handlePaidAdChange("phone", e.target.value)}
                     className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
                   />
                 </div>
@@ -542,9 +537,7 @@ export default function AdminLeadsPage() {
                   </label>
                   <input
                     value={paidAdForm.line_id}
-                    onChange={(e) =>
-                      handlePaidAdChange("line_id", e.target.value)
-                    }
+                    onChange={(e) => handlePaidAdChange("line_id", e.target.value)}
                     className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
                   />
                 </div>
@@ -571,9 +564,7 @@ export default function AdminLeadsPage() {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) =>
-                      setPaidAdImage(e.target.files?.[0] || null)
-                    }
+                    onChange={(e) => setPaidAdImage(e.target.files?.[0] || null)}
                     className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
                   />
 
@@ -645,7 +636,10 @@ export default function AdminLeadsPage() {
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {Object.keys(editForm)
-                  .filter((key) => !HIDDEN_FIELDS.includes(key))
+                  .filter(
+                    (key) =>
+                      !HIDDEN_FIELDS.includes(key) && !key.startsWith("__")
+                  )
                   .map((key) => {
                     const value = editForm[key];
                     const editable = isEditableField(key);

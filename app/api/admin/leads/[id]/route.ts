@@ -10,13 +10,44 @@ const TABLE_MAP: Record<LeadType, { table: string; pk: string }> = {
   lenders: { table: "profiles", pk: "id" },
 };
 
+const ALLOWED_SOURCE_TABLES = [
+  "loan_requests",
+  "lender_ads",
+  "paid_lender_ads",
+  "profiles",
+];
+
 const HIDDEN_FIELDS = ["password", "hashed_password"];
+
+function getConfig(type: LeadType, sourceTable?: string | null) {
+  const base = TABLE_MAP[type];
+
+  if (
+    sourceTable &&
+    ALLOWED_SOURCE_TABLES.includes(sourceTable) &&
+    (
+      (type === "borrower" && sourceTable === "loan_requests") ||
+      (type === "ads" &&
+        (sourceTable === "lender_ads" || sourceTable === "paid_lender_ads")) ||
+      (type === "lenders" &&
+        (sourceTable === "profiles" || sourceTable === "lender_ads"))
+    )
+  ) {
+    return {
+      table: sourceTable,
+      pk: "id",
+    };
+  }
+
+  return base;
+}
 
 function sanitizePayload(payload: Record<string, any>) {
   const next: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(payload)) {
-    if (["id", "created_at", "updated_at"].includes(key)) continue;
+    if (["id", "created_at", "updated_at", "source_label"].includes(key)) continue;
+    if (key.startsWith("__")) continue;
     if (HIDDEN_FIELDS.includes(key)) continue;
     next[key] = value;
   }
@@ -33,7 +64,9 @@ export async function PATCH(
 
   const { id } = await context.params;
   const body = await request.json();
+
   const type = body?.type as LeadType | undefined;
+  const sourceTable = body?.source_table as string | undefined;
   const payload = body?.payload as Record<string, any> | undefined;
 
   if (!type || !TABLE_MAP[type]) {
@@ -46,7 +79,7 @@ export async function PATCH(
 
   try {
     const admin = createAdminClient();
-    const config = TABLE_MAP[type];
+    const config = getConfig(type, sourceTable);
     const safePayload = sanitizePayload(payload);
 
     const { data, error } = await admin
@@ -87,6 +120,7 @@ export async function DELETE(
 
   const { id } = await context.params;
   const type = request.nextUrl.searchParams.get("type") as LeadType | null;
+  const sourceTable = request.nextUrl.searchParams.get("source_table");
 
   if (!type || !TABLE_MAP[type]) {
     return NextResponse.json({ error: "缺少或無效的 type" }, { status: 400 });
@@ -94,7 +128,7 @@ export async function DELETE(
 
   try {
     const admin = createAdminClient();
-    const config = TABLE_MAP[type];
+    const config = getConfig(type, sourceTable);
 
     const { data, error } = await admin
       .from(config.table)
