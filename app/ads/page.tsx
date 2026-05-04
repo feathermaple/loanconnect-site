@@ -84,7 +84,7 @@ export default async function AdsPage() {
                   </p>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {paidList.map((item) => (
                     <article
                       key={item.id}
@@ -95,7 +95,7 @@ export default async function AdsPage() {
                       }`}
                     >
                       {item.image_url ? (
-                        <div className="relative h-56 w-full overflow-hidden bg-[#eee5d8]">
+                        <div className="relative h-40 w-full overflow-hidden bg-[#eee5d8]">
                           <img
                             src={item.image_url}
                             alt={item.title || "圖文廣告"}
@@ -122,7 +122,7 @@ export default async function AdsPage() {
                         </div>
                       )}
 
-                      <div className="p-6">
+                      <div className="p-4">
                         <div className="mb-3 flex items-center justify-between gap-3">
                           <span className="rounded-full bg-[#f4efe7] px-3 py-1 text-xs font-semibold text-[#7a5a2a]">
                             {item.region || "不限地區"}
@@ -133,7 +133,7 @@ export default async function AdsPage() {
                           </span>
                         </div>
 
-                        <h3 className="text-2xl font-bold text-[#2f2a25]">
+                        <h3 className="text-xl font-bold text-[#2f2a25]">
                           {item.title || item.company_name || "放款廣告"}
                         </h3>
 
