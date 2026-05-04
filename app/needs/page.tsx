@@ -150,20 +150,7 @@ export default async function NeedsPage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center rounded-full border border-[#d8cbbd] bg-white px-6 py-3 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
-            >
-              查看會員方案
-            </Link>
-
-            <Link
-              href="/unlock-pack"
-              className="inline-flex items-center justify-center rounded-full border border-[#d8cbbd] bg-white px-6 py-3 text-sm font-bold text-[#3e3a34] transition hover:bg-[#f7f3ed]"
-            >
-              購買單筆解鎖
-            </Link>
-
+           
             <Link
               href="/apply-loan"
               className="inline-flex items-center justify-center rounded-full bg-[#3e3a34] px-6 py-3 text-sm font-bold text-white transition hover:opacity-95"

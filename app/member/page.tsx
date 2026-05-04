@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 type Profile = {
@@ -143,6 +144,12 @@ export default function MemberPage() {
     profile?.membership_status ||
     (profile?.role === "admin" ? "管理員" : "免費會員");
 
+  const isLender =
+    profile?.role === "lender" ||
+    profile?.role === "admin" ||
+    Boolean(profile?.membership_plan?.includes("金主")) ||
+    Boolean(membership?.plan_name?.includes("金主"));
+
   return (
     <main className="min-h-screen bg-[#f8f6f1] px-4 py-10">
       <div className="mx-auto max-w-5xl">
@@ -195,7 +202,9 @@ export default function MemberPage() {
             </div>
 
             <section className="mt-8 rounded-3xl border border-[#eadfce] bg-white p-8 shadow-sm">
-              <h2 className="text-3xl font-bold text-[#1f2937]">目前方案說明</h2>
+              <h2 className="text-3xl font-bold text-[#1f2937]">
+                目前方案說明
+              </h2>
 
               <div className="mt-6 space-y-4 text-lg leading-8 text-[#374151]">
                 <p>目前會員方案：{currentPlan}</p>
@@ -215,7 +224,36 @@ export default function MemberPage() {
               </div>
             </section>
 
-            
+            {isLender && (
+              <section className="mt-8 rounded-3xl border border-[#eadfce] bg-white p-8 shadow-sm">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h2 className="text-3xl font-bold text-[#3f2a14]">
+                      金主會員專區
+                    </h2>
+                    <p className="mt-3 text-base leading-7 text-[#7a6a5a]">
+                      升級會員方案或購買單筆解鎖，查看完整借款需求聯絡資料。
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Link
+                      href="/pricing"
+                      className="inline-flex items-center justify-center rounded-full border border-[#d8c6ad] bg-white px-6 py-3 text-sm font-bold text-[#3f2a14] transition hover:bg-[#f7f1e8]"
+                    >
+                      查看會員方案
+                    </Link>
+
+                    <Link
+                      href="/pricing?mode=unlock"
+                      className="inline-flex items-center justify-center rounded-full bg-[#3f3a33] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#2f2a24]"
+                    >
+                      購買單筆解鎖
+                    </Link>
+                  </div>
+                </div>
+              </section>
+            )}
           </>
         )}
       </div>
