@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+type UserRole = "admin" | "borrower" | "lender" | "both" | "member" | null;
+
 export default function ApplyLoanPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -26,7 +28,6 @@ export default function ApplyLoanPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (loading) return;
 
     if (!form.nickname.trim() || !form.region || !form.amount || !form.phone.trim()) {
@@ -66,9 +67,24 @@ export default function ApplyLoanPage() {
         return;
       }
 
-      if (profile?.role && profile.role !== "borrower") {
+      const role = (profile?.role ?? null) as UserRole;
+
+      const canPostLoan =
+        role === "borrower" ||
+        role === "both" ||
+        role === "admin" ||
+        role === "member"; // 舊會員先放行，避免舊資料不能用
+
+      if (!canPostLoan) {
         alert("此功能限借款會員使用");
         router.push("/member");
+        return;
+      }
+
+      const amountNumber = Number(form.amount);
+
+      if (!Number.isFinite(amountNumber) || amountNumber <= 0) {
+        alert("請填寫正確的借款金額");
         return;
       }
 
@@ -77,7 +93,7 @@ export default function ApplyLoanPage() {
           user_id: user.id,
           nickname: form.nickname.trim(),
           region: form.region,
-          amount: Number(form.amount),
+          amount: amountNumber,
           purpose: form.purpose.trim(),
           phone: form.phone.trim(),
           line_id: form.line_id.trim(),
