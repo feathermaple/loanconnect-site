@@ -1,325 +1,322 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-const baseNavLinks = [
-  { label: "首頁", href: "/" },
-  { label: "我要借錢", href: "/apply-loan" },
-  { label: "我要放款", href: "/post-lender" },
-  { label: "借款需求", href: "/needs" },
-  { label: "放款廣告", href: "/ads" },
-  { label: "各區放款資訊", href: "/lenders" },
-  { label: "借錢知識", href: "/articles" },
-  { label: "會員中心", href: "/member" },
-  { label: "關於平台", href: "/about-platform" },
-  { label: "聯絡我們", href: "/contact" },
-] as const;
-
-const adminNavLink = { label: "管理後台", href: "/admin" } as const;
-
 export default function Navbar() {
+  const pathname = usePathname();
+  const router = useRouter();
   const supabase = createClient();
 
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
   const [authReady, setAuthReady] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
-    document.documentElement.style.overflow = menuOpen ? "hidden" : "";
-
-    return () => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    };
   }, [menuOpen]);
 
   useEffect(() => {
-    let mounted = true;
+    const getUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    async function loadUser() {
-      try {
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession();
+      const currentUser = session?.user ?? null;
 
-        if (!mounted) return;
+      setUser(currentUser);
 
-        if (sessionError) {
-          console.error("讀取 session 失敗", sessionError);
-          setIsLoggedIn(false);
-          setIsAdmin(false);
-          setAuthReady(true);
-          return;
-        }
-
-        const user = session?.user ?? null;
-
-        if (!user) {
-          setIsLoggedIn(false);
-          setIsAdmin(false);
-          setAuthReady(true);
-          return;
-        }
-
-        setIsLoggedIn(true);
-
-        const { data: profile, error: profileError } = await supabase
+      if (currentUser?.email) {
+        const { data: profile } = await supabase
           .from("profiles")
-          .select("id, role")
-          .eq("id", user.id)
+          .select("role")
+          .eq("email", currentUser.email)
           .maybeSingle();
 
-        if (!mounted) return;
-
-        if (profileError) {
-          console.error("讀取 role 失敗", profileError);
-          setIsAdmin(false);
-          setAuthReady(true);
-          return;
-        }
-
         setIsAdmin(profile?.role === "admin");
-        setAuthReady(true);
-      } catch (err) {
-        if (!mounted) return;
-        console.error("Navbar loadUser 錯誤", err);
-        setIsLoggedIn(false);
-        setIsAdmin(false);
-        setAuthReady(true);
       }
-    }
 
-    loadUser();
+      setAuthReady(true);
+    };
+
+    getUser();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted) return;
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null;
 
-      if (!session?.user) {
-        setIsLoggedIn(false);
+      setUser(currentUser);
+
+      if (currentUser?.email) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("email", currentUser.email)
+          .maybeSingle();
+
+        setIsAdmin(profile?.role === "admin");
+      } else {
         setIsAdmin(false);
-        setAuthReady(true);
-        return;
       }
 
-      void loadUser();
+      setAuthReady(true);
     });
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
   }, [supabase]);
 
-  const navLinks = useMemo(() => {
-    return isAdmin ? [...baseNavLinks, adminNavLink] : baseNavLinks;
-  }, [isAdmin]);
-
-  async function handleLogout() {
-    if (loggingOut) return;
-
+  const handleLogout = async () => {
     try {
       setLoggingOut(true);
-      setMenuOpen(false);
 
-      const { error } = await supabase.auth.signOut();
+      await supabase.auth.signOut();
 
-      if (error) {
-        console.error("登出失敗", error);
-      }
+      setUser(null);
+      setIsAdmin(false);
+
+      router.push("/");
+      router.refresh();
     } catch (err) {
-      console.error("handleLogout 錯誤", err);
+      console.error(err);
+      alert("登出失敗");
     } finally {
-      window.location.href = "/";
+      setLoggingOut(false);
     }
-  }
+  };
+
+  const navItems = [
+    { href: "/", label: "首頁" },
+    { href: "/needs", label: "借款需求" },
+    { href: "/ads", label: "放款廣告" },
+    { href: "/lenders", label: "各區放款資訊" },
+    { href: "/articles", label: "借錢知識" },
+    { href: "/about-platform", label: "關於平台" },
+  ];
 
   return (
-    <>
-      <header className="sticky top-0 z-[999] w-full border-b border-[#e7dece] bg-[#fbf8f3]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(94,70,36,0.08)]">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center gap-3 px-3 py-2 sm:px-4 md:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-[#eadfce] bg-[#f6f2ec]/95 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+        {/* LOGO */}
+        <Link href="/" className="shrink-0">
+          <Image
+            src="/logo.png"
+            alt="秒貸通"
+            width={220}
+            height={80}
+            priority
+            className="h-auto w-[180px] md:w-[220px]"
+          />
+        </Link>
+
+        {/* Desktop Menu */}
+        <nav className="hidden items-center gap-2 lg:flex">
+          {navItems.map((item) => {
+            const active = pathname === item.href;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`rounded-full px-4 py-2 text-sm transition ${
+                  active
+                    ? "bg-[#ede3d3] font-semibold text-[#8b6b2c]"
+                    : "text-[#4b4b4b] hover:bg-[#f1ebe3]"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Right Buttons */}
+        <div className="hidden items-center gap-2 lg:flex">
+          {/* 我要借錢 */}
           <Link
-            href="/"
-            className="flex w-[210px] shrink-0 items-center sm:w-[250px] md:w-[280px] lg:w-[300px] xl:w-[330px]"
-            aria-label="回到首頁"
+            href={
+              user
+                ? "/apply-loan"
+                : "/register?redirect=/apply-loan"
+            }
+            className="rounded-full bg-[#b31217] px-5 py-3 text-sm font-bold text-white transition hover:scale-105"
           >
-            <div className="relative h-[82px] w-full sm:h-[92px] md:h-[100px] lg:h-[108px] xl:h-[116px]">
-              <Image
-                src="/logo.png"
-                alt="秒貸通"
-                fill
-                sizes="(max-width: 640px) 210px, (max-width: 1024px) 280px, 330px"
-                className="object-contain object-left drop-shadow-[0_8px_18px_rgba(178,132,38,0.2)]"
-                priority
-              />
-            </div>
+            我要借錢
           </Link>
 
-          <div className="ml-auto hidden min-w-0 items-center gap-2 lg:flex">
-            <nav className="flex min-w-0 items-center gap-2 rounded-full border border-[#eadfce] bg-white/75 px-3 py-2 shadow-[0_8px_24px_rgba(94,70,36,0.06)] xl:gap-3 xl:px-4">
-              {navLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="whitespace-nowrap text-[13px] font-medium text-[#5f5750] transition hover:-translate-y-0.5 hover:text-[#b8872b] xl:text-[14px]"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+          {/* 我要放款 */}
+          <Link
+            href={
+              user
+                ? "/post-lender"
+                : "/register?redirect=/post-lender"
+            }
+            className="rounded-full bg-[#1d4ed8] px-5 py-3 text-sm font-bold text-white transition hover:scale-105"
+          >
+            我要放款
+          </Link>
 
-            <Link
-              href="/apply-loan"
-              className="flex h-[68px] w-[48px] shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-red-500 to-red-700 px-2 text-center text-[13px] font-bold leading-[1.25] text-white shadow-[0_12px_25px_rgba(220,38,38,0.28)] transition hover:-translate-y-1 xl:h-[76px] xl:w-[52px] xl:text-[14px]"
-            >
-              我要借錢
-            </Link>
-
-            <Link
-              href="/post-lender"
-              className="flex h-[68px] w-[48px] shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-blue-500 to-blue-700 px-2 text-center text-[13px] font-bold leading-[1.25] text-white shadow-[0_12px_25px_rgba(37,99,235,0.28)] transition hover:-translate-y-1 xl:h-[76px] xl:w-[52px] xl:text-[14px]"
-            >
-              我要放款
-            </Link>
-
-            {!authReady ? (
-              <div className="flex h-[58px] w-[48px] shrink-0 items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-xs text-gray-400">
-                載入中
-              </div>
-            ) : isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="flex h-[58px] w-[48px] shrink-0 items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white disabled:opacity-60"
-                type="button"
-              >
-                {loggingOut ? "登出中" : "登出"}
-              </button>
-            ) : (
+          {!authReady ? null : !user ? (
+            <>
+              {/* 登入 */}
               <Link
                 href="/login"
-                className="flex h-[58px] w-[48px] shrink-0 items-center justify-center rounded-full border border-[#e6ded3] bg-white/80 text-center text-sm font-medium text-[#5f5750] transition hover:bg-white"
+                className="rounded-full border border-[#c89b45] px-4 py-3 text-sm font-medium text-[#c89b45] transition hover:bg-[#c89b45] hover:text-white"
               >
                 登入
               </Link>
-            )}
-          </div>
 
-          <button
-            onClick={() => setMenuOpen(true)}
-            className="relative z-[1000] ml-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#eadfce] bg-white text-2xl text-[#5f5750] shadow-sm lg:hidden"
-            aria-label="開啟選單"
-            type="button"
-          >
-            ☰
-          </button>
+              {/* 免費註冊 */}
+              <Link
+                href="/register?redirect=/apply-loan"
+                className="rounded-full bg-[#c89b45] px-5 py-3 text-sm font-bold text-white shadow-md transition hover:scale-105"
+              >
+                免費註冊
+              </Link>
+            </>
+          ) : (
+            <>
+              {/* 管理後台 */}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="rounded-full bg-black px-4 py-3 text-sm font-semibold text-white"
+                >
+                  管理後台
+                </Link>
+              )}
+
+              {/* 會員中心 */}
+              <Link
+                href="/member"
+                className="rounded-full border border-gray-300 px-4 py-3 text-sm transition hover:bg-gray-100"
+              >
+                會員中心
+              </Link>
+
+              {/* 登出 */}
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="rounded-full border border-gray-300 px-4 py-3 text-sm transition hover:bg-gray-100 disabled:opacity-60"
+              >
+                {loggingOut ? "登出中..." : "登出"}
+              </button>
+            </>
+          )}
         </div>
-      </header>
 
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#eadfce] bg-white lg:hidden"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-[#4b4b4b]"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            {menuOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-[1001] lg:hidden">
-          <button
-            type="button"
-            aria-label="關閉選單背景"
-            className="absolute inset-0 bg-black/45"
-            onClick={() => setMenuOpen(false)}
-          />
+        <div className="border-t border-[#eadfce] bg-[#f6f2ec] px-4 py-4 lg:hidden">
+          <div className="flex flex-col gap-2">
+            {navItems.map((item) => {
+              const active = pathname === item.href;
 
-          <div className="absolute right-0 top-0 h-dvh w-[86%] max-w-[390px] bg-[#fbf8f3] shadow-2xl">
-            <div className="flex h-full flex-col">
-              <div className="flex shrink-0 items-center justify-between border-b border-[#eadfce] px-5 py-4">
-                <div className="relative h-[72px] w-[220px]">
-                  <Image
-                    src="/logo.png"
-                    alt="秒貸通"
-                    fill
-                    sizes="220px"
-                    className="object-contain object-left"
-                    priority
-                  />
-                </div>
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`rounded-xl px-4 py-3 text-sm transition ${
+                    active
+                      ? "bg-[#ede3d3] font-semibold text-[#8b6b2c]"
+                      : "bg-white text-[#4b4b4b]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+
+            {!authReady ? null : !user ? (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-xl border border-[#c89b45] px-4 py-3 text-center text-sm font-medium text-[#c89b45]"
+                >
+                  登入
+                </Link>
+
+                <Link
+                  href="/register?redirect=/apply-loan"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-xl bg-[#c89b45] px-4 py-3 text-center text-sm font-bold text-white"
+                >
+                  免費註冊會員
+                </Link>
+              </>
+            ) : (
+              <>
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl bg-black px-4 py-3 text-center text-sm font-semibold text-white"
+                  >
+                    管理後台
+                  </Link>
+                )}
+
+                <Link
+                  href="/member"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-xl bg-white px-4 py-3 text-center text-sm"
+                >
+                  會員中心
+                </Link>
 
                 <button
-                  onClick={() => setMenuOpen(false)}
-                  aria-label="關閉選單"
-                  className="rounded-full border border-[#eadfce] bg-white px-4 py-2 text-sm text-[#5f5750]"
-                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="rounded-xl bg-white px-4 py-3 text-center text-sm disabled:opacity-60"
                 >
-                  關閉
+                  {loggingOut ? "登出中..." : "登出"}
                 </button>
-              </div>
-
-              <div
-                className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 pb-32"
-                style={{
-                  WebkitOverflowScrolling: "touch",
-                  touchAction: "pan-y",
-                }}
-              >
-                <div className="flex flex-col gap-3">
-                  {navLinks.map((item) => (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="rounded-2xl border border-[#eadfce] bg-white px-4 py-3 text-base font-medium text-[#5f5750] shadow-sm"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-
-                  <Link
-                    href="/apply-loan"
-                    onClick={() => setMenuOpen(false)}
-                    className="mt-2 rounded-2xl bg-red-600 px-5 py-3 text-center text-sm font-bold text-white shadow-lg"
-                  >
-                    我要借錢
-                  </Link>
-
-                  <Link
-                    href="/post-lender"
-                    onClick={() => setMenuOpen(false)}
-                    className="rounded-2xl bg-blue-600 px-5 py-3 text-center text-sm font-bold text-white shadow-lg"
-                  >
-                    我要放款
-                  </Link>
-
-                  {!authReady ? (
-                    <div className="rounded-2xl border border-[#eadfce] bg-white px-5 py-3 text-center text-sm text-gray-400">
-                      載入中...
-                    </div>
-                  ) : isLoggedIn ? (
-                    <button
-                      onClick={handleLogout}
-                      disabled={loggingOut}
-                      className="rounded-2xl border border-[#eadfce] bg-white px-5 py-3 text-sm font-medium text-[#5f5750] disabled:opacity-60"
-                      type="button"
-                    >
-                      {loggingOut ? "登出中..." : "登出"}
-                    </button>
-                  ) : (
-                    <Link
-                      href="/login"
-                      onClick={() => setMenuOpen(false)}
-                      className="rounded-2xl border border-[#eadfce] bg-white px-5 py-3 text-center text-sm font-medium text-[#5f5750]"
-                    >
-                      登入
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
       )}
-    </>
+    </header>
   );
 }

@@ -11,6 +11,8 @@ type Props = {
   primaryText: string;
 };
 
+type MemberRole = "borrower" | "lender" | "both" | "admin" | "member" | "";
+
 export default function AuthCard({ mode, title, desc, primaryText }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -19,16 +21,32 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [lineId, setLineId] = useState("");
-  const [memberRole, setMemberRole] = useState("");
+  const [memberRole, setMemberRole] = useState<MemberRole>("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+
+  function getRedirectPath(role?: string | null) {
+    const redirect = searchParams.get("redirect");
+    if (redirect) return redirect;
+
+    if (role === "admin") return "/admin";
+    if (role === "lender") return "/dashboard/lender";
+    if (role === "both") return "/member";
+    if (role === "borrower") return "/apply-loan";
+
+    return "/member";
+  }
 
   async function handleSubmit() {
     setLoading(true);
     setMsg("");
 
     try {
-      if (!email || !password) {
+      const cleanEmail = email.trim();
+      const cleanPhone = phone.trim();
+      const cleanLineId = lineId.trim();
+
+      if (!cleanEmail || !password) {
         setMsg("請輸入 Email 與密碼");
         setLoading(false);
         return;
@@ -41,15 +59,17 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
       }
 
       if (mode === "register") {
+        const selectedRole = memberRole === "lender" ? "lender" : "borrower";
+
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: cleanEmail,
           password,
           options: {
             emailRedirectTo: "https://miaodaitong.com/auth/callback",
             data: {
-              phone,
-              line_id: lineId,
-              role: memberRole,
+              phone: cleanPhone,
+              line_id: cleanLineId,
+              role: selectedRole,
             },
           },
         });
@@ -60,26 +80,37 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
           return;
         }
 
-        // 🔥 同步寫入 profiles（重點）
         const user = data.user;
 
         if (user) {
-          await supabase.from("profiles").insert({
-            id: user.id,
-            phone,
-            line_id: lineId,
-            role: memberRole,
-          });
+          const { error: profileError } = await supabase.from("profiles").upsert(
+            {
+              id: user.id,
+              email: cleanEmail,
+              phone: cleanPhone,
+              line_id: cleanLineId,
+              role: selectedRole,
+            },
+            { onConflict: "id" }
+          );
+
+          if (profileError) {
+            setMsg("帳號已建立，但會員資料寫入失敗：" + profileError.message);
+            setLoading(false);
+            return;
+          }
         }
 
-        setMsg("註冊成功，請到信箱驗證 Email");
+        setMsg("註冊成功，即將前往下一步");
         setLoading(false);
+
+        router.push(getRedirectPath(selectedRole));
+        router.refresh();
         return;
       }
 
-      // 登入
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: cleanEmail,
         password,
       });
 
@@ -89,26 +120,32 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
         return;
       }
 
-      // 🔥 登入後依會員身分導向
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single();
-
-        if (profile?.role === "lender") {
-          router.push("/dashboard/lender");
-        } else {
-          router.push("/apply-loan");
-        }
+      if (!user) {
+        setMsg("登入成功，但讀取會員資料失敗，請重新整理後再試");
+        setLoading(false);
+        return;
       }
 
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        setMsg("登入成功，但會員資料讀取失敗：" + profileError.message);
+        setLoading(false);
+        return;
+      }
+
+      const role = profile?.role ?? "member";
+
       setLoading(false);
+      router.push(getRedirectPath(role));
       router.refresh();
     } catch (err) {
       const message =
@@ -130,11 +167,10 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
           <>
             <Field label="手機號碼" value={phone} onChange={setPhone} />
 
-            {/* 🔥 會員身分 */}
             <SelectField
               label="會員身分"
               value={memberRole}
-              onChange={setMemberRole}
+              onChange={(value) => setMemberRole(value as MemberRole)}
             />
 
             <Field label="LINE ID" value={lineId} onChange={setLineId} />
@@ -143,12 +179,7 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
 
         <Field label="Email" type="email" value={email} onChange={setEmail} />
 
-        <Field
-          label="密碼"
-          type="password"
-          value={password}
-          onChange={setPassword}
-        />
+        <Field label="密碼" type="password" value={password} onChange={setPassword} />
 
         <button
           type="button"
@@ -160,11 +191,7 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
         </button>
 
         {msg && (
-          <p
-            className={`text-center text-sm ${
-              msg.includes("成功") ? "text-green-600" : "text-red-500"
-            }`}
-          >
+          <p className={`text-center text-sm ${msg.includes("成功") ? "text-green-600" : "text-red-500"}`}>
             {msg}
           </p>
         )}
