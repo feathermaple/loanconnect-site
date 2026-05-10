@@ -73,24 +73,29 @@ export default function Navbar() {
     };
   }, [supabase]);
 
-  const handleLogout = async () => {
-    try {
-      setLoggingOut(true);
+ const handleLogout = async () => {
+  try {
+    setLoggingOut(true);
 
-      await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
 
-      setUser(null);
-      setIsAdmin(false);
-
-      router.push("/");
-      router.refresh();
-    } catch (err) {
-      console.error(err);
+    if (error) {
+      console.error(error);
       alert("登出失敗");
-    } finally {
-      setLoggingOut(false);
+      return;
     }
-  };
+
+    setUser(null);
+    setIsAdmin(false);
+
+    router.push("/");
+    router.refresh();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoggingOut(false);
+  }
+};
 
   const navItems = [
     { href: "/", label: "首頁" },
