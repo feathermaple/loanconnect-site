@@ -1,262 +1,281 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+
+type Role = "borrower" | "lender" | "both" | "admin" | "member" | null;
 
 type Profile = {
   id: string;
-  email?: string | null;
-  role?: string | null;
-  membership_plan?: string | null;
-  membership_status?: string | null;
-  free_unlock_remaining?: number | null;
-  unlock_points?: number | null;
-};
-
-type Membership = {
-  id: string;
-  plan_name?: string | null;
-  status?: string | null;
-  expires_at?: string | null;
+  email: string;
+  role: Role;
+  phone?: string | null;
+  line_id?: string | null;
 };
 
 export default function MemberPage() {
-  const supabase = createClient();
+  const router = useRouter();
+
+  const supabase = useMemo(() => createClient(), []);
 
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [membership, setMembership] = useState<Membership | null>(null);
-  const [unlockedCount, setUnlockedCount] = useState(0);
-  const [freeRemaining, setFreeRemaining] = useState(0);
-  const [unlockPoints, setUnlockPoints] = useState(0);
-
-  async function loadMemberData() {
-    try {
-      setLoading(true);
-
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        console.error("讀取 session 失敗", sessionError);
-        setProfile(null);
-        setMembership(null);
-        setUnlockedCount(0);
-        setFreeRemaining(0);
-        setUnlockPoints(0);
-        return;
-      }
-
-      if (!session?.user) {
-        setProfile(null);
-        setMembership(null);
-        setUnlockedCount(0);
-        setFreeRemaining(0);
-        setUnlockPoints(0);
-        return;
-      }
-
-      const user = session.user;
-
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error("讀取 profiles 失敗", profileError);
-      }
-
-      setProfile(profileData || null);
-
-      const { data: membershipData, error: membershipError } = await supabase
-        .from("lender_memberships")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (membershipError) {
-        console.error("讀取會員方案失敗", membershipError);
-      }
-
-      setMembership(membershipData || null);
-
-      const { count: unlockCount, error: unlockError } = await supabase
-        .from("unlock_logs")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
-
-      if (unlockError) {
-        console.error("讀取 unlock_logs 失敗", unlockError);
-      }
-
-      setUnlockedCount(unlockCount || 0);
-      setFreeRemaining(Number(profileData?.free_unlock_remaining ?? 0));
-      setUnlockPoints(Number(profileData?.unlock_points ?? 0));
-    } catch (err) {
-      console.error("loadMemberData 錯誤", err);
-      setProfile(null);
-      setMembership(null);
-      setUnlockedCount(0);
-      setFreeRemaining(0);
-      setUnlockPoints(0);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   useEffect(() => {
-    loadMemberData();
+    const loadUser = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      loadMemberData();
-    });
+        const user = session?.user;
 
-    return () => {
-      subscription.unsubscribe();
+        if (!user) {
+          router.push("/login");
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        setProfile(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
-  }, []);
 
-  const roleText =
-    profile?.role === "admin"
-      ? "管理員"
-      : profile?.role === "lender"
-      ? "金主"
-      : profile?.role === "borrower"
-      ? "借款會員"
-      : profile?.role || "未設定";
+    loadUser();
+  }, [router, supabase]);
 
-  const currentPlan =
-    membership?.plan_name ||
-    profile?.membership_plan ||
-    (profile?.role === "admin" ? "管理員帳號" : "免費會員");
-
-  const currentStatus =
-    membership?.status ||
-    profile?.membership_status ||
-    (profile?.role === "admin" ? "管理員" : "免費會員");
-
-  const isLender =
-    profile?.role === "lender" ||
-    profile?.role === "admin" ||
-    Boolean(profile?.membership_plan?.includes("金主")) ||
-    Boolean(membership?.plan_name?.includes("金主"));
-
-  return (
-    <main className="min-h-screen bg-[#f8f6f1] px-4 py-10">
-      <div className="mx-auto max-w-5xl">
-        <h1 className="text-4xl font-bold text-[#1f2937]">會員中心</h1>
-        <p className="mt-3 text-base text-[#6b7280]">
-          這裡可以查看你的會員身份、解鎖額度與使用狀態。
-        </p>
-
-        {loading ? (
-          <div className="mt-8 rounded-3xl border border-[#eadfce] bg-white p-8 text-[#6b7280]">
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#f6f2ec] px-4 py-10">
+        <div className="mx-auto max-w-6xl">
+          <div className="rounded-[32px] bg-white p-10 text-center shadow-sm">
             載入中...
           </div>
-        ) : (
-          <>
-            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-5">
-              <div className="rounded-3xl border border-[#eadfce] bg-white p-6 shadow-sm">
-                <div className="text-sm text-[#8b7355]">會員身份</div>
-                <div className="mt-3 text-2xl font-bold text-[#1f2937]">
-                  {currentPlan}
-                </div>
-              </div>
+        </div>
+      </main>
+    );
+  }
 
-              <div className="rounded-3xl border border-[#eadfce] bg-white p-6 shadow-sm">
-                <div className="text-sm text-[#8b7355]">帳號角色</div>
-                <div className="mt-3 text-2xl font-bold text-[#1f2937]">
-                  {roleText}
-                </div>
-              </div>
+  const role = profile?.role ?? "member";
 
-              <div className="rounded-3xl border border-[#eadfce] bg-white p-6 shadow-sm">
-                <div className="text-sm text-[#8b7355]">已解鎖筆數</div>
-                <div className="mt-3 text-2xl font-bold text-[#1f2937]">
-                  {unlockedCount}
-                </div>
-              </div>
+  const roleLabelMap: Record<string, string> = {
+    borrower: "借錢會員",
+    lender: "金主會員",
+    both: "雙身分會員",
+    admin: "管理員",
+    member: "一般會員",
+  };
 
-              <div className="rounded-3xl border border-[#eadfce] bg-white p-6 shadow-sm">
-                <div className="text-sm text-[#8b7355]">免費剩餘</div>
-                <div className="mt-3 text-2xl font-bold text-[#1f2937]">
-                  {freeRemaining}
-                </div>
-              </div>
+  const roleLabel = roleLabelMap[role] || "未設定";
 
-              <div className="rounded-3xl border border-[#eadfce] bg-white p-6 shadow-sm">
-                <div className="text-sm text-[#8b7355]">解鎖點數</div>
-                <div className="mt-3 text-2xl font-bold text-[#1f2937]">
-                  {unlockPoints}
-                </div>
+  const isBorrower =
+    role === "borrower" ||
+    role === "both" ||
+    role === "admin" ||
+    role === "member";
+
+  const isLender =
+    role === "lender" ||
+    role === "both" ||
+    role === "admin";
+
+  return (
+    <main className="min-h-screen bg-[#f6f2ec] px-4 py-10">
+      <div className="mx-auto max-w-6xl space-y-6">
+        {/* 會員資訊 */}
+        <section className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm text-[#8a8175]">會員中心</p>
+
+              <h1 className="mt-2 text-3xl font-black text-[#2b2b2b]">
+                歡迎回來
+              </h1>
+
+              <div className="mt-4 space-y-2 text-sm text-[#5f564c]">
+                <p>
+                  <span className="font-semibold">帳號：</span>
+                  {profile?.email || "未設定"}
+                </p>
+
+                <p>
+                  <span className="font-semibold">會員身份：</span>
+                  {roleLabel}
+                </p>
+
+                <p>
+                  <span className="font-semibold">LINE ID：</span>
+                  {profile?.line_id || "未設定"}
+                </p>
+
+                <p>
+                  <span className="font-semibold">手機：</span>
+                  {profile?.phone || "未設定"}
+                </p>
               </div>
             </div>
 
-            <section className="mt-8 rounded-3xl border border-[#eadfce] bg-white p-8 shadow-sm">
-              <h2 className="text-3xl font-bold text-[#1f2937]">
-                目前方案說明
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/"
+                className="rounded-2xl border border-[#d7c8b4] px-5 py-3 text-sm font-semibold text-[#6b5840] transition hover:bg-[#f8f3ec]"
+              >
+                返回首頁
+              </Link>
+
+              <Link
+                href="/pricing"
+                className="rounded-2xl bg-[#c89b45] px-5 py-3 text-sm font-bold text-white transition hover:scale-105"
+              >
+                升級會員方案
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* 借錢會員功能 */}
+        {isBorrower && (
+          <section className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#8a8175]">Borrower Area</p>
+
+                <h2 className="mt-1 text-2xl font-black text-[#2b2b2b]">
+                  借款會員專區
+                </h2>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <Card
+                title="刊登借款需求"
+                desc="快速刊登資金需求，等待資金方主動聯繫。"
+                href="/apply-loan"
+                color="bg-[#b31217]"
+              />
+
+              <Card
+                title="查看借款需求"
+                desc="查看目前平台上的借款需求內容。"
+                href="/needs"
+                color="bg-[#6b5840]"
+              />
+            </div>
+          </section>
+        )}
+
+        {/* 金主會員功能 */}
+        {isLender && (
+          <section className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#8a8175]">Lender Area</p>
+
+                <h2 className="mt-1 text-2xl font-black text-[#2b2b2b]">
+                  金主會員專區
+                </h2>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <Card
+                title="刊登放款廣告"
+                desc="曝光你的放款服務與條件。"
+                href="/post-lender"
+                color="bg-[#1d4ed8]"
+              />
+
+              <Card
+                title="查看借款名單"
+                desc="瀏覽目前借款會員刊登的需求資料。"
+                href="/needs"
+                color="bg-[#111827]"
+              />
+
+              <Card
+                title="會員方案"
+                desc="查看金主會員方案與升級內容。"
+                href="/pricing"
+                color="bg-[#c89b45]"
+              />
+            </div>
+          </section>
+        )}
+
+        {/* 管理員 */}
+        {role === "admin" && (
+          <section className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+            <div className="mb-6">
+              <p className="text-sm text-[#8a8175]">Admin Area</p>
+
+              <h2 className="mt-1 text-2xl font-black text-[#2b2b2b]">
+                管理後台
               </h2>
+            </div>
 
-              <div className="mt-6 space-y-4 text-lg leading-8 text-[#374151]">
-                <p>目前會員方案：{currentPlan}</p>
-                <p>會員權限狀態：{currentStatus}</p>
-                <p>帳號角色：{roleText}</p>
-                <p>目前已解鎖：{unlockedCount} 筆</p>
-                <p>解鎖點數餘額：{unlockPoints} 點</p>
-                <p>到期時間：{membership?.expires_at || "無"}</p>
-              </div>
-
-              <div className="mt-6 rounded-2xl bg-[#f6f1e8] px-5 py-4 text-[#6b5b45]">
-                {profile?.role === "admin"
-                  ? "目前為管理員帳號"
-                  : currentStatus === "active"
-                  ? "目前方案已啟用"
-                  : "目前為免費會員"}
-              </div>
-            </section>
-
-            {isLender && (
-              <section className="mt-8 rounded-3xl border border-[#eadfce] bg-white p-8 shadow-sm">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <h2 className="text-3xl font-bold text-[#3f2a14]">
-                      金主會員專區
-                    </h2>
-                    <p className="mt-3 text-base leading-7 text-[#7a6a5a]">
-                      升級會員方案或購買單筆解鎖，查看完整借款需求聯絡資料。
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <Link
-                      href="/pricing"
-                      className="inline-flex items-center justify-center rounded-full border border-[#d8c6ad] bg-white px-6 py-3 text-sm font-bold text-[#3f2a14] transition hover:bg-[#f7f1e8]"
-                    >
-                      查看會員方案
-                    </Link>
-
-                    <Link
-                      href="/pricing?mode=unlock"
-                      className="inline-flex items-center justify-center rounded-full bg-[#3f3a33] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#2f2a24]"
-                    >
-                      購買單筆解鎖
-                    </Link>
-                  </div>
-                </div>
-              </section>
-            )}
-          </>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <Card
+                title="進入管理後台"
+                desc="管理會員、借款需求、放款廣告等內容。"
+                href="/admin"
+                color="bg-black"
+              />
+            </div>
+          </section>
         )}
       </div>
     </main>
+  );
+}
+
+function Card({
+  title,
+  desc,
+  href,
+  color,
+}: {
+  title: string;
+  desc: string;
+  href: string;
+  color: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group rounded-[28px] border border-[#eadfce] bg-[#fcfaf7] p-5 transition hover:-translate-y-1 hover:shadow-lg"
+    >
+      <div
+        className={`inline-flex rounded-full px-4 py-2 text-sm font-bold text-white ${color}`}
+      >
+        功能入口
+      </div>
+
+      <h3 className="mt-5 text-xl font-black text-[#2b2b2b]">
+        {title}
+      </h3>
+
+      <p className="mt-3 text-sm leading-7 text-[#6f665d]">
+        {desc}
+      </p>
+
+      <div className="mt-6 text-sm font-semibold text-[#8b6b2c]">
+        前往 →
+      </div>
+    </Link>
   );
 }

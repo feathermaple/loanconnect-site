@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+
+  const supabase = useMemo(() => createClient(), []);
 
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -19,10 +20,14 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [menuOpen]);
 
   useEffect(() => {
-    const getUser = async () => {
+    const syncUser = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -31,39 +36,25 @@ export default function Navbar() {
 
       setUser(currentUser);
 
-      if (currentUser?.email) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("email", currentUser.email)
-          .maybeSingle();
-
-        setIsAdmin(profile?.role === "admin");
-      }
+      // 加速重點：Navbar 不再每次查 profiles
+      // 管理員判斷先讀 auth metadata，避免全站重複打 Supabase DB
+      const role = currentUser?.user_metadata?.role;
+      setIsAdmin(role === "admin");
 
       setAuthReady(true);
     };
 
-    getUser();
+    syncUser();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       const currentUser = session?.user ?? null;
 
       setUser(currentUser);
 
-      if (currentUser?.email) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("email", currentUser.email)
-          .maybeSingle();
-
-        setIsAdmin(profile?.role === "admin");
-      } else {
-        setIsAdmin(false);
-      }
+      const role = currentUser?.user_metadata?.role;
+      setIsAdmin(role === "admin");
 
       setAuthReady(true);
     });
@@ -73,29 +64,30 @@ export default function Navbar() {
     };
   }, [supabase]);
 
- const handleLogout = async () => {
-  try {
-    setLoggingOut(true);
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
 
-    const { error } = await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
 
-    if (error) {
-      console.error(error);
-      alert("登出失敗");
-      return;
+      if (error) {
+        console.error(error);
+        alert("登出失敗");
+        return;
+      }
+
+      setUser(null);
+      setIsAdmin(false);
+      setMenuOpen(false);
+
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoggingOut(false);
     }
-
-    setUser(null);
-    setIsAdmin(false);
-
-    router.push("/");
-    router.refresh();
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoggingOut(false);
-  }
-};
+  };
 
   const navItems = [
     { href: "/", label: "首頁" },
@@ -144,25 +136,15 @@ export default function Navbar() {
 
         {/* Right Buttons */}
         <div className="hidden items-center gap-2 lg:flex">
-          {/* 我要借錢 */}
           <Link
-            href={
-              user
-                ? "/apply-loan"
-                : "/register?redirect=/apply-loan"
-            }
+            href={user ? "/apply-loan" : "/register?redirect=/apply-loan"}
             className="rounded-full bg-[#b31217] px-5 py-3 text-sm font-bold text-white transition hover:scale-105"
           >
             我要借錢
           </Link>
 
-          {/* 我要放款 */}
           <Link
-            href={
-              user
-                ? "/post-lender"
-                : "/register?redirect=/post-lender"
-            }
+            href={user ? "/post-lender" : "/register?redirect=/post-lender"}
             className="rounded-full bg-[#1d4ed8] px-5 py-3 text-sm font-bold text-white transition hover:scale-105"
           >
             我要放款
@@ -170,7 +152,6 @@ export default function Navbar() {
 
           {!authReady ? null : !user ? (
             <>
-              {/* 登入 */}
               <Link
                 href="/login"
                 className="rounded-full border border-[#c89b45] px-4 py-3 text-sm font-medium text-[#c89b45] transition hover:bg-[#c89b45] hover:text-white"
@@ -178,7 +159,6 @@ export default function Navbar() {
                 登入
               </Link>
 
-              {/* 免費註冊 */}
               <Link
                 href="/register?redirect=/apply-loan"
                 className="rounded-full bg-[#c89b45] px-5 py-3 text-sm font-bold text-white shadow-md transition hover:scale-105"
@@ -188,7 +168,6 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              {/* 管理後台 */}
               {isAdmin && (
                 <Link
                   href="/admin"
@@ -198,7 +177,6 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {/* 會員中心 */}
               <Link
                 href="/member"
                 className="rounded-full border border-gray-300 px-4 py-3 text-sm transition hover:bg-gray-100"
@@ -206,7 +184,6 @@ export default function Navbar() {
                 會員中心
               </Link>
 
-              {/* 登出 */}
               <button
                 onClick={handleLogout}
                 disabled={loggingOut}
