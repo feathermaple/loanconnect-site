@@ -90,7 +90,7 @@ export default async function NeedDetailPage({
   const isLenderRole = role === "lender" || role === "both" || role === "admin";
 
   if (!isLenderRole) {
-    redirect("/borrower/dashboard");
+    redirect("/member");
   }
 
   const membership = getMembershipInfo(profile);
