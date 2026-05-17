@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -68,11 +67,6 @@ export default async function NeedDetailPage({
   let isExpired = false;
   let unlockCredits = 0;
 
-  const headerStore = await headers();
-  const forwardedFor = headerStore.get("x-forwarded-for") || "";
-  const realIp = headerStore.get("x-real-ip") || "";
-  const ip = forwardedFor.split(",")[0]?.trim() || realIp.trim() || "unknown";
-
   const [{ data: profile }, { data: unlockLogs }] = await Promise.all([
     adminSupabase
       .from("profiles")
@@ -82,7 +76,7 @@ export default async function NeedDetailPage({
       .eq("id", user.id)
       .maybeSingle(),
     adminSupabase
-      .from("need_unlock_logs")
+      .from("unlock_logs")
       .select("need_id")
       .eq("user_id", user.id),
   ]);
@@ -93,7 +87,9 @@ export default async function NeedDetailPage({
   membershipExpiresAt = profile?.membership_expires_at || null;
   unlockCredits = profile?.unlock_credits || 0;
 
-  if (role !== "lender" && role !== "admin") {
+  const isLenderRole = role === "lender" || role === "both" || role === "admin";
+
+  if (!isLenderRole) {
     redirect("/borrower/dashboard");
   }
 
@@ -111,28 +107,24 @@ export default async function NeedDetailPage({
     canViewFull = true;
     statusText = "管理員可看";
     membershipReason = "目前為管理員帳號";
-  } else if (role === "lender") {
+  } else if (role === "lender" || role === "both") {
     if (isPaidMember) {
       canViewFull = true;
       statusText = alreadyUnlocked ? "已解鎖" : "VIP 可看";
 
       if (!alreadyUnlocked) {
         const { error: insertError } = await adminSupabase
-          .from("need_unlock_logs")
+          .from("unlock_logs")
           .insert({
-            user_id: user.id,
-            need_id: id,
-            ip,
-          });
-
-        if (!insertError) {
-          await adminSupabase.from("unlock_logs").insert({
             user_id: user.id,
             need_id: id,
             credit_cost: 0,
             unlock_type: "vip",
             note: "VIP 查看借款需求",
           });
+
+        if (insertError) {
+          console.error("VIP 寫入 unlock_logs 失敗", insertError);
         }
       }
     } else if (alreadyUnlocked) {
@@ -140,15 +132,8 @@ export default async function NeedDetailPage({
       statusText = "已解鎖";
     } else if (remainingFreeUnlocks > 0) {
       const { error: insertError } = await adminSupabase
-        .from("need_unlock_logs")
+        .from("unlock_logs")
         .insert({
-          user_id: user.id,
-          need_id: id,
-          ip,
-        });
-
-      if (!insertError) {
-        await adminSupabase.from("unlock_logs").insert({
           user_id: user.id,
           need_id: id,
           credit_cost: 0,
@@ -156,31 +141,27 @@ export default async function NeedDetailPage({
           note: "使用免費額度查看借款需求",
         });
 
+      if (!insertError) {
         canViewFull = true;
         statusText = "已解鎖";
         remainingFreeUnlocks = Math.max(0, remainingFreeUnlocks - 1);
+      } else {
+        console.error("免費額度寫入 unlock_logs 失敗", insertError);
       }
     } else if (unlockCredits > 0) {
-      const { error: insertError } = await adminSupabase
-        .from("need_unlock_logs")
-        .insert({
-          user_id: user.id,
-          need_id: id,
-          ip,
-        });
+      const nextCredits = Math.max(0, unlockCredits - 1);
 
-      if (!insertError) {
-        const nextCredits = Math.max(0, unlockCredits - 1);
+      const { error: creditUpdateError } = await adminSupabase
+        .from("profiles")
+        .update({
+          unlock_credits: nextCredits,
+        })
+        .eq("id", user.id);
 
-        const { error: creditUpdateError } = await adminSupabase
-          .from("profiles")
-          .update({
-            unlock_credits: nextCredits,
-          })
-          .eq("id", user.id);
-
-        if (!creditUpdateError) {
-          await adminSupabase.from("unlock_logs").insert({
+      if (!creditUpdateError) {
+        const { error: insertError } = await adminSupabase
+          .from("unlock_logs")
+          .insert({
             user_id: user.id,
             need_id: id,
             credit_cost: 1,
@@ -188,10 +169,15 @@ export default async function NeedDetailPage({
             note: "使用點數解鎖借款需求",
           });
 
+        if (!insertError) {
           canViewFull = true;
           statusText = "點數解鎖";
           unlockCredits = nextCredits;
+        } else {
+          console.error("點數解鎖寫入 unlock_logs 失敗", insertError);
         }
+      } else {
+        console.error("扣除 unlock_credits 失敗", creditUpdateError);
       }
     } else {
       redirect("/unlock-pack");
@@ -199,7 +185,8 @@ export default async function NeedDetailPage({
   }
 
   const maskedName = maskNickname(item.nickname);
-  const isLenderOrAdmin = role === "lender" || role === "admin";
+  const isLenderOrAdmin =
+    role === "lender" || role === "both" || role === "admin";
 
   return (
     <main className="min-h-screen bg-[#f8f5ef] px-4 py-10 md:px-6">
