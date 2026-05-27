@@ -132,6 +132,30 @@ export default function LoginClient() {
             {loading ? "登入中..." : "登入"}
           </button>
         </form>
+
+        <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 p-4 text-center">
+  <p className="text-sm text-stone-600">
+    還沒有帳號嗎？
+  </p>
+
+  <button
+    type="button"
+    onClick={() => {
+      const redirect = searchParams.get("redirect");
+
+      if (redirect) {
+        router.push(
+          `/register?redirect=${encodeURIComponent(redirect)}`
+        );
+      } else {
+        router.push("/register");
+      }
+    }}
+    className="mt-3 w-full rounded-2xl bg-[#c89b45] px-4 py-3 text-sm font-bold text-white transition hover:opacity-90"
+  >
+    免費註冊會員
+  </button>
+</div>
       </div>
     </main>
   );
