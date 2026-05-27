@@ -161,79 +161,107 @@ export default function ApplyLoanPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="space-y-6">
-            <div className="rounded-[28px] border border-[#eadfce] bg-white p-6 shadow-sm">
-              <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
-                刊登前說明
-              </div>
-              <h2 className="mt-3 text-2xl font-bold text-[#1f1f1f]">
-                填寫幾項基本資料，就能開始刊登需求
-              </h2>
-              <p className="mt-4 text-sm leading-7 text-[#655c51]">
-                建議您填寫正確且方便聯繫的資料，這樣後續處理與媒合效率會比較好。
-                若目前還不確定完整條件，也可以先填寫基本需求再進一步評估。
-              </p>
-            </div>
+     <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
+  <div className="mx-auto mb-14 max-w-3xl text-center">
+    <p className="text-sm font-semibold tracking-[0.35em] text-[#b8872b]">
+      ABOUT PLATFORM
+    </p>
 
-            <div className="rounded-[28px] border border-[#eadfce] bg-white p-6 shadow-sm">
-              <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
-                送出後會怎麼進行
-              </div>
-              <div className="mt-4 space-y-4">
-                <div className="rounded-2xl bg-[#faf6ef] p-4">
-                  <div className="font-bold text-[#2a241d]">1. 建立借款需求</div>
-                  <p className="mt-1 text-sm leading-7 text-[#62584d]">
-                    您送出表單後，系統會建立需求資料。
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-[#faf6ef] p-4">
-                  <div className="font-bold text-[#2a241d]">2. 等待後續媒合</div>
-                  <p className="mt-1 text-sm leading-7 text-[#62584d]">
-                    後續依平台流程與需求內容進行媒合或查看。
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-[#faf6ef] p-4">
-                  <div className="font-bold text-[#2a241d]">3. 進一步評估條件</div>
-                  <p className="mt-1 text-sm leading-7 text-[#62584d]">
-                    實際借款條件、額度、利率與費用，仍以後續雙方洽談為準。
-                  </p>
-                </div>
-              </div>
-            </div>
+    <h1 className="mt-4 text-4xl font-black tracking-tight text-[#1f1f1f] md:text-5xl">
+      關於平台
+    </h1>
 
-            <div className="rounded-[28px] border border-[#eadfce] bg-white p-6 shadow-sm">
-              <div className="text-sm font-semibold tracking-wide text-[#b8842c]">
-                常見問題
-              </div>
-              <div className="mt-4 space-y-4">
-                {faqList.map((item) => (
-                  <div key={item.q} className="border-b border-[#f1e8db] pb-4 last:border-b-0 last:pb-0">
-                    <div className="font-bold text-[#2a241d]">{item.q}</div>
-                    <p className="mt-2 text-sm leading-7 text-[#645b50]">{item.a}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+    <p className="mt-5 text-[15px] leading-8 text-[#6f6257] md:text-base">
+      我們致力打造簡單、安全、有效率的借貸媒合平台，
+      讓有資金需求與放款服務的雙方，
+      能更快速找到合適的媒合方式。
+    </p>
+  </div>
 
-         
-          <h2 className="mt-4 text-3xl font-bold text-[#1f1f1f] md:text-4xl">
-            現在就開始刊登借款需求
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[#655c51]">
-            若您現在就有資金需求，填寫基本資料後即可開始建立需求，
-            讓後續評估與媒合更快開始。
+  <div className="mx-auto max-w-4xl space-y-8">
+    {/* 刊登前說明 */}
+    <div className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+      <p className="text-sm font-semibold tracking-wide text-[#c89b45]">
+        刊登前說明
+      </p>
+
+      <h2 className="mt-3 text-2xl font-black leading-tight text-[#2a2422]">
+        填寫幾項基本資料，就能開始刊登需求
+      </h2>
+
+      <p className="mt-4 text-[15px] leading-8 text-[#6f6257]">
+        建議您填寫正確且方便聯繫的資料，
+        這樣後續處理與媒合效率會比較好。
+        若目前還不確定完整條件，
+        也可以先填寫基本需求再進一步評估。
+      </p>
+    </div>
+
+    {/* 流程 */}
+    <div className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+      <p className="text-sm font-semibold tracking-wide text-[#c89b45]">
+        送出後會怎麼進行
+      </p>
+
+      <div className="mt-5 space-y-4">
+        <div className="rounded-2xl bg-[#f7f2eb] p-5">
+          <h3 className="text-lg font-bold text-[#2a2422]">
+            1. 建立借款需求
+          </h3>
+
+          <p className="mt-2 text-sm leading-7 text-[#6f6257]">
+            您送出資料後，系統會建立需求資料。
           </p>
-          <a
-            href="#top"
-            className="mt-8 inline-flex rounded-2xl bg-[#c89b45] px-6 py-4 text-base font-bold text-white transition hover:bg-[#b98c35]"
-          >
-            立即開始填寫
-          </a>
         </div>
-      </section>
-    </main>
+
+        <div className="rounded-2xl bg-[#f7f2eb] p-5">
+          <h3 className="text-lg font-bold text-[#2a2422]">
+            2. 等待後續媒合
+          </h3>
+
+          <p className="mt-2 text-sm leading-7 text-[#6f6257]">
+            後續依平台流程與需求內容進行媒合或查看。
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-[#f7f2eb] p-5">
+          <h3 className="text-lg font-bold text-[#2a2422]">
+            3. 進一步評估條件
+          </h3>
+
+          <p className="mt-2 text-sm leading-7 text-[#6f6257]">
+            實際借款條件、額度、利率與費用，
+            仍以後續雙方洽談為準。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* FAQ */}
+    <div className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
+      <p className="text-sm font-semibold tracking-wide text-[#c89b45]">
+        常見問題
+      </p>
+
+      <div className="mt-5 space-y-5">
+        {faqList.map((item) => (
+          <div
+            key={item.q}
+            className="border-b border-[#f1e8db] pb-5 last:border-b-0 last:pb-0"
+          >
+            <h3 className="text-lg font-bold text-[#2a2422]">
+              {item.q}
+            </h3>
+
+            <p className="mt-2 text-sm leading-7 text-[#6f6257]">
+              {item.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+</main>
   );
 }
