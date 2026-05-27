@@ -33,6 +33,14 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+  <Link
+    href="/anti-fraud"
+    className="transition hover:text-ink"
+  >
+    防詐騙宣導
+  </Link>
+</li>
+            <li>
               <Link
                 href="/privacy-policy"
                 className="transition hover:text-ink"
