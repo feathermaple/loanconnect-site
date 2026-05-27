@@ -27,6 +27,7 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
   const [msg, setMsg] = useState("");
 
   const redirect = searchParams.get("redirect");
+
   const registerHref = redirect
     ? `/register?redirect=${encodeURIComponent(redirect)}`
     : "/register";
@@ -215,21 +216,21 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
         )}
 
         {mode === "login" ? (
-          <div className="rounded-2xl border border-[#eadfce] bg-white p-4 text-center">
-            <p className="text-sm text-[#555]">還沒有帳號嗎？</p>
+          <div className="mt-5 rounded-2xl border border-[#eadfce] bg-white p-4 text-center">
+            <p className="text-sm text-[#666]">還沒有帳號嗎？</p>
             <Link
               href={registerHref}
-              className="mt-3 block rounded-xl bg-[#c89b45] px-4 py-3 text-sm font-bold text-white"
+              className="mt-3 block rounded-2xl bg-[#c89b45] px-5 py-3 text-center text-sm font-bold text-white shadow-sm transition hover:opacity-90"
             >
               免費註冊會員
             </Link>
           </div>
         ) : (
-          <div className="rounded-2xl border border-[#eadfce] bg-white p-4 text-center">
-            <p className="text-sm text-[#555]">已經有帳號了嗎？</p>
+          <div className="mt-5 rounded-2xl border border-[#eadfce] bg-white p-4 text-center">
+            <p className="text-sm text-[#666]">已經有帳號了嗎？</p>
             <Link
               href={loginHref}
-              className="mt-3 block rounded-xl border border-[#c89b45] px-4 py-3 text-sm font-bold text-[#c89b45]"
+              className="mt-3 block rounded-2xl border border-[#c89b45] px-5 py-3 text-center text-sm font-bold text-[#c89b45] transition hover:bg-[#c89b45] hover:text-white"
             >
               直接登入
             </Link>
