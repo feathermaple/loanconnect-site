@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -25,8 +26,16 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
+  const redirect = searchParams.get("redirect");
+  const registerHref = redirect
+    ? `/register?redirect=${encodeURIComponent(redirect)}`
+    : "/register";
+
+  const loginHref = redirect
+    ? `/login?redirect=${encodeURIComponent(redirect)}`
+    : "/login";
+
   function getRedirectPath(role?: string | null) {
-    const redirect = searchParams.get("redirect");
     if (redirect) return redirect;
 
     if (role === "admin") return "/admin";
@@ -179,7 +188,12 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
 
         <Field label="Email" type="email" value={email} onChange={setEmail} />
 
-        <Field label="密碼" type="password" value={password} onChange={setPassword} />
+        <Field
+          label="密碼"
+          type="password"
+          value={password}
+          onChange={setPassword}
+        />
 
         <button
           type="button"
@@ -191,9 +205,35 @@ export default function AuthCard({ mode, title, desc, primaryText }: Props) {
         </button>
 
         {msg && (
-          <p className={`text-center text-sm ${msg.includes("成功") ? "text-green-600" : "text-red-500"}`}>
+          <p
+            className={`text-center text-sm ${
+              msg.includes("成功") ? "text-green-600" : "text-red-500"
+            }`}
+          >
             {msg}
           </p>
+        )}
+
+        {mode === "login" ? (
+          <div className="rounded-2xl border border-[#eadfce] bg-white p-4 text-center">
+            <p className="text-sm text-[#555]">還沒有帳號嗎？</p>
+            <Link
+              href={registerHref}
+              className="mt-3 block rounded-xl bg-[#c89b45] px-4 py-3 text-sm font-bold text-white"
+            >
+              免費註冊會員
+            </Link>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-[#eadfce] bg-white p-4 text-center">
+            <p className="text-sm text-[#555]">已經有帳號了嗎？</p>
+            <Link
+              href={loginHref}
+              className="mt-3 block rounded-xl border border-[#c89b45] px-4 py-3 text-sm font-bold text-[#c89b45]"
+            >
+              直接登入
+            </Link>
+          </div>
         )}
       </div>
     </section>

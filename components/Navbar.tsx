@@ -36,8 +36,6 @@ export default function Navbar() {
 
       setUser(currentUser);
 
-      // 加速重點：Navbar 不再每次查 profiles
-      // 管理員判斷先讀 auth metadata，避免全站重複打 Supabase DB
       const role = currentUser?.user_metadata?.role;
       setIsAdmin(role === "admin");
 
@@ -98,10 +96,12 @@ export default function Navbar() {
     { href: "/about-platform", label: "關於平台" },
   ];
 
+  const loanHref = user ? "/apply-loan" : "/login?redirect=/apply-loan";
+  const lenderHref = user ? "/post-lender" : "/login?redirect=/post-lender";
+
   return (
     <header className="sticky top-0 z-50 border-b border-[#eadfce] bg-[#f6f2ec]/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        {/* LOGO */}
         <Link href="/" className="shrink-0">
           <Image
             src="/logo.png"
@@ -113,7 +113,6 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* Desktop Menu */}
         <nav className="hidden items-center gap-2 lg:flex">
           {navItems.map((item) => {
             const active = pathname === item.href;
@@ -134,17 +133,16 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Right Buttons */}
         <div className="hidden items-center gap-2 lg:flex">
           <Link
-            href={user ? "/apply-loan" : "/register?redirect=/apply-loan"}
+            href={loanHref}
             className="rounded-full bg-[#b31217] px-5 py-3 text-sm font-bold text-white transition hover:scale-105"
           >
             我要借錢
           </Link>
 
           <Link
-            href={user ? "/post-lender" : "/register?redirect=/post-lender"}
+            href={lenderHref}
             className="rounded-full bg-[#1d4ed8] px-5 py-3 text-sm font-bold text-white transition hover:scale-105"
           >
             我要放款
@@ -195,10 +193,10 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#eadfce] bg-white lg:hidden"
+          aria-label="開啟選單"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -208,28 +206,35 @@ export default function Navbar() {
             stroke="currentColor"
           >
             {menuOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             )}
           </svg>
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="border-t border-[#eadfce] bg-[#f6f2ec] px-4 py-4 lg:hidden">
           <div className="flex flex-col gap-2">
+            <div className="mb-2 grid grid-cols-2 gap-2">
+              <Link
+                href={loanHref}
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl bg-[#b31217] px-4 py-3 text-center text-sm font-bold text-white"
+              >
+                我要借錢
+              </Link>
+
+              <Link
+                href={lenderHref}
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl bg-[#1d4ed8] px-4 py-3 text-center text-sm font-bold text-white"
+              >
+                我要放款
+              </Link>
+            </div>
+
             {navItems.map((item) => {
               const active = pathname === item.href;
 
