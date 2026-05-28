@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 const SOURCE_TABLES = {
   needs: ["loan_requests"],
   ads: ["paid_lender_ads", "lender_ads"],
-  lenders: ["regional_lenders", "paid_lender_ads", "lender_ads"],
+  lenders: ["regional_lenders"],
   orders: ["orders"],
 } as const;
 
@@ -30,14 +30,24 @@ async function getCount(
   supabase: ReturnType<typeof createAdminClient>,
   tables: readonly string[]
 ) {
-  const table = await findWorkingTable(supabase, tables);
-  if (!table) return { table: null, count: 0 };
+  let total = 0;
+  const workingTables: string[] = [];
 
-  const { count } = await supabase
-    .from(table)
-    .select("id", { count: "exact", head: true });
+  for (const table of tables) {
+    const { count, error } = await supabase
+      .from(table)
+      .select("id", { count: "exact", head: true });
 
-  return { table, count: count || 0 };
+    if (!error) {
+      total += count || 0;
+      workingTables.push(table);
+    }
+  }
+
+  return {
+    table: workingTables.join(" + ") || null,
+    count: total,
+  };
 }
 
 async function getRecentRows(
@@ -45,17 +55,39 @@ async function getRecentRows(
   tables: readonly string[],
   limit = 5
 ) {
-  const table = await findWorkingTable(supabase, tables);
-  if (!table) return { table: null, rows: [] as any[] };
+  const allRows: any[] = [];
+  const workingTables: string[] = [];
 
-  let { data } = await supabase.from(table).select("*").limit(limit);
-  data = (data || []).sort((a: any, b: any) => {
-    const ta = a?.created_at ? new Date(a.created_at).getTime() : 0;
-    const tb = b?.created_at ? new Date(b.created_at).getTime() : 0;
-    return tb - ta;
-  });
+  for (const table of tables) {
+    const { data, error } = await supabase
+      .from(table)
+      .select("*")
+      .limit(limit);
 
-  return { table, rows: data };
+    if (!error) {
+      workingTables.push(table);
+
+      allRows.push(
+        ...(data || []).map((row) => ({
+          ...row,
+          source_table: table,
+        }))
+      );
+    }
+  }
+
+  const rows = allRows
+    .sort((a: any, b: any) => {
+      const ta = a?.created_at ? new Date(a.created_at).getTime() : 0;
+      const tb = b?.created_at ? new Date(b.created_at).getTime() : 0;
+      return tb - ta;
+    })
+    .slice(0, limit);
+
+  return {
+    table: workingTables.join(" + ") || null,
+    rows,
+  };
 }
 
 function formatDate(value: any) {
@@ -159,7 +191,7 @@ export default async function AdminDashboardPage() {
           <RecentCard
             title="最新放款廣告"
             rows={recentAds.rows}
-            fields={["created_at", "region", "title", "contact_name", "contact_person"]}
+            fields={["source_table", "created_at", "region", "title", "company_name", "contact_name", "phone"]}
           />
           <RecentCard
             title="最新各區放款資訊"
