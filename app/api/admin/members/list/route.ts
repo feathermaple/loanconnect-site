@@ -8,7 +8,11 @@ const supabaseAdmin = createClient(
 
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
+
+    const {
+      data,
+      error,
+    } = await supabaseAdmin
       .from("profiles")
       .select(`
         id,
@@ -22,22 +26,39 @@ export async function GET() {
         created_at,
         updated_at
       `)
-      .order("created_at", { ascending: false });
+      .order("created_at", {
+        ascending: false,
+      });
 
     if (error) {
       return NextResponse.json(
-        { error: error.message },
+        {
+          error: error.message,
+        },
         { status: 500 }
       );
     }
 
+    const members =
+      (data || []).map((member) => ({
+        ...member,
+
+        uid: member.id,
+      }));
+
     return NextResponse.json({
       success: true,
-      members: data || [],
+      members,
     });
+
   } catch (error: any) {
+
     return NextResponse.json(
-      { error: error.message || "讀取會員失敗" },
+      {
+        error:
+          error.message ||
+          "讀取會員失敗",
+      },
       { status: 500 }
     );
   }
