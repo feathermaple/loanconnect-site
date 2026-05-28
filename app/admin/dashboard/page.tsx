@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 const SOURCE_TABLES = {
   needs: ["loan_requests"],
   ads: ["paid_lender_ads", "lender_ads"],
-  lenders: ["regional_lenders"],
+  lenders: ["paid_lender_ads", "lender_ads"],
   orders: ["orders"],
 } as const;
 
