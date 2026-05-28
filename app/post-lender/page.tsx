@@ -83,8 +83,22 @@ export default function PostLenderPage() {
 
     setLoading(true);
 
-    const { error } = await supabase.from("lender_ads").insert([
+   const {
+       data: { user },
+       } = await supabase.auth.getUser();
+
+    if (!user) {
+       alert("請先登入");
+       router.replace("/login?redirect=/post-lender");
+       setLoading(false);
+       return;
+    }
+
+    const { error } = await supabase.from("paid_lender_ads").insert([
       {
+        lender_user_id: user.id,
+        is_active: true,
+
         company_name: form.company_name,
         contact_name: form.contact_name,
         region: form.region,

@@ -120,7 +120,7 @@ export default function AdminMembersPage() {
           membership_plan: plan,
           membership_status: "active",
           membership_expires_at: expires.toISOString(),
-          admin_note: plan === "monthly" ? "開通月費會員 30 天" : "開通年費會員 365 天",
+          admin_note: plan === "monthly" ? "開通月費會員 30 天" : "開通年費會員 395 天",
         }),
       });
 
@@ -331,10 +331,10 @@ export default function AdminMembersPage() {
                 </button>
 
                 <button
-                  onClick={() => activatePlan(userId, "yearly", 365)}
+                  onClick={() => activatePlan(userId, "yearly", 395)}
                   className="bg-purple-600 text-white px-3 py-2 rounded"
                 >
-                  開通年費會員 365天
+                  開通年費會員 395天
                 </button>
 
                 <button

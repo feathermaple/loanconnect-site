@@ -183,6 +183,13 @@ export default function MemberPage() {
                 href="/needs"
                 color="bg-[#6b5840]"
               />
+
+              <Card
+               title="查看借款需求"
+               desc="查看目前平台上的借款需求內容。"
+               href="/needs"
+               color="bg-[#6b5840]"
+              />
             </div>
           </section>
         )}
@@ -212,6 +219,13 @@ export default function MemberPage() {
                 desc="瀏覽目前借款會員刊登的需求資料。"
                 href="/needs"
                 color="bg-[#111827]"
+              />
+
+              <Card
+               title="我的放款廣告"
+               desc="查看、修改、關閉或刪除自己刊登的放款廣告。"
+               href="/member/my-lender-ads"
+               color="bg-[#c89b45]"
               />
 
               <Card
