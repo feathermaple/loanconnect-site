@@ -67,9 +67,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "缺少資料 ID" }, { status: 400 });
     }
 
-    const updatePayload: any = {
-      updated_at: new Date().toISOString(),
-    };
+    const updatePayload: any = {};
 
     if (nickname !== undefined) updatePayload.nickname = nickname;
     if (region !== undefined) updatePayload.region = region;
