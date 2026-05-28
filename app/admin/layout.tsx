@@ -20,9 +20,7 @@ export default function AdminLayout({
   { name: "借款需求管理", href: "/admin/loan-requests" },
 
   { name: "放款廣告管理", href: "/admin/lender-ads" },
-
-  { name: "各區放款資訊", href: "/admin/regional-lenders" },
-
+  
   { name: "訂單管理", href: "/admin/orders" },
 ];
 
