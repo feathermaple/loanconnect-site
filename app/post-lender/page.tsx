@@ -22,6 +22,7 @@ useEffect(() => {
     } = await supabase.auth.getUser();
 
     if (!user) {
+      setCheckingAuth(false);
       router.replace("/login?redirect=/post-lender");
       return;
     }
@@ -40,6 +41,7 @@ useEffect(() => {
         profile.role !== "admin"
       )
     ) {
+      setCheckingAuth(false);
       router.replace("/pricing");
       return;
     }
