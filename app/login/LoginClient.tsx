@@ -16,6 +16,7 @@ export default function LoginClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
+  const loginError = searchParams.get("error");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -88,6 +89,21 @@ export default function LoginClient() {
         <p className="mt-2 text-sm text-stone-500">
           登入後將依照帳號身份自動進入正確頁面。
         </p>
+
+{loginError === "profile-missing" ? (
+  <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700">
+    <p className="font-bold">
+      找不到會員資料
+    </p>
+
+    <p className="mt-2 leading-7">
+      此帳號的會員資料不存在，
+      可能尚未完成註冊，
+      或會員資料已被移除。
+      請重新註冊會員後再登入。
+    </p>
+  </div>
+) : null}
 
         <form onSubmit={handleLogin} className="mt-8 space-y-4">
           <div>

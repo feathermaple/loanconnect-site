@@ -1,7 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Footer() {
+export default async function Footer() {
+
+const supabase = await createClient();
+
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+
   return (
     <footer className="border-t border-line bg-paper">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 md:grid-cols-3 md:px-6">
@@ -65,7 +73,7 @@ export default function Footer() {
           <div className="font-semibold text-ink">快速入口</div>
           <ul className="mt-4 space-y-3 text-sm text-muted">
             <li>
-              <Link href="/apply-loan" className="transition hover:text-ink">
+              <Link href={user ? "/apply-loan" : "/login?redirect=/apply-loan"} className="transition hover:text-ink">
                 我要借錢
               </Link>
             </li>

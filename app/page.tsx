@@ -383,12 +383,12 @@ export default async function HomePage() {
               {
                 title: "免費刊登借款需求",
                 desc: "借款方可快速刊登需求，讓更多放款方主動看到。",
-                href: "/apply-loan",
+                href: user ? "/apply-loan" : "/login?redirect=/apply-loan",
               },
               {
                 title: "免費刊登放款資訊",
                 desc: "放款方可刊登承作類型、金額區間與聯絡方式。",
-                href: "/post-lender",
+                href: user ? "/post-lender" : "/login?redirect=/post-lender",
               },
               {
                 title: "公開需求列表",
