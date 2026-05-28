@@ -7,16 +7,56 @@ const adminSupabase = createClient(
 );
 
 export async function GET() {
-  const { data, error } = await adminSupabase
-    .from("paid_lender_ads")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [
+    { data: paidAds, error: paidError },
+    { data: freeAds, error: freeError },
+  ] = await Promise.all([
+    adminSupabase
+      .from("paid_lender_ads")
+      .select("*")
+      .order("created_at", { ascending: false }),
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    adminSupabase
+      .from("lender_ads")
+      .select("*")
+      .order("created_at", { ascending: false }),
+  ]);
+
+  if (paidError) {
+    return NextResponse.json(
+      { error: paidError.message },
+      { status: 500 }
+    );
   }
 
-  return NextResponse.json({ success: true, items: data || [] });
+  if (freeError) {
+    return NextResponse.json(
+      { error: freeError.message },
+      { status: 500 }
+    );
+  }
+
+  const paidList = (paidAds || []).map((item) => ({
+    ...item,
+    source_table: "paid_lender_ads",
+  }));
+
+  const freeList = (freeAds || []).map((item) => ({
+    ...item,
+    source_table: "lender_ads",
+  }));
+
+  const merged = [...paidList, ...freeList].sort((a: any, b: any) => {
+    return (
+      new Date(b.created_at || "").getTime() -
+      new Date(a.created_at || "").getTime()
+    );
+  });
+
+  return NextResponse.json({
+    success: true,
+    items: merged,
+  });
 }
 
 export async function POST(req: NextRequest) {
