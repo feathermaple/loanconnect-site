@@ -5,14 +5,13 @@ import { useEffect, useState } from "react";
 
 type BorrowPost = {
   id: string;
-  customer_name?: string | null;
+  nickname?: string | null;
   phone?: string | null;
   line_id?: string | null;
-  city?: string | null;
-  district?: string | null;
-  loan_amount?: string | number | null;
+  region?: string | null;
+    amount?: string | number | null;
   purpose?: string | null;
-  note?: string | null;
+  description?: string | null;
   status?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
@@ -222,11 +221,11 @@ export default function MyBorrowPostsPage() {
 
               <div className="grid gap-3 md:grid-cols-2">
                 <input
-                  value={post.customer_name || ""}
+                  value={post.nickname || ""}
                   onChange={(e) =>
-                    updateLocal(post.id, { customer_name: e.target.value })
+                    updateLocal(post.id, { nickname: e.target.value })
                   }
-                  placeholder="姓名"
+                  placeholder="暱稱"
                   className="rounded-xl border border-[#eadfce] px-4 py-3"
                 />
 
@@ -249,31 +248,24 @@ export default function MyBorrowPostsPage() {
                 />
 
                 <input
-                  value={post.loan_amount || ""}
+                  value={post.amount || ""}
                   onChange={(e) =>
-                    updateLocal(post.id, { loan_amount: e.target.value })
+                    updateLocal(post.id, { amount: e.target.value })
                   }
                   placeholder="借款金額"
                   className="rounded-xl border border-[#eadfce] px-4 py-3"
                 />
 
                 <input
-                  value={post.city || ""}
+                  value={post.region || ""}
                   onChange={(e) =>
-                    updateLocal(post.id, { city: e.target.value })
+                    updateLocal(post.id, { region: e.target.value })
                   }
                   placeholder="縣市"
                   className="rounded-xl border border-[#eadfce] px-4 py-3"
                 />
 
-                <input
-                  value={post.district || ""}
-                  onChange={(e) =>
-                    updateLocal(post.id, { district: e.target.value })
-                  }
-                  placeholder="區域"
-                  className="rounded-xl border border-[#eadfce] px-4 py-3"
-                />
+            
 
                 <input
                   value={post.purpose || ""}
@@ -285,11 +277,11 @@ export default function MyBorrowPostsPage() {
                 />
 
                 <textarea
-                  value={post.note || ""}
+                  value={post.description || ""}
                   onChange={(e) =>
-                    updateLocal(post.id, { note: e.target.value })
+                    updateLocal(post.id, { description: e.target.value })
                   }
-                  placeholder="備註"
+                  placeholder="需求描述"
                   rows={4}
                   className="rounded-xl border border-[#eadfce] px-4 py-3 md:col-span-2"
                 />

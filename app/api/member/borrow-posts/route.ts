@@ -15,9 +15,9 @@ export async function GET() {
     }
 
     const { data, error } = await supabase
-      .from("customer_leads")
+      .from("loan_requests")
       .select("*")
-      .eq("customer_user_id", user.id)
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -53,14 +53,13 @@ export async function PATCH(req: NextRequest) {
 
     const {
       id,
-      customer_name,
+      nickname,
+      region,
+      amount,
+      purpose,
       phone,
       line_id,
-      city,
-      district,
-      loan_amount,
-      purpose,
-      note,
+      description,
       status,
     } = body || {};
 
@@ -72,21 +71,20 @@ export async function PATCH(req: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    if (customer_name !== undefined) updatePayload.customer_name = customer_name;
+    if (nickname !== undefined) updatePayload.nickname = nickname;
+    if (region !== undefined) updatePayload.region = region;
+    if (amount !== undefined) updatePayload.amount = amount;
+    if (purpose !== undefined) updatePayload.purpose = purpose;
     if (phone !== undefined) updatePayload.phone = phone;
     if (line_id !== undefined) updatePayload.line_id = line_id;
-    if (city !== undefined) updatePayload.city = city;
-    if (district !== undefined) updatePayload.district = district;
-    if (loan_amount !== undefined) updatePayload.loan_amount = loan_amount;
-    if (purpose !== undefined) updatePayload.purpose = purpose;
-    if (note !== undefined) updatePayload.note = note;
+    if (description !== undefined) updatePayload.description = description;
     if (status !== undefined) updatePayload.status = status;
 
     const { data, error } = await supabase
-      .from("customer_leads")
+      .from("loan_requests")
       .update(updatePayload)
       .eq("id", id)
-      .eq("customer_user_id", user.id)
+      .eq("user_id", user.id)
       .select()
       .single();
 
@@ -126,10 +124,10 @@ export async function DELETE(req: NextRequest) {
     }
 
     const { error } = await supabase
-      .from("customer_leads")
+      .from("loan_requests")
       .delete()
       .eq("id", id)
-      .eq("customer_user_id", user.id);
+      .eq("user_id", user.id);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
