@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
@@ -12,61 +11,9 @@ const supabase = createClient(
 
 export default function PostLenderPage() {
   const router = useRouter();
-const [checkingAuth, setCheckingAuth] = useState(true);
-const [allowed, setAllowed] = useState(false);
 
-useEffect(() => {
-  const checkPermission = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setCheckingAuth(false);
-      router.replace("/login?redirect=/post-lender");
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (
-      !profile ||
-      (
-        profile.role !== "lender" &&
-        profile.role !== "both" &&
-        profile.role !== "admin"
-      )
-    ) {
-      setCheckingAuth(false);
-      router.replace("/pricing");
-      return;
-    }
-
-    setAllowed(true);
-    setCheckingAuth(false);
-  };
-
-  checkPermission();
-}, [router]);
-
-if (checkingAuth) {
-  return (
-    <main className="min-h-screen bg-[#f8f5ef] px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-3xl rounded-3xl border border-[#e8dfd3] bg-white p-8 text-center shadow-sm">
-        權限確認中...
-      </div>
-    </main>
-  );
-}
-
-if (!allowed) {
-  return null;
-}
-
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [allowed, setAllowed] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -80,6 +27,44 @@ if (!allowed) {
     line_id: "",
     ad_content: "",
   });
+
+  useEffect(() => {
+    const checkPermission = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setCheckingAuth(false);
+        router.replace("/login?redirect=/post-lender");
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (
+        !profile ||
+        (
+          profile.role !== "lender" &&
+          profile.role !== "both" &&
+          profile.role !== "admin"
+        )
+      ) {
+        setCheckingAuth(false);
+        router.replace("/pricing");
+        return;
+      }
+
+      setAllowed(true);
+      setCheckingAuth(false);
+    };
+
+    checkPermission();
+  }, [router]);
 
   const handleChange = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -136,6 +121,20 @@ if (!allowed) {
       ad_content: "",
     });
   };
+
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen bg-[#f8f5ef] px-4 py-10 md:px-6">
+        <div className="mx-auto max-w-3xl rounded-3xl border border-[#e8dfd3] bg-white p-8 text-center shadow-sm">
+          權限確認中...
+        </div>
+      </main>
+    );
+  }
+
+  if (!allowed) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-[#f8f5ef] px-4 py-10 md:px-6">
