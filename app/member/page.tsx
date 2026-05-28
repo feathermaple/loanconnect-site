@@ -185,10 +185,10 @@ export default function MemberPage() {
               />
 
               <Card
-               title="查看借款需求"
-               desc="查看目前平台上的借款需求內容。"
-               href="/needs"
-               color="bg-[#6b5840]"
+               title="我的借款需求"
+               desc="查看、修改、關閉或刪除自己刊登的借款需求。"
+               href="/member/my-borrow-posts"
+               color="bg-[#c89b45]"
               />
             </div>
           </section>
