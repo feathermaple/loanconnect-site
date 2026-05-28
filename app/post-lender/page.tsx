@@ -99,6 +99,8 @@ export default function PostLenderPage() {
         lender_user_id: user.id,
         is_active: true,
 
+        title: `${form.company_name} 放款廣告`,
+
         company_name: form.company_name,
         contact_name: form.contact_name,
         region: form.region,
