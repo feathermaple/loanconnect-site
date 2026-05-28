@@ -24,6 +24,7 @@ export default async function AdsPage() {
   const { data: paidAds, error: paidError } = await supabase
     .from("paid_lender_ads")
     .select("*")
+    .eq("is_active", true)
     .order("is_top", { ascending: false })
     .order("created_at", { ascending: false });
 
