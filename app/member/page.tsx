@@ -17,7 +17,6 @@ type Profile = {
 
 export default function MemberPage() {
   const router = useRouter();
-
   const supabase = useMemo(() => createClient(), []);
 
   const [loading, setLoading] = useState(true);
@@ -33,7 +32,7 @@ export default function MemberPage() {
         const user = session?.user;
 
         if (!user) {
-          router.push("/login");
+          router.replace("/login");
           return;
         }
 
@@ -45,12 +44,22 @@ export default function MemberPage() {
 
         if (error) {
           console.error(error);
+          await supabase.auth.signOut();
+          router.replace("/login?error=profile-read-failed");
+          return;
+        }
+
+        if (!data) {
+          await supabase.auth.signOut();
+          router.replace("/login?error=profile-missing");
           return;
         }
 
         setProfile(data);
       } catch (err) {
         console.error(err);
+        await supabase.auth.signOut();
+        router.replace("/login?error=session-invalid");
       } finally {
         setLoading(false);
       }
@@ -71,7 +80,11 @@ export default function MemberPage() {
     );
   }
 
-  const role = profile?.role ?? "member";
+  if (!profile) {
+    return null;
+  }
+
+  const role = profile.role ?? "member";
 
   const roleLabelMap: Record<string, string> = {
     borrower: "借錢會員",
@@ -89,15 +102,11 @@ export default function MemberPage() {
     role === "admin" ||
     role === "member";
 
-  const isLender =
-    role === "lender" ||
-    role === "both" ||
-    role === "admin";
+  const isLender = role === "lender" || role === "both" || role === "admin";
 
   return (
     <main className="min-h-screen bg-[#f6f2ec] px-4 py-10">
       <div className="mx-auto max-w-6xl space-y-6">
-        {/* 會員資訊 */}
         <section className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -110,7 +119,7 @@ export default function MemberPage() {
               <div className="mt-4 space-y-2 text-sm text-[#5f564c]">
                 <p>
                   <span className="font-semibold">帳號：</span>
-                  {profile?.email || "未設定"}
+                  {profile.email || "未設定"}
                 </p>
 
                 <p>
@@ -120,12 +129,12 @@ export default function MemberPage() {
 
                 <p>
                   <span className="font-semibold">LINE ID：</span>
-                  {profile?.line_id || "未設定"}
+                  {profile.line_id || "未設定"}
                 </p>
 
                 <p>
                   <span className="font-semibold">手機：</span>
-                  {profile?.phone || "未設定"}
+                  {profile.phone || "未設定"}
                 </p>
               </div>
             </div>
@@ -148,7 +157,6 @@ export default function MemberPage() {
           </div>
         </section>
 
-        {/* 借錢會員功能 */}
         {isBorrower && (
           <section className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
             <div className="mb-6 flex items-center justify-between">
@@ -179,7 +187,6 @@ export default function MemberPage() {
           </section>
         )}
 
-        {/* 金主會員功能 */}
         {isLender && (
           <section className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
             <div className="mb-6 flex items-center justify-between">
@@ -217,7 +224,6 @@ export default function MemberPage() {
           </section>
         )}
 
-        {/* 管理員 */}
         {role === "admin" && (
           <section className="rounded-[32px] border border-[#eadfce] bg-white p-6 shadow-sm md:p-8">
             <div className="mb-6">
@@ -265,13 +271,9 @@ function Card({
         功能入口
       </div>
 
-      <h3 className="mt-5 text-xl font-black text-[#2b2b2b]">
-        {title}
-      </h3>
+      <h3 className="mt-5 text-xl font-black text-[#2b2b2b]">{title}</h3>
 
-      <p className="mt-3 text-sm leading-7 text-[#6f665d]">
-        {desc}
-      </p>
+      <p className="mt-3 text-sm leading-7 text-[#6f665d]">{desc}</p>
 
       <div className="mt-6 text-sm font-semibold text-[#8b6b2c]">
         前往 →

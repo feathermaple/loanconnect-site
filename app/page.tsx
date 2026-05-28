@@ -242,7 +242,7 @@ export default async function HomePage() {
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2 md:mt-10">
               <Link
-                href="/apply-loan"
+                href={user ? "/apply-loan" : "/login?redirect=/apply-loan"}
                 className="rounded-[28px] bg-[#8f2f23] px-6 py-5 text-center text-white shadow-lg transition hover:opacity-95"
               >
                 <div className="text-lg font-black">我要借錢</div>
@@ -252,7 +252,7 @@ export default async function HomePage() {
               </Link>
 
               <Link
-                href="/post-lender"
+                href={user ? "/post-lender" : "/login?redirect=/post-lender"}
                 className="rounded-[28px] bg-[#224f8f] px-6 py-5 text-center text-white shadow-lg transition hover:opacity-95"
               >
                 <div className="text-lg font-black">我要放款</div>
