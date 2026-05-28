@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 
 const SOURCE_TABLES = {
   needs: ["loan_requests"],
-  ads: ["lender_ads", "loan_ads", "ads"],
-  lenders: ["regional_lenders", "lenders", "lender_profiles"],
+  ads: ["paid_lender_ads", "lender_ads"],
+  lenders: ["regional_lenders", "paid_lender_ads", "lender_ads"],
   orders: ["orders"],
 } as const;
 
@@ -164,7 +164,7 @@ export default async function AdminDashboardPage() {
           <RecentCard
             title="最新各區放款資訊"
             rows={recentLenders.rows}
-            fields={["created_at", "region", "name", "title", "contact_name"]}
+            fields={["created_at", "region", "company_name", "title", "contact_name", "phone"]}
           />
         </section>
       </div>

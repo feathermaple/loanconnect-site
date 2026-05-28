@@ -11,10 +11,20 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   const menu = [
-    { name: "後台首頁", href: "/admin/dashboard" },
-    { name: "網站文章", href: "/admin/articles" },
-    { name: "會員管理", href: "/admin/members" }, // ⭐ 新增
-  ];
+  { name: "後台首頁", href: "/admin/dashboard" },
+
+  { name: "網站文章", href: "/admin/articles" },
+
+  { name: "會員管理", href: "/admin/members" },
+
+  { name: "借款需求管理", href: "/admin/loan-requests" },
+
+  { name: "放款廣告管理", href: "/admin/lender-ads" },
+
+  { name: "各區放款資訊", href: "/admin/regional-lenders" },
+
+  { name: "訂單管理", href: "/admin/orders" },
+];
 
   return (
     <div className="flex min-h-screen bg-slate-50">
