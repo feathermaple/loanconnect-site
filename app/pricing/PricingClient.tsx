@@ -26,7 +26,7 @@ const plans = [
   },
   {
     name: "VIP 月費會員",
-    price: "NT$2,980",
+    price: "NT$5,000",
     period: "/月",
     badge: "熱門方案",
     badgeClassName:
@@ -47,9 +47,9 @@ const plans = [
   },
   {
     name: "VIP 年費會員",
-    price: "NT$29,800",
+    price: "NT$60,000",
     period: "/年",
-    badge: "送 1 個月",
+    badge: "加贈 1 個月 VIP",
     badgeClassName:
       "border border-emerald-200 bg-emerald-100 text-emerald-700",
     cardClassName: "border-[#d8e7d3] bg-[#f8fff6]",
@@ -61,7 +61,7 @@ const plans = [
       "不限次查看完整借款需求",
       "完整顯示電話與 LINE ID",
       "年繳方案更划算",
-      "加送 1 個月使用期限",
+      "加贈 1 個月 VIP使用期限",
     ],
     note: "適合長期經營、重視成本效益的會員",
   },
@@ -78,7 +78,7 @@ const faqs = [
   },
   {
     q: "VIP 月費與年費有什麼差別？",
-    a: "兩者都可不限次查看完整需求。差別在於年費方案平均每月更划算，且加送 1 個月使用期限。",
+    a: "兩者都可不限次查看完整需求。差別在於年費方案平均每月更划算，且加加贈 1 個月 VIP使用期限。",
   },
   {
     q: "升級後可以看到哪些內容？",
@@ -235,7 +235,7 @@ export default function PricingClient() {
               ["完整查看需求資料", "2 筆", "不限次", "不限次"],
               ["完整電話 / LINE ID", "2 筆內可看", "可", "可"],
               ["適合對象", "先體驗", "固定開發", "長期經營"],
-              ["優惠內容", "-", "-", "送 1 個月"],
+              ["優惠內容", "-", "-", "加贈 1 個月 VIP"],
             ].map((row) => (
               <div
                 key={row[0]}
