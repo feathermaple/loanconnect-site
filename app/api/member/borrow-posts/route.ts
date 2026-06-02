@@ -118,26 +118,31 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json();
 
     if (!id) {
-      return NextResponse.json({ error: "缺少資料 ID" }, { status: 400 });
+      return NextResponse.json({ error: "缺少借款需求 ID" }, { status: 400 });
     }
 
     const { error } = await supabase
       .from("loan_requests")
-      .delete()
+      .update({
+        status: "delete_requested",
+      })
       .eq("id", id)
       .eq("user_id", user.id);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { error: error.message || "送出刪除申請失敗" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      message: "借款需求已刪除",
+      message: "已送出刪除申請，等待管理員審核",
     });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || "刪除借款需求失敗" },
+      { error: error.message || "送出刪除申請失敗" },
       { status: 500 }
     );
   }
