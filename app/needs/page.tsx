@@ -98,6 +98,14 @@ export default async function NeedsPage() {
   }
 
   function getBadge(item: any) {
+    if (item.status === "closed") {
+      return {
+       text: "借錢成功",
+       className:
+        "bg-green-600 text-white border border-green-600",
+      };
+    }
+
     if (!user) {
       return {
         text: "請先登入",
@@ -106,6 +114,7 @@ export default async function NeedsPage() {
     }
 
     if (isBorrowerOwnNeed(item)) {
+    
       return {
         text: "我的刊登",
         className: "bg-blue-100 text-blue-700 border border-blue-200",
