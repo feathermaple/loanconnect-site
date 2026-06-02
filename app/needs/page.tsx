@@ -73,7 +73,7 @@ export default async function NeedsPage() {
   const { data, error } = await adminSupabase
     .from("loan_requests")
     .select("*")
-    .eq("status", "open")
+    .in("status", ["open", "closed"])
     .order("created_at", { ascending: false });
 
   const requests = data || [];
