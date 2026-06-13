@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { GoogleTagManager } from "@next/third-parties/google";
 import FloatingLine from "@/components/FloatingLine";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const SITE_URL = "https://miaodaitong.com";
 
@@ -77,6 +78,7 @@ export default function RootLayout({
         <Footer />
 
         <FloatingLine />
+        <SpeedInsights />
       </body>
     </html>
   );
